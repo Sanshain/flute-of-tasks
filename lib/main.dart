@@ -79,9 +79,18 @@ class MainPageState extends State<MainPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: ListView.builder(
-            itemCount: users.length,
-            itemBuilder: _createListView,
+          Expanded(child: ListView.separated(
+              padding: const EdgeInsets.all(8),
+              itemCount: users.length,
+              separatorBuilder: (BuildContext context, int index) => Divider(),
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                    title: Text(users[index], style:TextStyle(fontSize: 22)),
+                    leading: Icon(Icons.face),
+                    trailing: Icon(Icons.phone),
+                    subtitle: Text("Works in ${users[index]}")
+                );
+              }
           ))
         ],
       ),
