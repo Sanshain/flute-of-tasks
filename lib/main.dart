@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'task_view.dart';
 
 void main() {
   runApp(const App());
@@ -49,9 +50,7 @@ class MainPageState extends State<MainPage> {
   ];
 
   void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    setState(() => _counter++);
   }
 
   @override
@@ -75,7 +74,14 @@ class MainPageState extends State<MainPage> {
               separatorBuilder: (BuildContext context, int index) => const Divider(),
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                    onTap: () => setState(() => selectedIndex = index),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          _createRoute(users[index])
+//                          MaterialPageRoute(builder: (context) => TaskPage(title: users[index]))
+                      );
+//                      setState(() => selectedIndex = index);
+                    },
                     title: Text(users[index], style: const TextStyle(fontSize: 22)),
                     leading: const Icon(Icons.face),
                     trailing: const Icon(Icons.phone),
@@ -86,20 +92,6 @@ class MainPageState extends State<MainPage> {
           ))
         ],
       ),
-//      body: Center(
-//        child: Column(
-//          mainAxisAlignment: MainAxisAlignment.start,
-//          children: <Widget>[
-//            const Text(
-//              'You have pushed the button this many times 5:',
-//            ),
-//            Text(
-//              '$_counter',
-//              style: Theme.of(context).textTheme.headline4,
-//            ),
-//          ],
-//        ),
-//      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
@@ -107,4 +99,19 @@ class MainPageState extends State<MainPage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+
+  Route _createRoute(String pageTitle) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => TaskPage(title: pageTitle),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = const Offset(0.0, 1.0);
+        var end = Offset.zero;
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation = animation.drive(tween);
+        return child;
+      },
+    );
+  }
+
 }
