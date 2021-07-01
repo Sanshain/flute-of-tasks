@@ -54,22 +54,6 @@ class MainPageState extends State<MainPage> {
     });
   }
 
-  Widget _createListView(BuildContext context, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        color: index == selectedIndex ? Colors.black12: Colors.white60,
-        child: Text(users[index], style: const TextStyle(fontSize: 16)),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,15 +63,23 @@ class MainPageState extends State<MainPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Center(
+              child: Text(
+                '$_counter (selected $selectedIndex)',
+                style: Theme.of(context).textTheme.headline6,
+              )
+          ),
           Expanded(child: ListView.separated(
               padding: const EdgeInsets.all(8),
               itemCount: users.length,
-              separatorBuilder: (BuildContext context, int index) => Divider(),
+              separatorBuilder: (BuildContext context, int index) => const Divider(),
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                    title: Text(users[index], style:TextStyle(fontSize: 22)),
-                    leading: Icon(Icons.face),
-                    trailing: Icon(Icons.phone),
+                    onTap: () => setState(() => selectedIndex = index),
+                    title: Text(users[index], style: const TextStyle(fontSize: 22)),
+                    leading: const Icon(Icons.face),
+                    trailing: const Icon(Icons.phone),
+                    tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
                     subtitle: Text("Works in ${users[index]}")
                 );
               }
