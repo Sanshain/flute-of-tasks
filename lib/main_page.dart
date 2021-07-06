@@ -42,6 +42,8 @@ class _TabInfo {
 
 class MainPageState extends State<MainPage> {
   int _counter = 0;
+
+  int selectedTab = 0;
   int selectedIndex = -1;
   final List<String> users = [
     "Tom", "Alice", "Sam", "Bob", "Kate",
@@ -89,7 +91,7 @@ class MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title + selectedTab.toString()),
       ),
       body: CupertinoTabScaffold(
         restorationId: 'cupertino_tab_scaffold',
@@ -99,16 +101,20 @@ class MainPageState extends State<MainPage> {
               BottomNavigationBarItem(
                 label: tabInfo.title,
                 icon: Icon(tabInfo.icon),
+//                onTap: () => {}
               ),
           ],
         ),
         tabBuilder: (context, index) {
           return CupertinoTabView(
             restorationScopeId: 'cupertino_tab_view_$index',
-            builder: (context) => CupertinoDemoTab(
-              title: _tabInfo[index].title,
-              icon: _tabInfo[index].icon,
-            ),
+            builder: (context) {
+              selectedTab = index;
+              return CupertinoDemoTab(
+                title: _tabInfo[index].title,
+                icon: _tabInfo[index].icon,
+              );
+            },
             defaultTitle: _tabInfo[index].title,
           );
         },
@@ -146,11 +152,19 @@ class MainPageState extends State<MainPage> {
 //          ))
 //        ],
 //      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.accessibility),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        floatingActionButton: selectedTab == 1 ? Container(
+          padding: const EdgeInsets.only(bottom: 50.0, right: 15.0),
+          child: Align(
+            alignment: Alignment.bottomRight,
+            child: FloatingActionButton(
+              onPressed: () {},
+              child: const Icon(Icons.add),
+//              icon: const Icon(Icons.phone_android),
+//              label: const Text("Authenticate using Phone"),
+            ),
+          ),
+        ) : null,
+//        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat
     );
   }
 
