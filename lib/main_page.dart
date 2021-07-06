@@ -91,7 +91,7 @@ class MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title + selectedTab.toString()),
+        title: Text("${widget.title} + ${selectedTab.toString()}"),
       ),
       body: CupertinoTabScaffold(
         restorationId: 'cupertino_tab_scaffold',
@@ -104,6 +104,28 @@ class MainPageState extends State<MainPage> {
 //                onTap: () => {}
               ),
           ],
+          onTap: (int index) {
+
+            setState(() => selectedTab = index);
+
+            // show the dialog
+//            showDialog(
+//              context: context,
+//              builder: (BuildContext context) {
+//                return AlertDialog(
+//                  title: const Text("My title"),
+//                  content: Text("This is my message." + selectedTab.toString()),
+//                  actions: [
+//                    TextButton(
+//                      child: const Text("OK"),
+//                      onPressed: () { },
+//                    )
+//                  ],
+//                );
+//              },
+//            );
+
+          }
         ),
         tabBuilder: (context, index) {
           return CupertinoTabView(
@@ -152,18 +174,24 @@ class MainPageState extends State<MainPage> {
 //          ))
 //        ],
 //      ),
-        floatingActionButton: selectedTab == 1 ? Container(
-          padding: const EdgeInsets.only(bottom: 50.0, right: 15.0),
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(
-              onPressed: () {},
-              child: const Icon(Icons.add),
+        floatingActionButton: Visibility(
+          maintainSize: true,
+          maintainAnimation: true,
+          maintainState: true,
+          visible: selectedTab == 0,
+          child: Container(
+            padding: const EdgeInsets.only(bottom: 50.0, right: 15.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+                onPressed: () {},
+                child: const Icon(Icons.add),
 //              icon: const Icon(Icons.phone_android),
 //              label: const Text("Authenticate using Phone"),
+              ),
             ),
           ),
-        ) : null,
+        ),
 //        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat
     );
   }
