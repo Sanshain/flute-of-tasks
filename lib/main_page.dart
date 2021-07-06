@@ -131,49 +131,52 @@ class MainPageState extends State<MainPage> {
           return CupertinoTabView(
             restorationScopeId: 'cupertino_tab_view_$index',
             builder: (context) {
-              selectedTab = index;
-              return CupertinoDemoTab(
-                title: _tabInfo[index].title,
-                icon: _tabInfo[index].icon,
-              );
+              if (selectedTab > 0) {
+                return CupertinoDemoTab(
+                  title: _tabInfo[index].title,
+                  icon: _tabInfo[index].icon,
+                );
+              }
+              else{
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                        child: Text(
+                          '$_counter (selected $selectedIndex)',
+                          style: Theme.of(context).textTheme.headline6,
+                        )
+                    ),
+                    Expanded(child: ListView.separated(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: users.length,
+                        separatorBuilder: (BuildContext context, int index) => const Divider(),
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    _createRoute(users[index])
+          //                          MaterialPageRoute(builder: (context) => TaskPage(title: users[index]))
+                                );
+          //                      setState(() => selectedIndex = index);
+                              },
+                              title: Text(users[index], style: const TextStyle(fontSize: 22)),
+                              leading: const Icon(Icons.face),
+                              trailing: const Icon(Icons.phone),
+                              tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
+                              subtitle: Text("Works in ${users[index]}")
+                          );
+                        }
+                    ))
+                  ],
+                );
+              }
             },
             defaultTitle: _tabInfo[index].title,
           );
         },
       ) ,
-//      Column(
-//        crossAxisAlignment: CrossAxisAlignment.start,
-//        children: [
-//          Center(
-//              child: Text(
-//                '$_counter (selected $selectedIndex)',
-//                style: Theme.of(context).textTheme.headline6,
-//              )
-//          ),
-//          Expanded(child: ListView.separated(
-//              padding: const EdgeInsets.all(8),
-//              itemCount: users.length,
-//              separatorBuilder: (BuildContext context, int index) => const Divider(),
-//              itemBuilder: (BuildContext context, int index) {
-//                return ListTile(
-//                    onTap: () {
-//                      Navigator.push(
-//                          context,
-//                          _createRoute(users[index])
-////                          MaterialPageRoute(builder: (context) => TaskPage(title: users[index]))
-//                      );
-////                      setState(() => selectedIndex = index);
-//                    },
-//                    title: Text(users[index], style: const TextStyle(fontSize: 22)),
-//                    leading: const Icon(Icons.face),
-//                    trailing: const Icon(Icons.phone),
-//                    tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
-//                    subtitle: Text("Works in ${users[index]}")
-//                );
-//              }
-//          ))
-//        ],
-//      ),
         floatingActionButton: Visibility(
           maintainSize: true,
           maintainAnimation: true,

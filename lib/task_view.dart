@@ -40,11 +40,16 @@ class TaskPageState extends State<TaskPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.accessibility),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 75.0),
+        child: FloatingActionButton(
+          onPressed: _incrementCounter,
+          tooltip: 'Increment',
+          child: const Icon(Icons.accessibility),
+          backgroundColor: Colors.orange,
+        ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+       floatingActionButtonLocation: FloatingActionButtonLocation.endTop
     );
   }
 }
