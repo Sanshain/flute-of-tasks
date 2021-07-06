@@ -92,11 +92,19 @@ class MainPageState extends State<MainPage> {
           ))
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.accessibility),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: Container(
+        padding: const EdgeInsets.only(bottom: 100.0),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: FloatingActionButton.extended(
+              onPressed: () {},
+              icon: const Icon(Icons.phone_android),
+//              label: const Text("Authenticate using Phone"),
+              label: const Text(""),
+            ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
