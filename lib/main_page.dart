@@ -19,7 +19,8 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(title: 'The Tasks'),
+//      home: const MainPage(title: 'The Tasks'),
+      initialRoute: '/',
       routes: {
         '/':(BuildContext context) => const MainPage(title: 'The Tasks'),
         '/task':(BuildContext context) {
@@ -173,7 +174,7 @@ class MainPageState extends State<MainPage> {
                                 onTap: () {
 
                                   inDetail = true;
-                                  Navigator.pushNamed(context, '/task/' + users[index]);
+                                  Navigator.pushNamed(context, '/task', arguments: {'title': users[index]});
 //                                  Navigator.push(
 //                                      context,
 ////                                      _createRoute(users[index])
