@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:some_app/widgets/popups.dart';
 
 import 'panel.dart';
 import 'task_view.dart';
@@ -19,6 +20,22 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MainPage(title: 'The Tasks'),
+      routes: {
+        '/':(BuildContext context) => const MainPage(title: 'The Tasks'),
+        '/task':(BuildContext context) {
+          return const TaskPage(title: 'title');
+        }
+      },
+      onGenerateRoute: (routeSettings){
+        var path = routeSettings.name!.split('/');
+
+        if (path[1] == "task") {
+          return MaterialPageRoute(
+            builder: (context) => TaskPage(title: path[2]),
+            settings: routeSettings,
+          );
+        }
+      }
     );
   }
 }
@@ -39,21 +56,39 @@ class _TabInfo {
   final IconData icon;
 }
 
+final _tabInfo = [
+  const _TabInfo(
+    'by time',
+    CupertinoIcons.home,
+  ),
+  const _TabInfo(
+    'by place',
+    CupertinoIcons.conversation_bubble,
+  ),
+  const _TabInfo(
+    'Archived',
+    CupertinoIcons.profile_circled,
+  ),
+];
+
+
+
 
 class MainPageState extends State<MainPage> {
   int _counter = 0;
 
   int selectedTab = 0;
   int selectedIndex = -1;
+  bool inDetail = false;
+
   final List<String> users = [
     "Tom", "Alice", "Sam", "Bob", "Kate",
     "Tom", "Alice", "Sam", "Bob", "Kate",
     "Tom", "Alice", "Sam", "Bob", "Kate"
   ];
 
-  void _incrementCounter() {
-    setState(() => _counter++);
-  }
+
+  void _incrementCounter() => setState(() => _counter++);
 
   Widget _createListView(BuildContext context, int index) {
     return GestureDetector(
@@ -71,23 +106,9 @@ class MainPageState extends State<MainPage> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
-
-    final _tabInfo = [
-      const _TabInfo(
-        'Active',
-        CupertinoIcons.home,
-      ),
-      const _TabInfo(
-        'Perfomed',
-        CupertinoIcons.conversation_bubble,
-      ),
-      const _TabInfo(
-        'Archived',
-        CupertinoIcons.profile_circled,
-      ),
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -108,72 +129,72 @@ class MainPageState extends State<MainPage> {
 
             setState(() => selectedTab = index);
 
-            // show the dialog
-//            showDialog(
-//              context: context,
-//              builder: (BuildContext context) {
-//                return AlertDialog(
-//                  title: const Text("My title"),
-//                  content: Text("This is my message." + selectedTab.toString()),
-//                  actions: [
-//                    TextButton(
-//                      child: const Text("OK"),
-//                      onPressed: () { },
-//                    )
-//                  ],
-//                );
-//              },
-//            );
-
           }
         ),
         tabBuilder: (context, index) {
-          return CupertinoTabView(
-            restorationScopeId: 'cupertino_tab_view_$index',
-            builder: (context) {
-              if (selectedTab > 0) {
-                return CupertinoDemoTab(
-                  title: _tabInfo[index].title,
-                  icon: _tabInfo[index].icon,
-                );
-              }
-              else{
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                        child: Text(
-                          '$_counter (selected $selectedIndex)',
-                          style: Theme.of(context).textTheme.headline6,
-                        )
-                    ),
-                    Expanded(child: ListView.separated(
-                        padding: const EdgeInsets.all(8),
-                        itemCount: users.length,
-                        separatorBuilder: (BuildContext context, int index) => const Divider(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    _createRoute(users[index])
-          //                          MaterialPageRoute(builder: (context) => TaskPage(title: users[index]))
-                                );
-          //                      setState(() => selectedIndex = index);
-                              },
-                              title: Text(users[index], style: const TextStyle(fontSize: 22)),
-                              leading: const Icon(Icons.face),
-                              trailing: const Icon(Icons.phone),
-                              tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
-                              subtitle: Text("Works in ${users[index]}")
-                          );
-                        }
-                    ))
-                  ],
-                );
+          return WillPopScope(
+            onWillPop: () async {
+              if (inDetail) {
+                popup(context, 'inDetail.toString()');
+                inDetail = false;
+                return false;
+              } else{
+                popup(context, '4544');
+
+                Navigator.of(context).pop();
+                return true;
               }
             },
-            defaultTitle: _tabInfo[index].title,
+            child: CupertinoTabView(
+              restorationScopeId: 'cupertino_tab_view_$index',
+              builder: (context) {
+                if (selectedTab > 0) {
+                  return CupertinoDemoTab(
+                    title: _tabInfo[index].title,
+                    icon: _tabInfo[index].icon,
+                  );
+                }
+                else{
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                          child: Text(
+                            '$_counter (_selected $selectedIndex)',
+                            style: Theme.of(context).textTheme.headline6,
+                          )
+                      ),
+                      Expanded(child: ListView.separated(
+                          padding: const EdgeInsets.all(8),
+                          itemCount: users.length,
+                          separatorBuilder: (BuildContext context, int index) => const Divider(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                                onTap: () {
+
+                                  inDetail = true;
+                                  Navigator.pushNamed(context, '/task/' + users[index]);
+//                                  Navigator.push(
+//                                      context,
+////                                      _createRoute(users[index])
+//                                      MaterialPageRoute(builder: (context) => TaskPage(title: users[index]))
+//                                  );
+
+                                },
+                                title: Text(users[index], style: const TextStyle(fontSize: 22)),
+                                leading: const Icon(Icons.face),
+                                trailing: const Icon(Icons.phone),
+                                tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
+                                subtitle: Text("Works in ${users[index]}")
+                            );
+                          }
+                      ))
+                    ],
+                  );
+                }
+              },
+              defaultTitle: _tabInfo[index].title,
+            ),
           );
         },
       ) ,

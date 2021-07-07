@@ -22,34 +22,40 @@ class TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            const Text(
-              'Your tas is:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 75.0),
-        child: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: const Icon(Icons.accessibility),
-          backgroundColor: Colors.orange,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'Your tas is:',
+              ),
+              Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+            ],
+          ),
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-       floatingActionButtonLocation: FloatingActionButtonLocation.endTop
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(top: 75.0),
+          child: FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Increment',
+            child: const Icon(Icons.accessibility),
+            backgroundColor: Colors.orange,
+          ),
+        ), // This trailing comma makes auto-formatting nicer for build methods.
+         floatingActionButtonLocation: FloatingActionButtonLocation.endTop
+      ),
     );
   }
 }
