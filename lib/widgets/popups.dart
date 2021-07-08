@@ -11,7 +11,9 @@ void popup(BuildContext context, String content, {String title = ''}) {
                 actions: [
                     TextButton(
                         child: const Text("OK"),
-                        onPressed: () {},
+                        onPressed: () {
+                            Navigator.pop(context);
+                        },
                     )
                 ],
             );

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 
 class TaskPage extends StatefulWidget {
-  const TaskPage({Key? key, required this.title}) : super(key: key);
+//  const TaskPage({Key? key, required this.title}) : super(key: key);
+
+  const TaskPage(this.taskContext, {Key? key, required this.title}) : super(key: key);
 
   final String title;
+  final List<BuildContext?>? taskContext;
 
   @override
   State<TaskPage> createState() => TaskPageState();
@@ -22,6 +25,9 @@ class TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    widget.taskContext![0] = context;
+
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pop();

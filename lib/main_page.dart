@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:some_app/transitions/instant.dart';
 import 'package:some_app/widgets/popups.dart';
 
 import 'panel.dart';
@@ -19,24 +20,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-//      home: const MainPage(title: 'The Tasks'),
-      initialRoute: '/',
-      routes: {
-        '/':(BuildContext context) => const MainPage(title: 'The Tasks'),
-        '/task':(BuildContext context) {
-          return const TaskPage(title: 'title');
-        }
-      },
-      onGenerateRoute: (routeSettings){
-        var path = routeSettings.name!.split('/');
-
-        if (path[1] == "task") {
-          return MaterialPageRoute(
-            builder: (context) => TaskPage(title: path[2]),
-            settings: routeSettings,
-          );
-        }
-      }
+      home: const MainPage(title: 'The Tasks'),
     );
   }
 }
@@ -82,6 +66,10 @@ class MainPageState extends State<MainPage> {
   int selectedIndex = -1;
   bool inDetail = false;
 
+  List<BuildContext?>? subContextWrapper = <BuildContext?>[
+    null
+  ];
+
   final List<String> users = [
     "Tom", "Alice", "Sam", "Bob", "Kate",
     "Tom", "Alice", "Sam", "Bob", "Kate",
@@ -91,12 +79,26 @@ class MainPageState extends State<MainPage> {
 
   void _incrementCounter() => setState(() => _counter++);
 
-  Widget _createListView(BuildContext context, int index) {
+  Widget _createListViewPoint(BuildContext context, int index) {
+
     return GestureDetector(
       onTap: () {
+
+        inDetail = true;
+        Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index]),
+              transitionsBuilder: instantTransition,
+            )
+//            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
+        );
+
         setState(() {
           selectedIndex = index;
         });
+
+
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -135,16 +137,17 @@ class MainPageState extends State<MainPage> {
         tabBuilder: (context, index) {
           return WillPopScope(
             onWillPop: () async {
-              if (inDetail) {
-                popup(context, 'inDetail.toString()');
-                inDetail = false;
-                return false;
-              } else{
-                popup(context, '4544');
+              if (inDetail && selectedTab == 0) {
 
-                Navigator.of(context).pop();
-                return true;
+                inDetail = false;
+                if (subContextWrapper!.isNotEmpty && subContextWrapper!.last != null){
+                  Navigator.pop(subContextWrapper!.last!);
+                }
+//                Navigator.of(context).pop();
+                return false;
               }
+
+              return true;
             },
             child: CupertinoTabView(
               restorationScopeId: 'cupertino_tab_view_$index',
@@ -170,24 +173,26 @@ class MainPageState extends State<MainPage> {
                           itemCount: users.length,
                           separatorBuilder: (BuildContext context, int index) => const Divider(),
                           itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                                onTap: () {
-
-                                  inDetail = true;
-                                  Navigator.pushNamed(context, '/task', arguments: {'title': users[index]});
+                            return _createListViewPoint(context, index);
+//                              ListTile(
+//                                onTap: () {
+//
+//                                  inDetail = true;
 //                                  Navigator.push(
 //                                      context,
-////                                      _createRoute(users[index])
-//                                      MaterialPageRoute(builder: (context) => TaskPage(title: users[index]))
+//                                      PageRouteBuilder(
+//                                        pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index]),
+//                                        transitionsBuilder: instantTransition,
+//                                      )
+////                                      MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
 //                                  );
-
-                                },
-                                title: Text(users[index], style: const TextStyle(fontSize: 22)),
-                                leading: const Icon(Icons.face),
-                                trailing: const Icon(Icons.phone),
-                                tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
-                                subtitle: Text("Works in ${users[index]}")
-                            );
+//                                },
+//                                title: Text(users[index], style: const TextStyle(fontSize: 22)),
+//                                leading: const Icon(Icons.face),
+//                                trailing: const Icon(Icons.phone),
+//                                tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
+//                                subtitle: Text("Works in ${users[index]}")
+//                            );
                           }
                       ))
                     ],
@@ -209,7 +214,9 @@ class MainPageState extends State<MainPage> {
             child: Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
-                onPressed: () {},
+                onPressed: () {
+                  popup(context, 'some content', title: 'title');
+                },
                 child: const Icon(Icons.add),
 //              icon: const Icon(Icons.phone_android),
 //              label: const Text("Authenticate using Phone"),
@@ -218,20 +225,6 @@ class MainPageState extends State<MainPage> {
           ),
         ),
 //        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat
-    );
-  }
-
-
-  Route _createRoute(String pageTitle) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => TaskPage(title: pageTitle),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = const Offset(0.0, 1.0);
-        var end = Offset.zero;
-        var tween = Tween(begin: begin, end: end);
-        var offsetAnimation = animation.drive(tween);
-        return child;
-      },
     );
   }
 
