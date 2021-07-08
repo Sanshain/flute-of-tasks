@@ -85,11 +85,15 @@ class MainPageState extends State<MainPage> {
     return GestureDetector(
       onTap: () {
 
-        inDetail = true;
+        setState(() => inDetail = true );
+        void onPop () {
+          setState(() => inDetail = false);
+        }
+
         Navigator.push(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index]),
+              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
               transitionsBuilder: instantTransition,
             )
 //            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
@@ -147,11 +151,11 @@ class MainPageState extends State<MainPage> {
             onWillPop: () async {
               if (inDetail && selectedTab == 0) {
 
-                inDetail = false;
+                setState(() => inDetail = false );
                 if (subContextWrapper!.isNotEmpty && subContextWrapper!.last != null){
                   Navigator.pop(subContextWrapper!.last!);
                 }
-//                Navigator.of(context).pop();
+
                 return false;
               }
 
@@ -197,7 +201,7 @@ class MainPageState extends State<MainPage> {
           maintainSize: true,
           maintainAnimation: true,
           maintainState: true,
-          visible: selectedTab == 0,
+          visible: selectedTab == 0 && inDetail == false,
           child: Container(
             padding: const EdgeInsets.only(bottom: 50.0, right: 15.0),
             child: Align(
@@ -207,7 +211,11 @@ class MainPageState extends State<MainPage> {
 
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => TaskEdit(subContextWrapper, title: ''))
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) => TaskEdit(subContextWrapper, title: ''),
+                        transitionsBuilder: instantTransition,
+                      )
+//                      MaterialPageRoute(builder: (context) => TaskEdit(subContextWrapper, title: ''))
                   );
 //                  popup(context, 'some content', title: 'title');
 //                  input(context, 'some content', title: 'title');

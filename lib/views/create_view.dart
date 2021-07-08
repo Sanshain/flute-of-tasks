@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:some_app/task_view.dart';
+import 'package:some_app/widgets/fields.dart';
 
 
 class TaskEdit extends TaskPage {
@@ -30,45 +31,32 @@ class TaskEditState extends State<TaskEdit> {
                 ),
                 body: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: const <Widget>[
+                    children: <Widget>[
 //                        Text(
 //                            'Your tas is:',
 //                        ),
+                        inputField(hint: 'Title', autofocus: true),
+                        inputField(hint: 'Description', minLines: 5, maxLines: 10),
                         Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: TextField(
-                              autofocus: true,
-                              style: TextStyle(fontSize: 22, color: Colors.blue),
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5.0),
-                                      )
-                                  ),
-                                  contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-                                  hintStyle: TextStyle(fontSize: 20.0, color: Colors.black26),
-                                  hintText: "Title"
-                              ),
-                          ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: TextField(
-                                style: TextStyle(fontSize: 22, color: Colors.blue),
-                                maxLines: 10,
-                                minLines: 5,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5.0),
-                                        )
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-                                    hintStyle: TextStyle(fontSize: 20.0, color: Colors.black26),
-                                    hintText: "Description"
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.black38,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30.0),
+                                    )
                                 ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Center(
+                                      child: Text("save", style: TextStyle(fontSize: 16))
+                                  ),
+                                ),
+                                onPressed: () {
+                                    Navigator.of(context).pop();
+                                }
                             ),
-                        ),
+                        )
                     ],
                 ),
             ),

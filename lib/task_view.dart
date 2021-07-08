@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 class TaskPage extends StatefulWidget {
 //  const TaskPage({Key? key, required this.title}) : super(key: key);
 
-  const TaskPage(this.taskContext, {Key? key, required this.title}) : super(key: key);
+  const TaskPage(this.taskContext, {Key? key, required this.title, this.onPop}) : super(key: key);
 
   final String title;
   final List<BuildContext?>? taskContext;
+  final Function? onPop;
 
   @override
   State<TaskPage> createState() => TaskPageState();
@@ -30,6 +31,7 @@ class TaskPageState extends State<TaskPage> {
 
     return WillPopScope(
       onWillPop: () async {
+        if (widget.onPop != null) widget.onPop!();
         Navigator.of(context).pop();
         return false;
       },
