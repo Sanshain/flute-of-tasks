@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:some_app/transitions/instant.dart';
+import 'package:some_app/views/create_view.dart';
 import 'package:some_app/widgets/popups.dart';
 
 import 'panel.dart';
@@ -94,17 +95,24 @@ class MainPageState extends State<MainPage> {
 //            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
         );
 
-        setState(() {
-          selectedIndex = index;
-        });
-
+//        setState(() {
+//          selectedIndex = index;
+//        });
 
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        color: index == selectedIndex ? Colors.black12: Colors.white60,
-        child: Text(users[index], style: const TextStyle(fontSize: 16)),
+        margin: const EdgeInsets.symmetric(vertical: 1),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        color: index == selectedIndex ? Colors.white60: Colors.white60,
+        child: Row(
+          children: [
+            const Padding(
+                padding: EdgeInsets.only(right: 15.0),
+                child: Icon(Icons.phone, color: Colors.black26)
+            ),
+            Text(users[index], style: const TextStyle(fontSize: 16, color: Colors.black54)),
+          ],
+        ),
       ),
     );
   }
@@ -174,25 +182,6 @@ class MainPageState extends State<MainPage> {
                           separatorBuilder: (BuildContext context, int index) => const Divider(),
                           itemBuilder: (BuildContext context, int index) {
                             return _createListViewPoint(context, index);
-//                              ListTile(
-//                                onTap: () {
-//
-//                                  inDetail = true;
-//                                  Navigator.push(
-//                                      context,
-//                                      PageRouteBuilder(
-//                                        pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index]),
-//                                        transitionsBuilder: instantTransition,
-//                                      )
-////                                      MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
-//                                  );
-//                                },
-//                                title: Text(users[index], style: const TextStyle(fontSize: 22)),
-//                                leading: const Icon(Icons.face),
-//                                trailing: const Icon(Icons.phone),
-//                                tileColor: index == selectedIndex ? Colors.black12: Colors.white60,
-//                                subtitle: Text("Works in ${users[index]}")
-//                            );
                           }
                       ))
                     ],
@@ -215,7 +204,13 @@ class MainPageState extends State<MainPage> {
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
                 onPressed: () {
-                  popup(context, 'some content', title: 'title');
+
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TaskEdit(subContextWrapper, title: ''))
+                  );
+//                  popup(context, 'some content', title: 'title');
+//                  input(context, 'some content', title: 'title');
                 },
                 child: const Icon(Icons.add),
 //              icon: const Icon(Icons.phone_android),
