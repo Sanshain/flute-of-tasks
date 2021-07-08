@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+//import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:some_app/transitions/instant.dart';
 import 'package:some_app/views/create_view.dart';
 import 'package:some_app/widgets/popups.dart';
@@ -66,6 +67,9 @@ class MainPageState extends State<MainPage> {
   int selectedTab = 0;
   int selectedIndex = -1;
   bool inDetail = false;
+  bool quickNew = false;
+  String? newTaskName;
+  BuildContext? rootContext;
 
   List<BuildContext?>? subContextWrapper = <BuildContext?>[
     null
@@ -91,17 +95,14 @@ class MainPageState extends State<MainPage> {
         }
 
         Navigator.push(
-            context,
+            rootContext!,
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
+//              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
+              pageBuilder: (rootContext, animation, secondaryAnimation) => TaskEdit(subContextWrapper, title: users[index], onPop: onPop,),
               transitionsBuilder: instantTransition,
             )
 //            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
         );
-
-//        setState(() {
-//          selectedIndex = index;
-//        });
 
       },
       child: Container(
@@ -124,6 +125,8 @@ class MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    rootContext = context;
 
     return Scaffold(
       appBar: AppBar(
@@ -152,6 +155,7 @@ class MainPageState extends State<MainPage> {
               if (inDetail && selectedTab == 0) {
 
                 setState(() => inDetail = false );
+// ???
                 if (subContextWrapper!.isNotEmpty && subContextWrapper!.last != null){
                   Navigator.pop(subContextWrapper!.last!);
                 }
@@ -171,24 +175,100 @@ class MainPageState extends State<MainPage> {
                   );
                 }
                 else{
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  return Stack(
                     children: [
-                      Center(
-                          child: Text(
-                            '$_counter (_selected $selectedIndex)',
-                            style: Theme.of(context).textTheme.headline6,
-                          )
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                              child: Text(
+                                '$_counter ( selected $selectedIndex)',
+                                style: Theme.of(context).textTheme.headline6,
+                              )
+                          ),
+                          Expanded(child: ListView.separated(
+                              padding: const EdgeInsets.all(8),
+                              itemCount: users.length,
+                              separatorBuilder: (BuildContext context, int index) => const Divider(),
+                              itemBuilder: (BuildContext context, int index) {
+                                return _createListViewPoint(context, index);
+                              }
+                          )),
+                        ],
                       ),
-                      Expanded(child: ListView.separated(
-                          padding: const EdgeInsets.all(8),
-                          itemCount: users.length,
-                          separatorBuilder: (BuildContext context, int index) => const Divider(),
-                          itemBuilder: (BuildContext context, int index) {
-                            return _createListViewPoint(context, index);
-                          }
-                      ))
-                    ],
+                      Visibility(
+                        visible: quickNew == true,
+                        child: Positioned(
+                          top: 50,
+//                        width: MediaQuery.of(context).size.width,
+                          height: 150.0,
+                          left: 15.0,
+                          right: 15.0,
+                          child: Container(
+                            color: Colors.white,
+//                            decoration: BoxDecoration(
+//                                border: Border.all(color: Colors.greenAccent)
+//                            ),
+                            child: Column(
+                              // ignore: prefer_const_literals_to_create_immutables
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextField(
+                                    restorationId: 'quickNew',
+                                    onSubmitted: (String text){
+                                      newTaskName = null;
+                                      setState((){
+                                        if (text.isNotEmpty) users.insert(0, text);
+                                        quickNew = false;
+                                      });
+                                    },
+                                    onChanged: (String text){
+                                      newTaskName = text;
+                                    },
+                                    autofocus: true,
+                                    style: const TextStyle(fontSize: 22, color: Colors.black54),
+                                    decoration: const InputDecoration(
+                                        hintStyle: TextStyle(fontSize: 20.0, color: Colors.black26),
+                                        hintText: 'Enter title of new task'
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        primary: Colors.black38,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30.0),
+                                        )
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Text("save", style: TextStyle(fontSize: 16)),
+                                          )
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      setState((){
+//                                        users.add('value');
+//                                      ???
+                                        if (newTaskName != null && newTaskName!.isNotEmpty) users.insert(0, newTaskName!);
+                                        quickNew = false;
+                                      });
+//                                  Navigator.pop(context);
+                                    },
+                                  ),
+                                )
+                              ],
+                            )
+                          )
+                        ),
+                      ),
+                    ]
                   );
                 }
               },
@@ -201,7 +281,7 @@ class MainPageState extends State<MainPage> {
           maintainSize: true,
           maintainAnimation: true,
           maintainState: true,
-          visible: selectedTab == 0 && inDetail == false,
+          visible: selectedTab == 0 && inDetail == false && quickNew == false,
           child: Container(
             padding: const EdgeInsets.only(bottom: 50.0, right: 15.0),
             child: Align(
@@ -209,14 +289,19 @@ class MainPageState extends State<MainPage> {
               child: FloatingActionButton(
                 onPressed: () {
 
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) => TaskEdit(subContextWrapper, title: ''),
-                        transitionsBuilder: instantTransition,
-                      )
-//                      MaterialPageRoute(builder: (context) => TaskEdit(subContextWrapper, title: ''))
-                  );
+                  setState((){
+                    quickNew = true;
+                  });
+
+//                  Navigator.push(
+//                      context,
+//                      PageRouteBuilder(
+//                        pageBuilder: (context, animation, secondaryAnimation) => TaskEdit(subContextWrapper, title: ''),
+//                        transitionsBuilder: instantTransition,
+//                      )
+////                      MaterialPageRoute(builder: (context) => TaskEdit(subContextWrapper, title: ''))
+//                  );
+
 //                  popup(context, 'some content', title: 'title');
 //                  input(context, 'some content', title: 'title');
                 },

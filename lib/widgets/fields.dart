@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = false}){
+Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = false, value = ''}){
     return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: TextField(
+        child: TextFormField(
+            initialValue: value,
             autofocus: autofocus,
             maxLines: maxLines,
             minLines: minLines,
