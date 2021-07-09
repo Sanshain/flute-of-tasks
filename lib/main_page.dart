@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 //import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:some_app/transitions/instant.dart';
 import 'package:some_app/views/create_view.dart';
+import 'package:some_app/views/sub_views/quick_new.dart';
 import 'package:some_app/views/sub_views/task_item.dart';
 import 'package:some_app/widgets/popups.dart';
 
@@ -81,47 +82,7 @@ class MainPageState extends State<MainPage> {
     Task('my title')
   ];
 
-
   void _incrementCounter() => setState(() => _counter++);
-
-//  Widget createListViewPoint(BuildContext context, int index) {
-//
-//    return GestureDetector(
-//      onTap: () {
-//
-//        setState(() => inDetail = true );
-//        void onPop () {
-//          setState(() => inDetail = false);
-//        }
-//
-//        Navigator.push(
-//            rootContext!,
-//            PageRouteBuilder(
-////              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
-//              pageBuilder: (rootContext, animation, secondaryAnimation) => TaskEdit(subContextWrapper, title: tasks[index].title, onPop: onPop,),
-//              transitionsBuilder: instantTransition,
-//            )
-////            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
-//        );
-//
-//      },
-//      child: Container(
-//        margin: const EdgeInsets.symmetric(vertical: 1),
-//        padding: const EdgeInsets.symmetric(vertical: 16),
-//        color: index == selectedIndex ? Colors.white60: Colors.white60,
-//        child: Row(
-//          children: [
-//            const Padding(
-//                padding: EdgeInsets.only(right: 15.0),
-//                child: Icon(Icons.phone, color: Colors.black26)
-//            ),
-//            Text(tasks[index].title, style: const TextStyle(fontSize: 16, color: Colors.black54)),
-//          ],
-//        ),
-//      ),
-//    );
-//  }
-//
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +168,7 @@ class MainPageState extends State<MainPage> {
                           )),
                         ],
                       ),
-                      createQuickTask(),
+                      _createQuickTask(),
                     ]
                   );
                 }
@@ -257,79 +218,102 @@ class MainPageState extends State<MainPage> {
   }
 
 
-  Visibility createQuickTask() {
+  Visibility _createQuickTask() {
     return Visibility(
         visible: quickNew == true,
-        child: Positioned(
-          top: 50,
-//                        width: MediaQuery.of(context).size.width,
-          height: 150.0,
-          left: 15.0,
-          right: 15.0,
-          child: Container(
-            color: Colors.white,
-//                            decoration: BoxDecoration(
-//                                border: Border.all(color: Colors.greenAccent)
-//                            ),
-            child: Column(
-              // ignore: prefer_const_literals_to_create_immutables
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    restorationId: 'quickNew',
-                    onSubmitted: (String text){
-                      newTaskName = null;
-                      setState((){
-                        if (text.isNotEmpty) tasks.insert(0, Task(text));
-                        quickNew = false;
-                      });
-                    },
-                    onChanged: (String text){
-                      newTaskName = text;
-                    },
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 22, color: Colors.black54),
-                    decoration: const InputDecoration(
-                        hintStyle: TextStyle(fontSize: 20.0, color: Colors.black26),
-                        hintText: 'Enter title of new task'
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        primary: Colors.black38,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        )
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("save", style: TextStyle(fontSize: 16)),
-                          )
-                      ),
-                    ),
-                    onPressed: () {
-                      setState((){
-//                                        users.add('value');
-//                                      ???
-                        if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
-                        quickNew = false;
-                      });
-//                                  Navigator.pop(context);
-                    },
-                  ),
-                )
-              ],
-            )
-          )
+        child: createQuickTask(
+            onSubmitted: (String text){
+                newTaskName = null;
+                setState((){
+                    if (text.isNotEmpty) tasks.insert(0, Task(text));
+                    quickNew = false;
+                });
+            },
+            onChanged: (String text){
+                newTaskName = text;
+            },
+            onPressed: () {
+                setState((){
+//                    if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
+                    if (newTaskName?.isNotEmpty ?? false) tasks.insert(0, Task(newTaskName!));
+                    quickNew = false;
+                });
+//                Navigator.pop(context);
+            },
         ),
       );
   }
+
+//  Positioned createQuickTask() {
+//    return Positioned(
+//        top: 50,
+////                        width: MediaQuery.of(context).size.width,
+//        height: 150.0,
+//        left: 15.0,
+//        right: 15.0,
+//        child: Container(
+//          color: Colors.white,
+////                            decoration: BoxDecoration(
+////                                border: Border.all(color: Colors.greenAccent)
+////                            ),
+//          child: Column(
+//            // ignore: prefer_const_literals_to_create_immutables
+//            children: [
+//              Padding(
+//                padding: const EdgeInsets.all(8.0),
+//                child: TextField(
+//                  restorationId: 'quickNew',
+//                  onSubmitted: (String text){
+//                    newTaskName = null;
+//                    setState((){
+//                      if (text.isNotEmpty) tasks.insert(0, Task(text));
+//                      quickNew = false;
+//                    });
+//                  },
+//                  onChanged: (String text){
+//                    newTaskName = text;
+//                  },
+//                  autofocus: true,
+//                  style: const TextStyle(fontSize: 22, color: Colors.black54),
+//                  decoration: const InputDecoration(
+//                      hintStyle: TextStyle(fontSize: 20.0, color: Colors.black26),
+//                      hintText: 'Enter title of new task'
+//                  ),
+//                ),
+//              ),
+//              Padding(
+//                padding: const EdgeInsets.all(8.0),
+//                child: ElevatedButton(
+//                  style: ElevatedButton.styleFrom(
+//                      primary: Colors.black38,
+//                      shape: RoundedRectangleBorder(
+//                        borderRadius: BorderRadius.circular(30.0),
+//                      )
+//                  ),
+//                  child: const Padding(
+//                    padding: EdgeInsets.all(8.0),
+//                    child: Center(
+//                        child: Padding(
+//                          padding: EdgeInsets.all(8.0),
+//                          child: Text("save", style: TextStyle(fontSize: 16)),
+//                        )
+//                    ),
+//                  ),
+//                  onPressed: () {
+//                    setState((){
+////                                        users.add('value');
+////                                      ???
+//                      if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
+//                      quickNew = false;
+//                    });
+////                                  Navigator.pop(context);
+//                  },
+//                ),
+//              )
+//            ],
+//          )
+//        )
+//      );
+//  }
 
 }
