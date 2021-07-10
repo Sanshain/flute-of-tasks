@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:some_app/models/tasks.dart';
 
 
 class TaskPage extends StatefulWidget {
 //  const TaskPage({Key? key, required this.title}) : super(key: key);
 
-  const TaskPage(this.taskContext, {Key? key, required this.title, this.onPop}) : super(key: key);
+  TaskPage(this.taskContext, Task _task, {Key? key, this.onPop}) : super(key: key){
 
-  final String title;
+    task = _task;
+  }
+
+  late final Task task;
   final List<BuildContext?>? taskContext;
   final Function? onPop;
 
@@ -37,7 +41,7 @@ class TaskPageState extends State<TaskPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(widget.task.title),
         ),
         body: Center(
           child: Column(

@@ -28,7 +28,12 @@ Widget createListViewPoint(BuildContext context, int index, {
                 rootContext,
                 PageRouteBuilder(
 //              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
-                    pageBuilder: (rootContext, animation, secondaryAnimation) => TaskEdit(subContextWrapper, title: tasks[index].title, onPop: onPop,),
+                    pageBuilder: (rootContext, animation, secondaryAnimation) => TaskEdit(
+                        subContextWrapper,
+                        index: index,
+                        tasks: tasks,
+                        onPop: onPop,
+                    ),
                     transitionsBuilder: instantTransition,
                 )
 //            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))

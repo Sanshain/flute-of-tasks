@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:some_app/models/tasks.dart';
 import 'package:some_app/task_view.dart';
 import 'package:some_app/widgets/fields.dart';
 
@@ -6,12 +7,15 @@ import 'package:some_app/widgets/fields.dart';
 class TaskEdit extends TaskPage {
 //  const TaskPage({Key? key, required this.title}) : super(key: key);
 
-    const TaskEdit(taskContext, {Key? key, required title, Function? onPop}) : super(
+     TaskEdit(taskContext, {Key? key, required this.index, required this.tasks, Function? onPop}) : super(
         taskContext,
+        tasks[index],
         key: key,
-        title: title,
         onPop: onPop
     );
+
+    final int index;
+    final List<Task> tasks;
 
     @override
     State<TaskEdit> createState() => TaskEditState();
@@ -19,6 +23,8 @@ class TaskEdit extends TaskPage {
 
 
 class TaskEditState extends State<TaskEdit> {
+
+    var textController = TextEditingController();
 
     @override
     Widget build(BuildContext context) {
@@ -33,7 +39,7 @@ class TaskEditState extends State<TaskEdit> {
             },
             child: Scaffold(
                 appBar: AppBar(
-                    title: Text(widget.title.isNotEmpty ? widget.title : 'new task'),
+                    title: Text(widget.task.title.isNotEmpty ? widget.task.title : 'new task'),
                 ),
                 body: SingleChildScrollView(
                   child: Column(
@@ -42,8 +48,16 @@ class TaskEditState extends State<TaskEdit> {
 //                        Text(
 //                            'Your tas is:',
 //                        ),
-                          inputField(hint: 'Title', value: widget.title),
-                          inputField(hint: 'Description', minLines: 5, maxLines: 10, autofocus: true),
+                          inputField(hint: 'Title', value: widget.task.title, onChanged: (String text) {
+                              widget.task.title = text;
+                          }),
+                          inputField(hint: 'Description',
+                              value: widget.task.description,
+                              minLines: 5, maxLines: 10,
+                              autofocus: true, onChanged: (String text) {
+
+                              widget.task.description = text;
+                          }),
                           Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: ElevatedButton(
