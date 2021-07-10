@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 //import 'package:keyboard_visibility/keyboard_visibility.dart';
@@ -7,16 +9,28 @@ import 'package:some_app/views/sub_views/quick_new.dart';
 import 'package:some_app/views/sub_views/task_item.dart';
 import 'package:some_app/widgets/popups.dart';
 
+import 'models/dao/tasks_dao.dart';
+import 'models/database/database.dart';
 import 'models/tasks.dart';
 import 'panel.dart';
 import 'task_view.dart';
 
-void main() {
-  runApp(const App());
+void main() async {
+
+    WidgetsFlutterBinding.ensureInitialized();
+
+    final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+
+    final TaskDao tasks = database.taskDao;
+
+    runApp(App(tasks));
+//    runApp(const App(tasks));
 }
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  const App(this.tasks, {Key? key}) : super(key: key);
+
+  final TaskDao tasks;
 
   @override
   Widget build(BuildContext context) {
@@ -25,15 +39,17 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(title: 'The Tasks'),
+//      home: const MainPage(tasks, title: 'The Tasks'),
+      home: MainPage(tasks, title: 'The Tasks'),
     );
   }
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key, required this.title}) : super(key: key);
+  const MainPage(this.tasks, {Key? key, required this.title}) : super(key: key);
 
   final String title;
+  final TaskDao tasks;
 
   @override
   State<MainPage> createState() => MainPageState();
@@ -77,6 +93,22 @@ class MainPageState extends State<MainPage> {
   List<BuildContext?>? subContextWrapper = <BuildContext?>[
     null
   ];
+
+  @override
+  Future<void> initState() async {
+      super.initState();
+
+      var tasks = await widget.tasks.all();
+      stdout.write(tasks.toString());
+
+//      final task = Task('Frank');
+//
+//      await widget.tasks.insertItem(task);
+//      final result = await widget.tasks.findById(1);
+//
+//      stdout.write(result.toString());
+  }
+
 
   final List<Task> tasks = [
     Task('my title')

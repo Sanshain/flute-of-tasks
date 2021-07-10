@@ -29,6 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  floor: ^1.1.0
 #  keyboard_visibility: ^0.5.2
   flutter_localizations: # Add this line
     sdk: flutter         # Add this line
@@ -43,6 +44,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  floor_generator: ^1.1.0
+  build_runner: ^2.0.0
 
 
 
