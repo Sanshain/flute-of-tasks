@@ -87,7 +87,7 @@ class MainPageState extends State<MainPage> {
   int selectedIndex = -1;
   bool inDetail = false;
   bool quickNew = false;
-  String? newTaskName;
+  String? newTaskNameTitle;
   BuildContext? rootContext;
 
   List<BuildContext?>? subContextWrapper = <BuildContext?>[
@@ -95,11 +95,14 @@ class MainPageState extends State<MainPage> {
   ];
 
   @override
-  Future<void> initState() async {
-      super.initState();
+  void initState() {
+    super.initState();                                  //      Future.delayed(Duration.zero,() { });
 
-      var tasks = await widget.tasks.all();
-      stdout.write(tasks.toString());
+    widget.tasks.all().then((tasks) {
+
+        stdout.write(tasks.toString());
+    });
+  }
 
 //      final task = Task('Frank');
 //
@@ -107,11 +110,11 @@ class MainPageState extends State<MainPage> {
 //      final result = await widget.tasks.findById(1);
 //
 //      stdout.write(result.toString());
-  }
+//  }
 
 
   final List<Task> tasks = [
-    Task('my title')
+    Task(1, 'my title')
   ];
 
   void _incrementCounter() => setState(() => _counter++);
@@ -147,16 +150,17 @@ class MainPageState extends State<MainPage> {
             onWillPop: () async {
               if (inDetail && selectedTab == 0) {
 
+
                 setState(() => inDetail = false );
 // ???
                 if (subContextWrapper!.isNotEmpty && subContextWrapper!.last != null){
                   Navigator.pop(subContextWrapper!.last!);
                 }
-
                 return false;
               }
-
               return true;
+
+
             },
             child: CupertinoTabView(
               restorationScopeId: 'cupertino_tab_view_$index',
@@ -189,10 +193,14 @@ class MainPageState extends State<MainPage> {
                                   subContextWrapper: subContextWrapper,
                                   tasks: tasks,
                                   onTap: () {
+
+
                                     setState(() => inDetail = true );
                                     return () {
                                         setState(() => inDetail = false);
                                     };
+
+
                                   },
                                   rootContext: rootContext!
                                 );
@@ -222,6 +230,7 @@ class MainPageState extends State<MainPage> {
               child: FloatingActionButton(
                 onPressed: () {
 
+
                   setState((){
                     quickNew = true;
                   });
@@ -237,6 +246,8 @@ class MainPageState extends State<MainPage> {
 
 //                  popup(context, 'some content', title: 'title');
 //                  input(context, 'some content', title: 'title');
+
+
                 },
                 child: const Icon(Icons.add),
 //              icon: const Icon(Icons.phone_android),
@@ -255,19 +266,25 @@ class MainPageState extends State<MainPage> {
         visible: quickNew == true,
         child: createQuickTask(
             onSubmitted: (String text){
-                newTaskName = null;
+                newTaskNameTitle = null;
                 setState((){
-                    if (text.isNotEmpty) tasks.insert(0, Task(text));
+                    if (text.isNotEmpty) tasks.insert(0, Task(1, text));
                     quickNew = false;
                 });
             },
             onChanged: (String text){
-                newTaskName = text;
+                newTaskNameTitle = text;
             },
-            onPressed: () {
-                setState((){
+            onPressed: () async {
+
+                var task = Task(1, newTaskNameTitle!);
+                await widget.tasks.insertItem(task);
+
+                setState(()  {
 //                    if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
-                    if (newTaskName?.isNotEmpty ?? false) tasks.insert(0, Task(newTaskName!));
+                    if (newTaskNameTitle?.isNotEmpty ?? false) {
+                        tasks.insert(0, task);
+                    }
                     quickNew = false;
                 });
 //                Navigator.pop(context);

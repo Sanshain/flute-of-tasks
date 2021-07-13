@@ -81,7 +81,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -107,7 +107,7 @@ class _$TaskDao extends TaskDao {
                   'description': item.description,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
-                  'deadline': _dateTimeConverter.encode(item.deadline)
+                  'deadline': _nullableDateTimeConverter.encode(item.deadline)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -121,14 +121,16 @@ class _$TaskDao extends TaskDao {
   @override
   Future<List<Task>> all() async {
     return _queryAdapter.queryList('SELECT * FROM Task',
-        mapper: (Map<String, Object?> row) => Task(row['title'] as String,
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int, row['title'] as String,
             description: row['description'] as String));
   }
 
   @override
   Future<Task?> findById(int id) async {
     return _queryAdapter.query('SELECT * FROM Task WHERE id = ?1',
-        mapper: (Map<String, Object?> row) => Task(row['title'] as String,
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int, row['title'] as String,
             description: row['description'] as String),
         arguments: [id]);
   }
@@ -141,3 +143,4 @@ class _$TaskDao extends TaskDao {
 
 // ignore_for_file: unused_element
 final _dateTimeConverter = DateTimeConverter();
+final _nullableDateTimeConverter = NullableDateTimeConverter();

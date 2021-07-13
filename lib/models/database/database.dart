@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart'; // the generated code will be there
 
-@TypeConverters([DateTimeConverter])
+@TypeConverters([DateTimeConverter, NullableDateTimeConverter])
 @Database(version: 1, entities: [Task])
 abstract class AppDatabase extends FloorDatabase {
     TaskDao get taskDao;

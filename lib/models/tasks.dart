@@ -3,12 +3,13 @@ import 'package:floor/floor.dart';
 @entity
 class Task {
 
-    Task(this.title, {this.description = ''}){
+    Task(this.id, this.title, {this.description = ''}){
         created = DateTime.now();
     }
 
 //    @primaryKey
-    @PrimaryKey(autoGenerate: true)
+//    @PrimaryKey(autoGenerate: true)
+    @primaryKey
     late final int id;
 
     String title;
@@ -22,7 +23,7 @@ class Task {
 //    }
 
     late final DateTime created;
-    late DateTime deadline;
+    DateTime? deadline;
 
     @override
     bool operator ==(Object other) {
