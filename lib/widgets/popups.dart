@@ -51,3 +51,41 @@ void input(BuildContext context, String content, {String title = ''}) {
         },
     );
 }
+
+
+Future<bool>? showConfirmationDialog(BuildContext context, String action, {String title = 'Подтверждение'}) {
+// show the dialog
+
+    showDialog<bool>(
+        context: context,
+//        barrierDismissible: true,
+//        barrierColor: Colors.lightBlueAccent,
+        builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(title),
+                content: SizedBox(
+                    height: 50,
+                    child: Text(
+                        action,
+//                        style: const TextStyle(fontSize: 22, color: Colors.blue),
+                    ),
+                ),
+                actions: [
+                    TextButton(
+                        child: const Text("OK"),
+                        onPressed: () {
+                            Navigator.pop(context, true);
+                        },
+                    ),
+                    TextButton(
+                        child: const Text("Cancel"),
+                        onPressed: () {
+                            Navigator.pop(context, false);
+                        },
+                    )
+                ],
+            );
+        },
+    );
+}
+

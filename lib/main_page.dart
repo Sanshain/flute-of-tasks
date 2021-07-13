@@ -108,14 +108,6 @@ class MainPageState extends State<MainPage> {
     });
   }
 
-//      final task = Task('Frank');
-//
-//      await widget.tasks.insertItem(task);
-//      final result = await widget.tasks.findById(1);
-//
-//      stdout.write(result.toString());
-//  }
-
   @override
   Widget build(BuildContext context) {
 
@@ -189,6 +181,29 @@ class MainPageState extends State<MainPage> {
                                 return createListViewPoint(context, index,
                                   subContextWrapper: subContextWrapper,
                                   tasks: tasks,
+                                  confirmDismiss: (DismissDirection direction) async {
+                                      if(direction == DismissDirection.endToStart){
+                                          var poll = await showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?') ?? false;
+                                          return !poll;
+                                      }
+                                      return true;
+                                  },
+                                  onDismissed: (direction){
+                                      if(direction == DismissDirection.startToEnd) { // Right Swipe
+                                          //Left Swipe
+                                          //add event to Calendar
+                                      }
+                                      else if(direction == DismissDirection.endToStart) {
+
+                                          setState(() {
+                                              tasks.removeAt(index);
+                                          });
+
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text("item dismissed"))
+                                          );
+                                      }
+                                  },
                                   onTap: () {
 
 
