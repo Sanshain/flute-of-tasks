@@ -3,14 +3,13 @@ import 'package:floor/floor.dart';
 @entity
 class Task {
 
-    Task(this.id, this.title, {this.description = ''}){
+    Task(this.title, {this.id, this.description = ''}){
         created = DateTime.now();
     }
 
 //    @primaryKey
-//    @PrimaryKey(autoGenerate: true)
-    @primaryKey
-    late final int id;
+    @PrimaryKey(autoGenerate: true)
+    final int? id;
 
     String title;
     String description;

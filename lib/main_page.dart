@@ -81,7 +81,6 @@ final _tabInfo = [
 
 
 class MainPageState extends State<MainPage> {
-  int _counter = 0;
 
   int selectedTab = 0;
   int selectedIndex = -1;
@@ -90,17 +89,22 @@ class MainPageState extends State<MainPage> {
   String? newTaskNameTitle;
   BuildContext? rootContext;
 
-  List<BuildContext?>? subContextWrapper = <BuildContext?>[
-    null
+  List<BuildContext?>? subContextWrapper = <BuildContext?>[null];
+
+  final List<Task> tasks = [
+
   ];
 
   @override
   void initState() {
     super.initState();                                  //      Future.delayed(Duration.zero,() { });
 
-    widget.tasks.all().then((tasks) {
+    widget.tasks.all().then((_tasks) {
 
-        stdout.write(tasks.toString());
+        stdout.write(_tasks.toString());
+        setState((){
+            tasks.addAll(_tasks);
+        });
     });
   }
 
@@ -111,13 +115,6 @@ class MainPageState extends State<MainPage> {
 //
 //      stdout.write(result.toString());
 //  }
-
-
-  final List<Task> tasks = [
-    Task(1, 'my title')
-  ];
-
-  void _incrementCounter() => setState(() => _counter++);
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +176,7 @@ class MainPageState extends State<MainPage> {
                         children: [
                           Center(
                               child: Text(
-                                '$_counter ( selected $selectedIndex)',
+                                '( selected $selectedIndex)',
                                 style: Theme.of(context).textTheme.headline6,
                               )
                           ),
@@ -268,7 +265,7 @@ class MainPageState extends State<MainPage> {
             onSubmitted: (String text){
                 newTaskNameTitle = null;
                 setState((){
-                    if (text.isNotEmpty) tasks.insert(0, Task(1, text));
+                    if (text.isNotEmpty) tasks.insert(0, Task(text));
                     quickNew = false;
                 });
             },
@@ -277,7 +274,7 @@ class MainPageState extends State<MainPage> {
             },
             onPressed: () async {
 
-                var task = Task(1, newTaskNameTitle!);
+                var task = Task(newTaskNameTitle!);
                 await widget.tasks.insertItem(task);
 
                 setState(()  {
