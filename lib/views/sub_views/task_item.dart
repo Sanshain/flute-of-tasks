@@ -20,23 +20,35 @@ Widget createListViewPoint(BuildContext context, int index, {
 
     return Dismissible(
 //      key: Key(index.toString()),
-      key: UniqueKey(),
-      onDismissed: onDismissed,
-      confirmDismiss: confirmDismiss,
-      child: GestureDetector(
+        key: UniqueKey(),
+        onDismissed: onDismissed,
+        confirmDismiss: confirmDismiss,
+        secondaryBackground: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            color: Colors.red,
+            alignment: Alignment.centerLeft,
+            child: const Icon(Icons.cancel),
+        ),
+        background: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            color: Colors.green,
+            alignment: Alignment.centerRight,
+            child: const Icon(Icons.check),
+        ),
+        child: GestureDetector(
           onTap: () {
 
               var onPop = onTap();
 
-//            setState(() => inDetail = true );
-//            void onPop () {
-//                setState(() => inDetail = false);
-//            }
+        //            setState(() => inDetail = true );
+        //            void onPop () {
+        //                setState(() => inDetail = false);
+        //            }
 
               Navigator.push(
                   rootContext,
                   PageRouteBuilder(
-//              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
+        //              pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
                       pageBuilder: (rootContext, animation, secondaryAnimation) => TaskEdit(
                           subContextWrapper,
                           index: index,
@@ -45,14 +57,14 @@ Widget createListViewPoint(BuildContext context, int index, {
                       ),
                       transitionsBuilder: instantTransition,
                   )
-//            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
+        //            MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
               );
 
           },
           child: Container(
               margin: const EdgeInsets.symmetric(vertical: 1),
               padding: const EdgeInsets.symmetric(vertical: 16),
-//            color: index == selectedIndex ? Colors.white60: Colors.white60,
+        //            color: index == selectedIndex ? Colors.white60: Colors.white60,
               color: Colors.white60,
               child: Row(
                   children: [
@@ -64,6 +76,6 @@ Widget createListViewPoint(BuildContext context, int index, {
                   ],
               ),
           ),
-      ),
+        ),
     );
 }
