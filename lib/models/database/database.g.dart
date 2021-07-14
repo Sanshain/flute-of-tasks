@@ -149,15 +149,25 @@ class _$TaskDao extends TaskDao {
   @override
   Future<List<Task>> all() async {
     return _queryAdapter.queryList('SELECT * FROM Task',
-        mapper: (Map<String, Object?> row) => Task(row['title'] as String,
-            id: row['id'] as int?, description: row['description'] as String));
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int)));
   }
 
   @override
   Future<Task?> findById(int id) async {
     return _queryAdapter.query('SELECT * FROM Task WHERE id = ?1',
-        mapper: (Map<String, Object?> row) => Task(row['title'] as String,
-            id: row['id'] as int?, description: row['description'] as String),
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int)),
         arguments: [id]);
   }
 
@@ -169,6 +179,11 @@ class _$TaskDao extends TaskDao {
   @override
   Future<void> updateItem(Task task) async {
     await _taskUpdateAdapter.update(task, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateTasks(List<Task> task) async {
+    await _taskUpdateAdapter.updateList(task, OnConflictStrategy.abort);
   }
 
   @override

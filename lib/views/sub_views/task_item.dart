@@ -15,7 +15,7 @@ Widget createListViewPoint(BuildContext context, int index, {
                             required List<Task> tasks,
                             required Function(DismissDirection) onDismissed,
                             Future<bool> Function(DismissDirection)? confirmDismiss,
-                            required Function Function() onTap,
+                            required Function(Task?) Function() onTap,
                             required BuildContext rootContext,}) {
 
     return Dismissible(
@@ -38,7 +38,7 @@ Widget createListViewPoint(BuildContext context, int index, {
         child: GestureDetector(
           onTap: () {
 
-              var onPop = onTap();
+              void Function(Task?) onPop = onTap();
 
         //            setState(() => inDetail = true );
         //            void onPop () {

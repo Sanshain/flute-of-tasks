@@ -9,7 +9,7 @@ import 'package:some_app/widgets/popups.dart';
 class TaskEdit extends TaskPage {
 //  const TaskPage({Key? key, required this.title}) : super(key: key);
 
-     TaskEdit(taskContext, {Key? key, required this.index, required this.tasks, Function? onPop}) : super(
+     TaskEdit(taskContext, {Key? key, required this.index, required this.tasks, Function(Task?)? onPop}) : super(
         taskContext,
         tasks[index],
         key: key,
@@ -33,10 +33,11 @@ class TaskEditState extends State<TaskEdit> {
 
         widget.taskContext![0] = context;
         DateTime selectedDate;
+        Task? updated;
 
         return WillPopScope(
             onWillPop: () async {
-                if (widget.onPop != null) widget.onPop!();
+                if (widget.onPop != null) await widget.onPop!(updated);
                 Navigator.of(context).pop();
                 return false;
             },
@@ -59,6 +60,7 @@ class TaskEditState extends State<TaskEdit> {
                           minLines: 5, maxLines: 10,
                         //                              autofocus: widget.task.description.isEmpty,
                           onChanged: (String text) {
+                              updated = updated ?? widget.task;
                               widget.task.description = text;
                           }
                         ),
@@ -73,6 +75,7 @@ class TaskEditState extends State<TaskEdit> {
                                             context, null,
                                             setState: (datetime){
 //                                                selectedDate = datetime;
+                                                updated = updated ?? widget.task;
                                                 setState(() {
                                                     widget.task.deadline = datetime;
                                                 });
@@ -83,7 +86,10 @@ class TaskEditState extends State<TaskEdit> {
                                 ],
                             ),
                         ),
-                        const StyledButton('save')
+                        StyledButton('save', onPress:() async {
+                            widget.onPop?.call(updated);
+//                            await widget.onPop != null?(updated);
+                        })
                       ],
                   ),
                 ),

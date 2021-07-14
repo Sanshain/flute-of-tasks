@@ -184,7 +184,10 @@ class MainPageState extends State<MainPage> {
                                     },
                                     onTap: () {
                                         setState(() => inDetail = true );
-                                        return () {
+                                        return (Task? task) async {
+                                            if (task is Task){
+                                                await widget.tasks.updateItem(task);
+                                            }
                                             setState(() => inDetail = false);
                                         };
                                     },
@@ -226,8 +229,7 @@ class MainPageState extends State<MainPage> {
                                   onDismissed: (direction) async {
 
                                       if(direction == DismissDirection.startToEnd) { // Right Swipe
-                                          //Left Swipe
-                                          //add event to Calendar
+
                                           tasks[index].isDone = true;
                                           await widget.tasks.updateItem(tasks[index]);
 
@@ -248,9 +250,11 @@ class MainPageState extends State<MainPage> {
                                   },
                                   onTap: () {
 
-
                                     setState(() => inDetail = true );
-                                    return () {
+                                    return (Task? task) async {
+                                        if (task is Task){
+                                            await widget.tasks.updateItem(task);
+                                        }
                                         setState(() => inDetail = false);
                                     };
 
@@ -322,7 +326,7 @@ class MainPageState extends State<MainPage> {
             onSubmitted: (String text){
                 newTaskNameTitle = null;
                 setState((){
-                    if (text.isNotEmpty) tasks.insert(0, Task(text));
+                    if (text.isNotEmpty) tasks.insert(0, Task.init(text));
                     quickNew = false;
                 });
             },
@@ -331,7 +335,7 @@ class MainPageState extends State<MainPage> {
             },
             onPressed: () async {
 
-                var task = Task(newTaskNameTitle!);
+                var task = Task.init(newTaskNameTitle!);
                 await widget.tasks.insertItem(task);
 
                 setState(()  {

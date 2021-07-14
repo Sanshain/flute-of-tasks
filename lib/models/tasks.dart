@@ -3,8 +3,11 @@ import 'package:floor/floor.dart';
 @entity
 class Task {
 
-    Task(this.title, {this.id, this.description = ''}){
+    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline);
+
+    Task.init(this.title, {this.id, this.description = ''}){
         created = DateTime.now();
+        isDone = false;
     }
 
 //    @primaryKey
@@ -13,7 +16,7 @@ class Task {
 
     String title;
     String description;
-    bool isDone = false;
+    late final bool isDone;
 
 //    DateTime get deadLine => _deadline; DateTime _deadline;
 //    set (DateTime _dl) {
@@ -31,7 +34,7 @@ class Task {
     }
 
     @override int get hashCode => id.hashCode ^ title.hashCode;
-    @override String toString() => 'Task{id: $id, message: $title}';
+    @override String toString() => 'Task {id: $id, message: $title, isDone: $isDone}';
 
 }
 

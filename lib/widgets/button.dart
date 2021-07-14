@@ -10,7 +10,7 @@ class StyledButton extends StatelessWidget{
 
     final EdgeInsetsGeometry? padding;
     final String text;
-    final Function()? onPress;
+    final Future<void> Function()? onPress;
 
     @override
     Widget build(BuildContext context) {
@@ -29,8 +29,8 @@ class StyledButton extends StatelessWidget{
                         child: Text(text, style: const TextStyle(fontSize: 16))
                     ),
                 ),
-                onPressed: () {
-                    onPress?.call();
+                onPressed: () async {
+                    await onPress?.call();
                     Navigator.of(context).pop();
                 }
             ),
