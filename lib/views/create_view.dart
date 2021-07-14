@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:some_app/models/tasks.dart';
 import 'package:some_app/task_view.dart';
+import 'package:some_app/widgets/button.dart';
 import 'package:some_app/widgets/fields.dart';
+import 'package:some_app/widgets/popups.dart';
 
 
 class TaskEdit extends TaskPage {
@@ -30,6 +32,7 @@ class TaskEditState extends State<TaskEdit> {
     Widget build(BuildContext context) {
 
         widget.taskContext![0] = context;
+        DateTime selectedDate;
 
         return WillPopScope(
             onWillPop: () async {
@@ -48,36 +51,39 @@ class TaskEditState extends State<TaskEdit> {
 //                        Text(
 //                            'Your tas is:',
 //                        ),
-                          inputField(hint: 'Title', value: widget.task.title, onChanged: (String text) {
-                              widget.task.title = text;
-                          }),
-                          inputField(hint: 'Description',
-                              value: widget.task.description,
-                              minLines: 5, maxLines: 10,
-                              autofocus: true, onChanged: (String text) {
-
+                        inputField(hint: 'Title', value: widget.task.title, onChanged: (String text) {
+                          widget.task.title = text;
+                        }),
+                        inputField(hint: 'Description',
+                          value: widget.task.description,
+                          minLines: 5, maxLines: 10,
+                        //                              autofocus: widget.task.description.isEmpty,
+                          onChanged: (String text) {
                               widget.task.description = text;
-                          }),
-                          Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      primary: Colors.black38,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(30.0),
-                                      )
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Center(
-                                        child: Text("save", style: TextStyle(fontSize: 16))
+                          }
+                        ),
+                        Center(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                    Text("${widget.task.deadline ?? ''}".split(' ')[0]),
+                                    const SizedBox(height: 20.0,),
+                                    ElevatedButton(
+                                        onPressed: () => selectDate(
+                                            context, null,
+                                            setState: (datetime){
+//                                                selectedDate = datetime;
+                                                setState(() {
+                                                    widget.task.deadline = datetime;
+                                                });
+                                            }
+                                        ),
+                                        child: const Text('Select date'),
                                     ),
-                                  ),
-                                  onPressed: () {
-                                      Navigator.of(context).pop();
-                                  }
-                              ),
-                          )
+                                ],
+                            ),
+                        ),
+                        const StyledButton('save')
                       ],
                   ),
                 ),

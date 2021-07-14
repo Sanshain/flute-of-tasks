@@ -108,6 +108,30 @@ class _$TaskDao extends TaskDao {
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
+                }),
+        _taskUpdateAdapter = UpdateAdapter(
+            database,
+            'Task',
+            ['id'],
+            (Task item) => <String, Object?>{
+                  'id': item.id,
+                  'title': item.title,
+                  'description': item.description,
+                  'isDone': item.isDone ? 1 : 0,
+                  'created': _dateTimeConverter.encode(item.created),
+                  'deadline': _nullableDateTimeConverter.encode(item.deadline)
+                }),
+        _taskDeletionAdapter = DeletionAdapter(
+            database,
+            'Task',
+            ['id'],
+            (Task item) => <String, Object?>{
+                  'id': item.id,
+                  'title': item.title,
+                  'description': item.description,
+                  'isDone': item.isDone ? 1 : 0,
+                  'created': _dateTimeConverter.encode(item.created),
+                  'deadline': _nullableDateTimeConverter.encode(item.deadline)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -117,6 +141,10 @@ class _$TaskDao extends TaskDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<Task> _taskInsertionAdapter;
+
+  final UpdateAdapter<Task> _taskUpdateAdapter;
+
+  final DeletionAdapter<Task> _taskDeletionAdapter;
 
   @override
   Future<List<Task>> all() async {
@@ -136,6 +164,16 @@ class _$TaskDao extends TaskDao {
   @override
   Future<void> insertItem(Task task) async {
     await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateItem(Task task) async {
+    await _taskUpdateAdapter.update(task, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteItem(Task task) async {
+    await _taskDeletionAdapter.delete(task);
   }
 }
 

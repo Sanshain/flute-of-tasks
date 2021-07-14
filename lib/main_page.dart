@@ -91,6 +91,9 @@ class MainPageState extends State<MainPage> {
 
   List<BuildContext?>? subContextWrapper = <BuildContext?>[null];
 
+  final List<Task> archive = [
+
+  ];
   final List<Task> tasks = [
 
   ];
@@ -103,7 +106,8 @@ class MainPageState extends State<MainPage> {
 
         stdout.write(_tasks.toString());
         setState((){
-            tasks.addAll(_tasks);
+            tasks.addAll(_tasks.where((task) => task.isDone == false));
+            archive.addAll(_tasks.where((task) => task.isDone));
         });
     });
   }
@@ -154,11 +158,42 @@ class MainPageState extends State<MainPage> {
             child: CupertinoTabView(
               restorationScopeId: 'cupertino_tab_view_$index',
               builder: (context) {
-                if (selectedTab > 0) {
+                if (selectedTab > 1) {
                   return CupertinoDemoTab(
                     title: _tabInfo[index].title,
                     icon: _tabInfo[index].icon,
                   );
+                }
+                else if (selectedTab == 1){
+
+                    return Column(
+                      children: [
+                        Expanded(child: ListView.separated(
+                            padding: const EdgeInsets.all(8),
+                            itemCount: archive.length,
+                            separatorBuilder: (BuildContext context, int index) => const Divider(),
+                            itemBuilder: (BuildContext context, int index) {
+                                return createListViewPoint(context, index,
+                                    subContextWrapper: subContextWrapper,
+                                    tasks: archive,
+                                    onDismissed: (direction){
+                                        if(direction == DismissDirection.endToStart)
+                                        {
+                                            setState(() => archive.removeAt(index));
+                                        }
+                                    },
+                                    onTap: () {
+                                        setState(() => inDetail = true );
+                                        return () {
+                                            setState(() => inDetail = false);
+                                        };
+                                    },
+                                    rootContext: rootContext!
+                                );
+                            }
+                        )),
+                      ],
+                    );
                 }
                 else{
                   return Stack(
@@ -166,12 +201,12 @@ class MainPageState extends State<MainPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(
-                              child: Text(
-                                '( selected $selectedIndex)',
-                                style: Theme.of(context).textTheme.headline6,
-                              )
-                          ),
+//                          Center(
+//                              child: Text(
+//                                  _tabInfo[index].title,  // '( selected $selectedIndex)',
+//                                style: Theme.of(context).textTheme.headline6,
+//                              )
+//                          ),
                           Expanded(child: ListView.separated(
                               padding: const EdgeInsets.all(8),
                               itemCount: tasks.length,
@@ -188,16 +223,23 @@ class MainPageState extends State<MainPage> {
                                       }
                                       return true;
                                   },
-                                  onDismissed: (direction){
+                                  onDismissed: (direction) async {
+
                                       if(direction == DismissDirection.startToEnd) { // Right Swipe
                                           //Left Swipe
                                           //add event to Calendar
+                                          tasks[index].isDone = true;
+                                          await widget.tasks.updateItem(tasks[index]);
+
+                                          setState(() {
+                                              archive.add(tasks[index]);
+                                              tasks.removeAt(index);
+                                          });
                                       }
                                       else if(direction == DismissDirection.endToStart) {
 
-                                          setState(() {
-                                              tasks.removeAt(index);
-                                          });
+                                          setState(() => tasks.removeAt(index));
+                                          await widget.tasks.deleteItem(tasks[index]);
 
                                           ScaffoldMessenger.of(context).showSnackBar(
                                               const SnackBar(content: Text("item dismissed"))

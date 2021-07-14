@@ -14,7 +14,7 @@ Widget createListViewPoint(BuildContext context, int index, {
                             List<BuildContext?>? subContextWrapper,
                             required List<Task> tasks,
                             required Function(DismissDirection) onDismissed,
-                            required Future<bool> Function(DismissDirection) confirmDismiss,
+                            Future<bool> Function(DismissDirection)? confirmDismiss,
                             required Function Function() onTap,
                             required BuildContext rootContext,}) {
 
