@@ -69,11 +69,15 @@ final _tabInfo = [
   ),
   const _TabInfo(
     'by place',
-    CupertinoIcons.conversation_bubble,
+//    CupertinoIcons.conversation_bubble,
+//    CupertinoIcons.location_circle,
+//      Icons.add_location_alt
+      Icons.my_location
   ),
   const _TabInfo(
     'Archived',
-    CupertinoIcons.profile_circled,
+//    CupertinoIcons.profile_circled,
+    CupertinoIcons.archivebox,
   ),
 ];
 
@@ -158,13 +162,13 @@ class MainPageState extends State<MainPage> {
             child: CupertinoTabView(
               restorationScopeId: 'cupertino_tab_view_$index',
               builder: (context) {
-                if (selectedTab > 1) {
+                if (index == 1) {
                   return CupertinoDemoTab(
                     title: _tabInfo[index].title,
                     icon: _tabInfo[index].icon,
                   );
                 }
-                else if (selectedTab == 1){
+                else if (index == 2){
 
                     return Column(
                       children: [
@@ -174,11 +178,24 @@ class MainPageState extends State<MainPage> {
                             separatorBuilder: (BuildContext context, int index) => const Divider(),
                             itemBuilder: (BuildContext context, int index) {
                                 return createListViewPoint(context, index,
+                                    toLeft: const SwipeBackground(Colors.orangeAccent, Icon(Icons.unarchive_outlined)),
+                                    toRight: const SwipeBackground(Colors.redAccent, Icon(Icons.delete_forever)),
                                     subContextWrapper: subContextWrapper,
                                     tasks: archive,
-                                    onDismissed: (direction){
+                                    onDismissed: (direction) async {
                                         if(direction == DismissDirection.endToStart)
                                         {
+                                            archive[index].isDone = false;
+                                            await widget.tasks.updateItem(archive[index]);
+
+                                            setState(() {
+                                                tasks.add(archive[index]);
+                                                archive.removeAt(index);
+                                            });
+                                        }
+                                        else if(direction == DismissDirection.startToEnd){
+
+                                            await widget.tasks.deleteItem(archive[index]);
                                             setState(() => archive.removeAt(index));
                                         }
                                     },
@@ -240,8 +257,8 @@ class MainPageState extends State<MainPage> {
                                       }
                                       else if(direction == DismissDirection.endToStart) {
 
-                                          setState(() => tasks.removeAt(index));
                                           await widget.tasks.deleteItem(tasks[index]);
+                                          setState(() => tasks.removeAt(index));
 
                                           ScaffoldMessenger.of(context).showSnackBar(
                                               const SnackBar(content: Text("item dismissed"))

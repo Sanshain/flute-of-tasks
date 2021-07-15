@@ -9,9 +9,19 @@ import '../create_view.dart';
 //typedef ChangeState = Function Function();
 
 
+class SwipeBackground{
+
+    const SwipeBackground(this.color, this.icon);
+
+    final Color color;
+    final Icon icon;
+}
+
 
 Widget createListViewPoint(BuildContext context, int index, {
                             List<BuildContext?>? subContextWrapper,
+                            SwipeBackground? toLeft,
+                            SwipeBackground? toRight,
                             required List<Task> tasks,
                             required Function(DismissDirection) onDismissed,
                             Future<bool> Function(DismissDirection)? confirmDismiss,
@@ -25,15 +35,15 @@ Widget createListViewPoint(BuildContext context, int index, {
         confirmDismiss: confirmDismiss,
         secondaryBackground: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            color: Colors.red,
-            alignment: Alignment.centerLeft,
-            child: const Icon(Icons.cancel),
+            color: toLeft?.color ?? Colors.red,
+            alignment: Alignment.centerRight,
+            child: toLeft?.icon ?? const Icon(Icons.cancel),
         ),
         background: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            color: Colors.green,
-            alignment: Alignment.centerRight,
-            child: const Icon(Icons.check),
+            color: toRight?.color ?? Colors.green,
+            alignment: Alignment.centerLeft,
+            child: toRight?.icon ?? const Icon(Icons.check),
         ),
         child: GestureDetector(
           onTap: () {

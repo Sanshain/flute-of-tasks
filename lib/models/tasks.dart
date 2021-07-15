@@ -16,7 +16,7 @@ class Task {
 
     String title;
     String description;
-    late final bool isDone;
+    late bool isDone;
 
 //    DateTime get deadLine => _deadline; DateTime _deadline;
 //    set (DateTime _dl) {
