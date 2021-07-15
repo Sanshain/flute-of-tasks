@@ -1,3 +1,5 @@
+//import 'package:flutter/material.dart';
+
 import 'package:flutter/material.dart';
 
 void popup(BuildContext context, String content, {String title = ''}) {
@@ -53,12 +55,12 @@ void input(BuildContext context, String content, {String title = ''}) {
 }
 
 
-Future<bool>? showConfirmationDialog(BuildContext context, String action, {String title = 'Подтверждение'}) {
+Future<bool?> showConfirmationDialog(BuildContext rootContext, String action, {String title = 'Подтверждение'}) {
 // show the dialog
 
-    showDialog<bool>(
-        context: context,
-//        barrierDismissible: true,
+    return showDialog<bool>(
+        context: rootContext,
+        barrierDismissible: true,
 //        barrierColor: Colors.lightBlueAccent,
         builder: (BuildContext context) {
             return AlertDialog(
@@ -67,20 +69,20 @@ Future<bool>? showConfirmationDialog(BuildContext context, String action, {Strin
                     height: 50,
                     child: Text(
                         action,
-//                        style: const TextStyle(fontSize: 22, color: Colors.blue),
+//               style: const TextStyle(fontSize: 22, color: Colors.blue),
                     ),
                 ),
                 actions: [
                     TextButton(
                         child: const Text("OK"),
                         onPressed: () {
-                            Navigator.pop(context, true);
+                            Navigator.of(context).pop(true);
                         },
                     ),
                     TextButton(
                         child: const Text("Cancel"),
                         onPressed: () {
-                            Navigator.pop(context, false);
+                            Navigator.of(context).pop(false);
                         },
                     )
                 ],

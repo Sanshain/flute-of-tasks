@@ -237,9 +237,17 @@ class MainPageState extends State<MainPage> {
                                   subContextWrapper: subContextWrapper,
                                   tasks: tasks,
                                   confirmDismiss: (DismissDirection direction) async {
-                                      if(direction == DismissDirection.endToStart){
-                                          var poll = await showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?') ?? false;
-                                          return !poll;
+                                      if(direction == DismissDirection.endToStart) {
+//                                          var poll = await showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?');
+//                                          return poll ?? false;
+                                          showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?').then((value) async {
+                                              await widget.tasks.deleteItem(tasks[index]);
+                                              setState(() => tasks.removeAt(index));
+
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text("item dismissed"))
+                                              );
+                                          });
                                       }
                                       return true;
                                   },
@@ -256,13 +264,7 @@ class MainPageState extends State<MainPage> {
                                           });
                                       }
                                       else if(direction == DismissDirection.endToStart) {
-
-                                          await widget.tasks.deleteItem(tasks[index]);
-                                          setState(() => tasks.removeAt(index));
-
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text("item dismissed"))
-                                          );
+                                        // move to confirmDismiss
                                       }
                                   },
                                   onTap: () {
@@ -274,8 +276,6 @@ class MainPageState extends State<MainPage> {
                                         }
                                         setState(() => inDetail = false);
                                     };
-
-
                                   },
                                   rootContext: rootContext!
                                 );
