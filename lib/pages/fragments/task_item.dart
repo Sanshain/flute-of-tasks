@@ -59,6 +59,8 @@ class ListViewItem extends StatefulWidget {
 
 class ListViewItemState extends State<ListViewItem> {
 
+    List<Task> expandedCache = [];
+
     @override
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
@@ -82,7 +84,6 @@ class ListViewItemState extends State<ListViewItem> {
         IExpandedTaskList? parent = widget.parent;
         BuildContext rootContext = widget.rootContext;
 
-        List<Task> expandedCache = [];
 
         return Dismissible(
 //      key: Key(index.toString()),
@@ -128,12 +129,16 @@ class ListViewItemState extends State<ListViewItem> {
                     color: Colors.white60,
                     child: ExpansionTile(
                         onExpansionChanged: (bool expanded) async {
-                            if (expanded && tasks[index].subTasksAmount != expandedCache.length) {
+
+                            var startAmount = tasks[index].subTasksAmount;
+
+                            if (expanded && startAmount != expandedCache.length) {
 //                                expandedCache = (await tasks[index].children) ?? [];
                                 var subTasks = (await tasks[index].children) ?? [];
                                 setState(() {
 //                                    expandedCache = expandedCache;
-                                    expandedCache = subTasks;
+//                                    expandedCache = subTasks;
+                                    expandedCache.insertAll(expandedCache.length, subTasks);
                                 });
                             }
                         },
@@ -191,12 +196,13 @@ class ListViewItemState extends State<ListViewItem> {
                             ListView.separated(
                                 shrinkWrap: true,
                                 padding: const EdgeInsets.all(8),
-                                itemCount: tasks[index].subTasksAmount ?? 0,
-                                separatorBuilder: (BuildContext context, int index) => const Divider(),
-                                itemBuilder: (BuildContext context, int index) {
+//                                itemCount: tasks[index].subTasksAmount ?? 0,
+                                itemCount: expandedCache.length,
+                                separatorBuilder: (BuildContext context, int _index) => const Divider(),
+                                itemBuilder: (BuildContext context, int _index) {
 //                                return parent?.listTileGenerate(index) ?? const Text('Parent element is not defined');
 
-                                    return Text(expandedCache[index].title);
+                                    return Text(expandedCache[_index].title);
                                 }
                             )
                         ],
