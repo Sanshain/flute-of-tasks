@@ -1,5 +1,8 @@
 import 'package:floor/floor.dart';
 
+import 'dao/tasks_dao.dart';
+import 'database/database.dart';
+
 //@entity
 @Entity(
     foreignKeys: [
@@ -11,6 +14,8 @@ import 'package:floor/floor.dart';
     ],
 )
 class Task {
+
+    static TaskDao? tasks;
 
     Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, { this.subTasksAmount });
 
@@ -34,6 +39,16 @@ class Task {
 //    @ColumnInfo(name: '')
     int? subTasksAmount;
 
+
+    Future<List<Task>?> get children async {
+        if (tasks != null){
+            var _tasks = await tasks?.getChildren(id!);
+            return _tasks;
+        }
+        else {
+          throw Exception('static field database is not defined');
+        }
+    }
 
     @override
     bool operator ==(Object other) {

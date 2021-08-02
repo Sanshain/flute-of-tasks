@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'main_page.dart';
 import 'models/dao/tasks_dao.dart';
 import 'models/database/database.dart';
+import 'models/tasks.dart';
 //import 'models/migrations/init.dart';
 
 
@@ -18,7 +19,7 @@ void main() async {
 //        .addMigrations([migration_1To2])
         .build();
 
-    final TaskDao tasks = database.taskDao;
+    final TaskDao tasks = Task.tasks = database.taskDao;
 
     runApp(App(tasks));
 //    runApp(const App(tasks));

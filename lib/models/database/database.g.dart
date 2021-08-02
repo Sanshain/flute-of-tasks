@@ -179,6 +179,23 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Future<List<Task>> getChildren(int id) async {
+    return _queryAdapter.queryList(
+        'SELECT            parent_task.*, count(children.id) as subTasksAmount         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?,
+            subTasksAmount: row['subTasksAmount'] as int?
+        ),
+        arguments: [id]);
+  }
+
+  @override
   Future<Task?> findById(int id) async {
     return _queryAdapter.query('SELECT * FROM Task WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Task(
