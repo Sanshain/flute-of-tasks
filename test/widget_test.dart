@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:some_app/main.dart';
 
 import 'package:some_app/main_page.dart';
 import 'package:some_app/models/dao/tasks_dao.dart';

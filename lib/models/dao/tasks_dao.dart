@@ -8,6 +8,20 @@ abstract class TaskDao {
     @Query('SELECT * FROM Task')
     Future<List<Task>> all();
 
+    @Query("""
+        SELECT
+           parent_task.*, count(children.id) as subTasksAmount
+        FROM
+           "Task" as parent_task 
+           LEFT OUTER JOIN
+              "Task" AS children 
+              ON children.parent = parent_task.id
+        WHERE
+           parent_task.parent is NULL
+        GROUP BY parent_task.id;    
+    """)
+    Future<List<Task>> readWChildren();
+
     @Query('SELECT * FROM Task WHERE id = :id')
     Future<Task?> findById(int id);
 //    Stream<Task?> findById(int id);

@@ -1,6 +1,35 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+
+
+class TabInfo {
+    const TabInfo(this.title, this.icon);
+
+    final String title;
+    final IconData icon;
+}
+
+final tabInfo = [
+    const TabInfo(
+        'by time',
+        CupertinoIcons.home,
+    ),
+    const TabInfo(
+        'by place',
+//    CupertinoIcons.conversation_bubble,
+//    CupertinoIcons.location_circle,
+//      Icons.add_location_alt
+        Icons.my_location
+    ),
+    const TabInfo(
+        'Archived',
+//    CupertinoIcons.profile_circled,
+        CupertinoIcons.archivebox,
+    ),
+];
 
 
 

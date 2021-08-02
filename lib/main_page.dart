@@ -2,111 +2,58 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:some_app/pages/fragments/quick_new.dart';
+import 'package:some_app/pages/fragments/task_item.dart';
 //import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:some_app/transitions/instant.dart';
-import 'package:some_app/views/create_view.dart';
-import 'package:some_app/views/sub_views/quick_new.dart';
-import 'package:some_app/views/sub_views/task_item.dart';
 import 'package:some_app/widgets/popups.dart';
 
+
 import 'models/dao/tasks_dao.dart';
-import 'models/database/database.dart';
 import 'models/tasks.dart';
 import 'panel.dart';
-import 'task_view.dart';
 
-void main() async {
 
-    WidgetsFlutterBinding.ensureInitialized();
-
-    final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
-
-    final TaskDao tasks = database.taskDao;
-
-    runApp(App(tasks));
-//    runApp(const App(tasks));
-}
-
-class App extends StatelessWidget {
-  const App(this.tasks, {Key? key}) : super(key: key);
-
-  final TaskDao tasks;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Some Awesome App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-//      home: const MainPage(tasks, title: 'The Tasks'),
-      home: MainPage(tasks, title: 'The Tasks'),
-    );
-  }
-}
-
+/// MainPage
 class MainPage extends StatefulWidget {
-  const MainPage(this.tasks, {Key? key, required this.title}) : super(key: key);
+    const MainPage(this.tasks, {Key? key, required this.title}) : super(key: key);
 
-  final String title;
-  final TaskDao tasks;
+    final String title;
+    final TaskDao tasks;
 
-  @override
-  State<MainPage> createState() => MainPageState();
+    @override
+    State<MainPage> createState() => MainPageState();
 }
 
-class _TabInfo {
-  const _TabInfo(this.title, this.icon);
 
-  final String title;
-  final IconData icon;
-}
-
-final _tabInfo = [
-  const _TabInfo(
-    'by time',
-    CupertinoIcons.home,
-  ),
-  const _TabInfo(
-    'by place',
-//    CupertinoIcons.conversation_bubble,
-//    CupertinoIcons.location_circle,
-//      Icons.add_location_alt
-      Icons.my_location
-  ),
-  const _TabInfo(
-    'Archived',
-//    CupertinoIcons.profile_circled,
-    CupertinoIcons.archivebox,
-  ),
-];
-
-
-
-
+/// MainPageState
 class MainPageState extends State<MainPage> {
+
 
   int selectedTab = 0;
   int selectedIndex = -1;
   bool inDetail = false;
+
   bool quickNew = false;
+  int? rootTask;
+
   String? newTaskNameTitle;
   BuildContext? rootContext;
 
   List<BuildContext?>? subContextWrapper = <BuildContext?>[null];
+  final List<Task> archive = [];
+  final List<Task> tasks = [];
 
-  final List<Task> archive = [
-
-  ];
-  final List<Task> tasks = [
-
-  ];
 
   @override
   void initState() {
     super.initState();                                  //      Future.delayed(Duration.zero,() { });
 
     widget.tasks.all().then((_tasks) {
+        stdout.write(_tasks.toString());
+    });
+
+    widget.tasks.readWChildren().then((_tasks) {
 
         stdout.write(_tasks.toString());
         setState((){
@@ -115,6 +62,74 @@ class MainPageState extends State<MainPage> {
         });
     });
   }
+
+
+
+  Widget listTileGenerate(int index){
+
+      return createListViewPoint(
+          context,
+          index,
+          subContextWrapper: subContextWrapper,
+          tasks: tasks,
+          confirmDismiss: (DismissDirection direction) async {
+              if(direction == DismissDirection.endToStart) {
+//                  var poll = await showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?');
+//                  return poll ?? false;
+                  showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?').then((poll) async {
+
+                      if (poll ?? false){
+                          await widget.tasks.deleteItem(tasks[index]);
+                          setState(() => tasks.removeAt(index));
+
+//                          ScaffoldMessenger.of(context).showSnackBar(
+//                              const SnackBar(content: Text("item dismissed"))
+//                          );
+                      }
+                  });
+              }
+              return true;
+          },
+          onDismissed: (direction) async {
+
+              if(direction == DismissDirection.startToEnd) { // Right Swipe
+
+                  tasks[index].isDone = true;
+                  await widget.tasks.updateItem(tasks[index]);
+
+                  setState(() {
+                      archive.add(tasks[index]);
+                      tasks.removeAt(index);
+                  });
+              }
+              else if(direction == DismissDirection.endToStart) {
+                  // move to confirmDismiss
+              }
+          },
+          onTap: () {
+
+              setState(() => inDetail = true );
+              return (Task? task) async {
+                  if (task is Task){
+                      await widget.tasks.updateItem(task);
+                  }
+                  setState(() => inDetail = false);
+              };
+          },
+          subTaskCreateAction: () {
+              setState(() => quickNew = true);
+              rootTask = tasks[index].id;
+          },
+          expandAction: (){
+
+          },
+          rootContext: rootContext!
+      );
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +144,7 @@ class MainPageState extends State<MainPage> {
         restorationId: 'cupertino_tab_scaffold',
         tabBar: CupertinoTabBar(
           items: [
-            for (final tabInfo in _tabInfo)
+            for (final tabInfo in tabInfo)
               BottomNavigationBarItem(
                 label: tabInfo.title,
                 icon: Icon(tabInfo.icon),
@@ -164,8 +179,8 @@ class MainPageState extends State<MainPage> {
               builder: (context) {
                 if (index == 1) {
                   return CupertinoDemoTab(
-                    title: _tabInfo[index].title,
-                    icon: _tabInfo[index].icon,
+                    title: tabInfo[index].title,
+                    icon: tabInfo[index].icon,
                   );
                 }
                 else if (index == 2){
@@ -233,20 +248,25 @@ class MainPageState extends State<MainPage> {
                               separatorBuilder: (BuildContext context, int index) => const Divider(),
                               itemBuilder: (BuildContext context, int index) {
 //                                return createListViewPoint(context, index);
-                                return createListViewPoint(context, index,
+                                return createListViewPoint(
+                                  context,
+                                  index,
                                   subContextWrapper: subContextWrapper,
                                   tasks: tasks,
                                   confirmDismiss: (DismissDirection direction) async {
                                       if(direction == DismissDirection.endToStart) {
 //                                          var poll = await showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?');
 //                                          return poll ?? false;
-                                          showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?').then((value) async {
-                                              await widget.tasks.deleteItem(tasks[index]);
-                                              setState(() => tasks.removeAt(index));
+                                          showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?').then((poll) async {
 
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("item dismissed"))
-                                              );
+                                              if (poll ?? false){
+                                                  await widget.tasks.deleteItem(tasks[index]);
+                                                  setState(() => tasks.removeAt(index));
+
+//                                                  ScaffoldMessenger.of(context).showSnackBar(
+//                                                      const SnackBar(content: Text("item dismissed"))
+//                                                  );
+                                              }
                                           });
                                       }
                                       return true;
@@ -277,6 +297,13 @@ class MainPageState extends State<MainPage> {
                                         setState(() => inDetail = false);
                                     };
                                   },
+                                  subTaskCreateAction: () {
+                                      setState(() => quickNew = true);
+                                      rootTask = tasks[index].id;
+                                  },
+                                  expandAction: (){
+
+                                  },
                                   rootContext: rootContext!
                                 );
                               }
@@ -288,7 +315,7 @@ class MainPageState extends State<MainPage> {
                   );
                 }
               },
-              defaultTitle: _tabInfo[index].title,
+              defaultTitle: tabInfo[index].title,
             ),
           );
         },
@@ -352,8 +379,9 @@ class MainPageState extends State<MainPage> {
             },
             onPressed: () async {
 
-                var task = Task.init(newTaskNameTitle!);
+                var task = Task.init(newTaskNameTitle!, parent: rootTask);
                 await widget.tasks.insertItem(task);
+                rootTask = null;
 
                 setState(()  {
 //                    if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
@@ -362,6 +390,7 @@ class MainPageState extends State<MainPage> {
                     }
                     quickNew = false;
                 });
+
 //                Navigator.pop(context);
             },
         ),

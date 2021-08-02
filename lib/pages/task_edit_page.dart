@@ -57,7 +57,7 @@ class TaskEditState extends State<TaskEdit> {
                         }),
                         inputField(hint: 'Description',
                           value: widget.task.description,
-                          minLines: 5, maxLines: 10,
+                          minLines: 4, maxLines: 10,
                         //                              autofocus: widget.task.description.isEmpty,
                           onChanged: (String text) {
                               updated = updated ?? widget.task;

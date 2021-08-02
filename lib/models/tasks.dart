@@ -1,11 +1,20 @@
 import 'package:floor/floor.dart';
 
-@entity
+//@entity
+@Entity(
+    foreignKeys: [
+        ForeignKey(
+            childColumns: ['parent'],
+            parentColumns: ['id'],
+            entity: Task,
+        )
+    ],
+)
 class Task {
 
-    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline);
+    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, { this.subTasksAmount });
 
-    Task.init(this.title, {this.id, this.description = ''}){
+    Task.init(this.title, {this.id, this.description = '', this.parent}){
         created = DateTime.now();
         isDone = false;
     }
@@ -13,19 +22,18 @@ class Task {
 //    @primaryKey
     @PrimaryKey(autoGenerate: true)
     final int? id;
+    final int? parent;
 
     String title;
     String description;
     late bool isDone;
-
-//    DateTime get deadLine => _deadline; DateTime _deadline;
-//    set (DateTime _dl) {
-//        isDone = false;
-//        _deadline = _dl;
-//    }
-
     late final DateTime created;
     DateTime? deadline;
+
+    @ignore
+//    @ColumnInfo(name: '')
+    int? subTasksAmount;
+
 
     @override
     bool operator ==(Object other) {

@@ -13,10 +13,10 @@ class DateTimeConverter extends TypeConverter<DateTime, int> {
 }
 
 
-class NullableDateTimeConverter extends TypeConverter<DateTime?, int> {
+class NullableDateTimeConverter extends TypeConverter<DateTime?, int?> {
     @override
-    DateTime? decode(int databaseValue) {
-        return databaseValue >= 0 ? DateTime.fromMillisecondsSinceEpoch(databaseValue) : null;
+    DateTime? decode(int? databaseValue) {
+        return (databaseValue ?? -1) >= 0 ? DateTime.fromMillisecondsSinceEpoch(databaseValue ?? -1) : null;
     }
 
     @override

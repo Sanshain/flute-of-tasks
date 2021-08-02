@@ -4,6 +4,7 @@ typedef OnChangeEvent = Function(String text);
 
 //Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = false, value = '', TextEditingController? controller}){
 
+/// input field
 Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = false, value = '', OnChangeEvent? onChanged}){
     return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -13,7 +14,7 @@ Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = fal
             autofocus: autofocus,
             maxLines: maxLines,
             minLines: minLines,
-            style: const TextStyle(fontSize: 22, color: Colors.black54),
+            style: const TextStyle(fontSize: 16, color: Colors.black54),
             onChanged: (String text){
                 onChanged?.call(text);
             },

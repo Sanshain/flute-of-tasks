@@ -81,7 +81,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER, FOREIGN KEY (`parent`) REFERENCES `Task` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -103,6 +103,7 @@ class _$TaskDao extends TaskDao {
             'Task',
             (Task item) => <String, Object?>{
                   'id': item.id,
+                  'parent': item.parent,
                   'title': item.title,
                   'description': item.description,
                   'isDone': item.isDone ? 1 : 0,
@@ -115,6 +116,7 @@ class _$TaskDao extends TaskDao {
             ['id'],
             (Task item) => <String, Object?>{
                   'id': item.id,
+                  'parent': item.parent,
                   'title': item.title,
                   'description': item.description,
                   'isDone': item.isDone ? 1 : 0,
@@ -127,6 +129,7 @@ class _$TaskDao extends TaskDao {
             ['id'],
             (Task item) => <String, Object?>{
                   'id': item.id,
+                  'parent': item.parent,
                   'title': item.title,
                   'description': item.description,
                   'isDone': item.isDone ? 1 : 0,
@@ -155,7 +158,24 @@ class _$TaskDao extends TaskDao {
             row['description'] as String,
             (row['isDone'] as int) != 0,
             _dateTimeConverter.decode(row['created'] as int),
-            _nullableDateTimeConverter.decode(row['deadline'] as int)));
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?));
+  }
+
+  @override
+  Future<List<Task>> readWChildren() async {
+    return _queryAdapter.queryList(
+        'SELECT            parent_task.*, count(children.id) as subTasksAmount         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent is NULL         GROUP BY parent_task.id;',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?,
+            subTasksAmount: row['subTasksAmount'] as int?
+        ));
   }
 
   @override
@@ -167,7 +187,8 @@ class _$TaskDao extends TaskDao {
             row['description'] as String,
             (row['isDone'] as int) != 0,
             _dateTimeConverter.decode(row['created'] as int),
-            _nullableDateTimeConverter.decode(row['deadline'] as int)),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?),
         arguments: [id]);
   }
 
