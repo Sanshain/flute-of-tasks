@@ -70,7 +70,15 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     }
 
     @override
-    Widget listTileGenerate(int index) {
+    Widget listTileGenerate(int index, {
+        BuildContext? parentContext,
+        List<BuildContext?>? childContextWrapper,
+        List<Task>? parentTasks
+    }) {
+
+        parentContext = parentContext ?? rootContext;
+        childContextWrapper = childContextWrapper ?? subContextWrapper;
+        parentTasks = parentTasks ?? tasks;
 
 //        return createListViewPoint(
         return ListViewItem(
@@ -134,7 +142,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
             expandAction: () {
 
             },
-            rootContext: rootContext!
+            rootContext: parentContext!
         );
     }
 

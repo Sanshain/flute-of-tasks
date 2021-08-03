@@ -217,14 +217,14 @@ class ListViewItemState extends State<ListViewItem> {
                                 itemBuilder: (BuildContext context, int _index) {
 //                                return parent?.listTileGenerate(index) ?? const Text('Parent element is not defined');
 
-//                                    return parent?.listTileGenerate(_index) ?? Padding(
-//                                        padding: const EdgeInsets.only(left: 32),
-//                                        child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 12, color: Colors.black54),),
-//                                    );
-                                    return Padding(
-                                      padding: const EdgeInsets.only(left: 32, bottom: 3, top: 3),
-                                      child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 14, color: Colors.black54),),
+                                    return parent?.listTileGenerate(_index) ?? Padding(
+                                        padding: const EdgeInsets.only(left: 32),
+                                        child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 12, color: Colors.black54),),
                                     );
+//                                    return Padding(
+//                                      padding: const EdgeInsets.only(left: 32, bottom: 3, top: 3),
+//                                      child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 14, color: Colors.black54),),
+//                                    );
                                 }
                             )
                         ],
