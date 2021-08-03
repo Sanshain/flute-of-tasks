@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   floor: ^1.1.0
+  get:
 #  keyboard_visibility: ^0.5.2
   flutter_localizations: # Add this line
     sdk: flutter         # Add this line

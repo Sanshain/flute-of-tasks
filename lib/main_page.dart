@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
+
 import 'package:some_app/pages/fragments/quick_new.dart';
 import 'package:some_app/pages/fragments/task_item.dart';
 
@@ -38,7 +40,8 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     bool inDetail = false;
 
     bool quickNew = false;
-    int? rootTask;
+    int? rootTaskId;
+    int? rootTaskIndex;
 
     String? newTaskNameTitle;
     BuildContext? rootContext;
@@ -47,6 +50,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     final List<Task> archive = [];
     final List<Task> tasks = [];
 
+    void Function(Task)? useSubTasksUpdate;
 
     @override
     void initState() {
@@ -120,9 +124,12 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     setState(() => inDetail = false);
                 };
             },
-            subTaskCreateAction: () {
+//            subTaskCreateAction: (void Function(Task)? callbackUpState) {
+            subTaskCreateAction: ({void Function(Task)? onApply}) {
                 setState(() => quickNew = true);
-                rootTask = tasks[index].id;
+                useSubTasksUpdate = onApply;
+                rootTaskId = tasks[index].id;
+                rootTaskIndex = index;
             },
             expandAction: () {
 
@@ -313,17 +320,26 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     newTaskNameTitle = text;
                 },
                 onPressed: () async {
-                    var task = Task.init(newTaskNameTitle!, parent: rootTask);
+                    var task = Task.init(newTaskNameTitle!, parent: rootTaskId);
                     await widget.tasks.insertItem(task);
-                    rootTask = null;
 
                     setState(() {
 //                    if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
                         if (newTaskNameTitle?.isNotEmpty ?? false) {
-                            tasks.insert(0, task);
+                            if (rootTaskId == null){
+                                tasks.insert(0, task);
+                            }
+                            else {
+//                                tasks[rootTask!].subTasksAmount = tasks[rootTask!].subTasksAmount! + 1;
+                                tasks[rootTaskIndex!].subTasksAmount = tasks[rootTaskIndex!].subTasksAmount! + 1;
+                                useSubTasksUpdate?.call(task);
+                            }
                         }
                         quickNew = false;
                     });
+
+                    rootTaskId = null;
+                    useSubTasksUpdate = null;
 
 //                Navigator.pop(context);
                 },

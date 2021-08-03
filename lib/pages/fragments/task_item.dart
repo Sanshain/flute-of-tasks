@@ -33,7 +33,7 @@ class ListViewItem extends StatefulWidget {
     final Function(DismissDirection) onDismissed;
     final Future<bool> Function(DismissDirection)? confirmDismiss;
     final Function(Task?) Function() onTap;
-    final Function? subTaskCreateAction;
+    final void Function({void Function(Task)? onApply})? subTaskCreateAction;
     final Function? expandAction;
     final IExpandedTaskList? parent;
     final BuildContext rootContext;
@@ -59,6 +59,7 @@ class ListViewItem extends StatefulWidget {
 
 class ListViewItemState extends State<ListViewItem> {
 
+    int? rootIndex;
     List<Task> expandedCache = [];
 
     @override
@@ -72,6 +73,7 @@ class ListViewItemState extends State<ListViewItem> {
         var widget = self.widget;
 
         int index = widget.index;
+        rootIndex = index;
         List<BuildContext?>? subContextWrapper = widget.subContextWrapper;
         SwipeBackground? toLeft = widget.toLeft;
         SwipeBackground? toRight = widget.toRight;
@@ -79,7 +81,8 @@ class ListViewItemState extends State<ListViewItem> {
         Function(DismissDirection) onDismissed = widget.onDismissed;
         Future<bool> Function(DismissDirection)? confirmDismiss = widget.confirmDismiss;
         Function(Task?) Function() onTap = widget.onTap;
-        Function? subTaskCreateAction = widget.subTaskCreateAction;
+//        Function(Function(Task)?)? subTaskCreateAction = widget.subTaskCreateAction;
+        Function({Function(Task)? onApply})? subTaskCreateAction = widget.subTaskCreateAction;
         Function? expandAction = widget.expandAction;
         IExpandedTaskList? parent = widget.parent;
         BuildContext rootContext = widget.rootContext;
@@ -104,37 +107,24 @@ class ListViewItemState extends State<ListViewItem> {
             ),
             child: GestureDetector(
                 onTap: () {
-                    void Function(Task?) onPop = onTap();
 
-                    Navigator.push(
-                        rootContext,
-//                MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
-                        PageRouteBuilder(
-//                    pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
-                            pageBuilder: (rootContext, animation, secondaryAnimation) =>
-                                TaskEdit(
-                                    subContextWrapper,
-                                    index: index,
-                                    tasks: tasks,
-                                    onPop: onPop,
-                                ),
-                            transitionsBuilder: instantTransition,
-                        )
-                    );
                 },
                 child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 1),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 1),
 //            color: index == selectedIndex ? Colors.white60: Colors.white60,
                     color: Colors.white60,
                     child: ExpansionTile(
+                        key: PageStorageKey<String>(rootIndex!.toString()),
+//                        key: Key(index.toString()),
                         onExpansionChanged: (bool expanded) async {
 
                             var startAmount = tasks[index].subTasksAmount;
 
                             if (expanded && startAmount != expandedCache.length) {
 //                                expandedCache = (await tasks[index].children) ?? [];
-                                var subTasks = (await tasks[index].children) ?? [];
+                                var _index = index;
+                                var subTasks = (await tasks[_index].children) ?? [];
                                 setState(() {
 //                                    expandedCache = expandedCache;
 //                                    expandedCache = subTasks;
@@ -167,10 +157,17 @@ class ListViewItemState extends State<ListViewItem> {
                                             child: GestureDetector(
 
                                                 /// add
-                                                child: const Icon(Icons.add, color: Colors.black26),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                                  child: Icon(Icons.add, color: Colors.black26),
+                                                ),
                                                 onTap: () {
 //                                            popup(context, 'content');
-                                                    subTaskCreateAction?.call();
+                                                    subTaskCreateAction?.call(onApply: (Task task){
+                                                        setState(() {
+                                                          expandedCache.add(task);
+                                                        });
+                                                    });
                                                 },
                                             ),
                                         ),
@@ -179,9 +176,26 @@ class ListViewItemState extends State<ListViewItem> {
                                             child: GestureDetector(
 
                                                 /// expand
-                                                child: const Icon(Icons.expand_less, color: Colors.black26),
+//                                                child: const Icon(Icons.expand_less, color: Colors.black26),
+                                                child: const Icon(Icons.edit_outlined, color: Colors.black26),
                                                 onTap: () {
+                                                    void Function(Task?) onPop = onTap();
 
+                                                    Navigator.push(
+                                                        rootContext,
+//                                                      MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
+                                                        PageRouteBuilder(
+//                                                          pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
+                                                            pageBuilder: (rootContext, animation, secondaryAnimation) =>
+                                                                TaskEdit(
+                                                                    subContextWrapper,
+                                                                    index: index,
+                                                                    tasks: tasks,
+                                                                    onPop: onPop,
+                                                                ),
+                                                            transitionsBuilder: instantTransition,
+                                                        )
+                                                    );
                                                 },
                                             ),
                                         ),
@@ -194,6 +208,7 @@ class ListViewItemState extends State<ListViewItem> {
 //                    ],
                         children: [
                             ListView.separated(
+                                key: PageStorageKey<String>(rootIndex!.toString()),
                                 shrinkWrap: true,
                                 padding: const EdgeInsets.all(8),
 //                                itemCount: tasks[index].subTasksAmount ?? 0,
@@ -202,7 +217,14 @@ class ListViewItemState extends State<ListViewItem> {
                                 itemBuilder: (BuildContext context, int _index) {
 //                                return parent?.listTileGenerate(index) ?? const Text('Parent element is not defined');
 
-                                    return Text(expandedCache[_index].title);
+//                                    return parent?.listTileGenerate(_index) ?? Padding(
+//                                        padding: const EdgeInsets.only(left: 32),
+//                                        child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 12, color: Colors.black54),),
+//                                    );
+                                    return Padding(
+                                      padding: const EdgeInsets.only(left: 32, bottom: 3, top: 3),
+                                      child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 14, color: Colors.black54),),
+                                    );
                                 }
                             )
                         ],
@@ -230,7 +252,7 @@ Widget createListViewPoint(BuildContext context, int index, {
     required Function(DismissDirection) onDismissed,
     Future<bool> Function(DismissDirection)? confirmDismiss,
     required Function(Task?) Function() onTap,
-    Function? subTaskCreateAction,
+    Function? subTaskCreateAct,
     Function? expandAction,
     IExpandedTaskList? parent,
     required BuildContext rootContext}) {
@@ -312,7 +334,7 @@ Widget createListViewPoint(BuildContext context, int index, {
                                             child: const Icon(Icons.add, color: Colors.black26),
                                             onTap: () {
 //                                            popup(context, 'content');
-                                                subTaskCreateAction?.call();
+                                                subTaskCreateAct?.call();
                                             },
                                         ),
                                     ),

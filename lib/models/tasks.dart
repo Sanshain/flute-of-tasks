@@ -53,7 +53,7 @@ class Task {
     @override
     bool operator ==(Object other) {
         var isEqual = identical(this, other);
-        return isEqual || other is Task && runtimeType == other.runtimeType && id == other.id;
+        return isEqual || other is Task && runtimeType == other.runtimeType && id == other.id && title == other.title;
     }
 
     @override int get hashCode => id.hashCode ^ title.hashCode;
