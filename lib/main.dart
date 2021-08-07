@@ -9,6 +9,8 @@ import 'models/database/database.dart';
 import 'models/tasks.dart';
 //import 'models/migrations/init.dart';
 
+import 'package:get/get.dart';
+
 
 void main() async {
 
@@ -32,7 +34,8 @@ class App extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return MaterialApp(
+//        return MaterialApp(
+        return GetMaterialApp(
             title: 'Some Awesome App',
             theme: ThemeData(
                 primarySwatch: Colors.blue,

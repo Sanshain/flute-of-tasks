@@ -62,10 +62,12 @@ class _$AppDatabase extends AppDatabase {
 
   TaskDao? _taskDaoInstance;
 
+  Places? _placesHandlerInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 2,
+      version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -94,6 +96,11 @@ class _$AppDatabase extends AppDatabase {
   @override
   TaskDao get taskDao {
     return _taskDaoInstance ??= _$TaskDao(database, changeListener);
+  }
+
+  @override
+  Places get placesHandler {
+    return _placesHandlerInstance ??= _$Places(database, changeListener);
   }
 }
 
@@ -165,11 +172,30 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['created'] as int),
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
-            row['place'] as int?,
-            subTasksAmount: row['subTasksAmount'] as int?,
-            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
-        )
-    );
+            row['place'] as int?));
+  }
+
+  @override
+  Future<List<Task>> getTasksFromPlace(int place) async {
+    return _queryAdapter.queryList(
+        'SELECT EndPointTasks.* FROM              Task as EndPointTasks              LEFT JOIN Task as child ON EndPointTasks.id = child.parent         WHERE              child.id is NULL AND EndPointTasks.place = ?1',
+        mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?),
+        arguments: [place]);
+  }
+
+  @override
+  Future<List<Task>> endPointTasks() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM Task as EndPointTask WHERE (SELECT Count(*) FROM Task WHERE parent = EndPointTask.id) = 0',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?,
+            row['place'] as int?));
   }
 
   @override
@@ -187,15 +213,18 @@ class _$TaskDao extends TaskDao {
             row['place'] as int?,
             subTasksAmount: row['subTasksAmount'] as int?,
             doneSubTasksAmount: row['doneSubTasksAmount'] as int?
-        )
-    );
+        ));
   }
 
   @override
   Future<List<Task>> getChildren(int id) async {
     return _queryAdapter.queryList(
         'SELECT            parent_task.*, count(children.id) as subTasksAmount,                       SUM(children.isDone) as doneSubTasksAmount	         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
-        mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?),
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?,
+            subTasksAmount: row['subTasksAmount'] as int?,
+            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
+        ),
         arguments: [id]);
   }
 
@@ -232,6 +261,45 @@ class _$TaskDao extends TaskDao {
   @override
   Future<void> deleteItem(Task task) async {
     await _taskDeletionAdapter.delete(task);
+  }
+}
+
+class _$Places extends Places {
+  _$Places(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  @override
+  Future<List<Task>> all() async {
+    return _queryAdapter.queryList('SELECT * FROM Place',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?,
+            row['place'] as int?));
+  }
+
+  @override
+  Future<List<Task>> getAll() async {
+    return _queryAdapter.queryList('SELECT * FROM Place',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?,
+            row['place'] as int?));
   }
 }
 

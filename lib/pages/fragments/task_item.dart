@@ -341,15 +341,15 @@ Widget createListViewPoint(BuildContext context, int index, {
             },
             child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 1),
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 8),
 //            color: index == selectedIndex ? Colors.white60: Colors.white60,
-                color: Colors.white60,
-                child: ExpansionTile(
-                    onExpansionChanged: (bool expanded) async {
-                        if (expanded && tasks[index].subTasksAmount != expandedCache.length) {
-                            expandedCache = (await tasks[index].children) ?? [];
-                        }
-                    },
+                color: Colors.white70,
+                child: ListTile(
+//                    onExpansionChanged: (bool expanded) async {
+//                        if (expanded && tasks[index].subTasksAmount != expandedCache.length) {
+//                            expandedCache = (await tasks[index].children) ?? [];
+//                        }
+//                    },
                     title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -357,62 +357,45 @@ Widget createListViewPoint(BuildContext context, int index, {
                                 padding: const EdgeInsets.only(left: 15.0),
 //                      child: Icon(Icons.phone, color: Colors.black26)
                                 child: Text(
-                                    '${tasks[index].title} (${tasks[index].doneSubTasksAmount}/${tasks[index].subTasksAmount})',
+//                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
+                                    '${tasks[index].title} ${tasks[index].parentName != null ? '(${tasks[index].parentName})' : ''}',
                                     style: const TextStyle(fontSize: 16, color: Colors.black54)
                                 ),
                             ),
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                    Container(
-                                        decoration: const BoxDecoration(
-//                                        borderRadius: BorderRadius.circular(16),
-//                                        color: Colors.orange,
-                                            boxShadow: [
-                                                BoxShadow(color: Colors.white, spreadRadius: 8),
-                                            ],
-                                        ),
-                                        child: GestureDetector(
-
-                                            /// add
-                                            child: const Icon(Icons.add, color: Colors.black26),
-                                            onTap: () {
-//                                            popup(context, 'content');
-                                                subTaskCreateAct?.call();
-                                            },
-                                        ),
-                                    ),
-                                    Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                        child: GestureDetector(
-
-                                            /// expand
-                                            child: const Icon(Icons.expand_less, color: Colors.black26),
-                                            onTap: () {
-
-                                            },
-                                        ),
-                                    ),
-                                ],
-                            )
+//                            Row(
+//                                mainAxisAlignment: MainAxisAlignment.end,
+//                                children: [
+//                                    Padding(
+//                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+//                                        child: GestureDetector(
+//
+//                                            /// expand
+//                                            child: const Icon(Icons.expand_less, color: Colors.black26),
+//                                            onTap: () {
+//
+//                                            },
+//                                        ),
+//                                    ),
+//                                ],
+//                            )
                         ],
                     ),
 //                    children: const [
 //                        Text('Parent element is not defined')
 //                    ],
-                    children: [
-                        ListView.separated(
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.all(8),
-                            itemCount: tasks[index].subTasksAmount ?? 0,
-                            separatorBuilder: (BuildContext context, int index) => const Divider(),
-                            itemBuilder: (BuildContext context, int index) {
-//                                return parent?.listTileGenerate(index) ?? const Text('Parent element is not defined');
-//                                return const Text('Parent element is not defined');
-                                return Text(expandedCache[index].title);
-                            }
-                        )
-                    ],
+//                    children: [
+//                        ListView.separated(
+//                            shrinkWrap: true,
+//                            padding: const EdgeInsets.all(8),
+//                            itemCount: tasks[index].subTasksAmount ?? 0,
+//                            separatorBuilder: (BuildContext context, int index) => const Divider(),
+//                            itemBuilder: (BuildContext context, int index) {
+////                                return parent?.listTileGenerate(index) ?? const Text('Parent element is not defined');
+////                                return const Text('Parent element is not defined');
+//                                return Text(expandedCache[index].title);
+//                            }
+//                        )
+//                    ],
                 ),
             ),
         ),

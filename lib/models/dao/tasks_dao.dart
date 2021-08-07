@@ -5,12 +5,26 @@ import 'package:some_app/models/tasks.dart';
 @dao
 abstract class TaskDao {
 
-    @Query('SELECT * FROM Task')
+    @Query("SELECT * FROM Task")
     Future<List<Task>> all();
 
-    @Query("SELECT * FROM Task WHERE place = :place")
+
+    @Query("""
+        SELECT EndPointTasks.* FROM 
+            Task as EndPointTasks 
+            LEFT JOIN Task as child ON EndPointTasks.id = child.parent
+        WHERE 
+            child.id is NULL AND EndPointTasks.place = :place
+    """)
+//    @Query("SELECT * FROM Task WHERE place = :place")
     Future<List<Task>> getTasksFromPlace(int place);
 
+
+    @Query("SELECT * FROM Task as EndPointTask WHERE (SELECT Count(*) FROM Task WHERE parent = EndPointTask.id) = 0")
+    Future<List<Task>> endPointTasks();
+
+
+    // todo rename to rootTasks:
     @Query("""
         SELECT
            parent_task.*, count(children.id) as subTasksAmount,
@@ -25,6 +39,7 @@ abstract class TaskDao {
         GROUP BY parent_task.id;    
     """)
     Future<List<Task>> readWChildren();
+
 
     @Query("""
         SELECT

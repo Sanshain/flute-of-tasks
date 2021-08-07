@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:some_app/controller.dart';
 
 import 'package:some_app/pages/fragments/quick_new.dart';
 import 'package:some_app/pages/fragments/task_item.dart';
@@ -16,6 +17,7 @@ import 'models/dao/tasks_dao.dart';
 import 'models/tasks.dart';
 import 'panel.dart';
 
+import 'package:collection/collection.dart';
 
 
 /// MainPage
@@ -51,20 +53,35 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     final List<Task> tasks = [];
 
     void Function(Task)? useSubTasksUpdate;
+    final Controller controller = Get.put(Controller());
+
 
     @override
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
 
         widget.tasks.all().then((_tasks) {
+            controller.setTasks(_tasks);
+
             stdout.write(_tasks.toString());
+            archive.addAll(
+                _tasks.where((task) {
+                    task.parentName = _tasks.where((t) => task.parent == t.id).firstOrNull?.title;
+                    return task.isDone && _tasks.where((t) => task.id == t.parent).isEmpty;
+                })
+            );
         });
 
         widget.tasks.readWChildren().then((_tasks) {
+
             stdout.write(_tasks.toString());
             setState(() {
                 tasks.addAll(_tasks.where((task) => task.isDone == false));
-                archive.addAll(_tasks.where((task) => task.isDone));
+//                archive.addAll(
+//                    _tasks.where((task) {
+//                        return task.isDone && _tasks.where((t) => t.parent == task.id).isEmpty;
+//                    })
+//                );
             });
         });
     }
@@ -91,9 +108,9 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
             tasks: tasks,
             parent: this,
             deep: deep,
-            toLeft: const SwipeBackground(
-                Colors.orangeAccent, Icon(Icons.unarchive_outlined)),
             toRight: const SwipeBackground(
+                Colors.orangeAccent, Icon(Icons.unarchive_outlined)),
+            toLeft: const SwipeBackground(
                 Colors.redAccent, Icon(Icons.delete_forever)),
             confirmDismiss: (DismissDirection direction) async {
                 if (direction == DismissDirection.endToStart) {
@@ -105,7 +122,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                             setState(() => tasks.removeAt(index));
 
 //                          ScaffoldMessenger.of(context).showSnackBar(
-//                              const SnackBar(contentwidget: Text("item dismissed"))
+//                              const SnackBar(content widget: Text("item dismissed"))
 //                          );
                         }
                     });
@@ -119,6 +136,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     await widget.tasks.updateItem(tasks[index]);
 
                     setState(() {
+                        tasks[index].parentName = controller.tasks.where((t) => tasks[index].parent == t.id).firstOrNull?.title;
                         archive.add(tasks[index]);
                         tasks.removeAt(index);
                     });

@@ -56,6 +56,7 @@ class Task {
     late final DateTime created;
     DateTime? deadline;
 
+    @ignore String? parentName;
     @ignore int? subTasksAmount;    //    @ColumnInfo(name: '')
     @ignore int? doneSubTasksAmount;
     int get activeSubTasksAmount => (subTasksAmount ?? 0) - (doneSubTasksAmount ?? 0);
