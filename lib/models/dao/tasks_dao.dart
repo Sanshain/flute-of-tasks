@@ -8,6 +8,9 @@ abstract class TaskDao {
     @Query('SELECT * FROM Task')
     Future<List<Task>> all();
 
+    @Query("SELECT * FROM Task WHERE place = :place")
+    Future<List<Task>> getTasksFromPlace(int place);
+
     @Query("""
         SELECT
            parent_task.*, count(children.id) as subTasksAmount,
@@ -53,4 +56,15 @@ abstract class TaskDao {
 
     @update
     Future<void> updateTasks(List<Task> task);
+}
+
+
+
+@dao
+abstract class Places {
+    @Query('SELECT * FROM Place')
+    Future<List<Task>> all();
+
+    /// todo annotate to count of active tasks:
+    @Query('SELECT * FROM Place') Future<List<Task>> getAll();
 }
