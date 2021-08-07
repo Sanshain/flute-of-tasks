@@ -145,10 +145,10 @@ class ListViewItemState extends State<ListViewItem> {
 //                        tilePadding: EdgeInsets.all(0),
 //                        childrenPadding: const EdgeInsets.all(0),
                         collapsedIconColor: (currentTask.subTasksAmount ?? 0) > 0 ? Colors.black54 : Colors.transparent,
-//                        trailing: null,
+                        trailing: null,
 //                        trailing: Visibility(
 //                            visible: (currentTask.subTasksAmount ?? 0) > 0 ? true : false,
-//                            child: const Icon(Icons.add_comment)
+//                            child: const Icon(Icons.expand_less)
 //                        ),
 //                        collapsedIconColor: expandedCache[rootIndex!].subTasksAmount == 0 ? Colors.black12 : Colors.black54,
                         key: PageStorageKey<String>(rootIndex!.toString()),
@@ -173,7 +173,8 @@ class ListViewItemState extends State<ListViewItem> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                                 Container(
-                                    width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
+//                                    width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
+                                    width: MediaQuery.of(context).size.width - 220,
                                     padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
 //                      child: Icon(Icons.phone, color: Colors.black26)
                                     child: Text(
