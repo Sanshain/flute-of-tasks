@@ -10,7 +10,8 @@ abstract class TaskDao {
 
     @Query("""
         SELECT
-           parent_task.*, count(children.id) as subTasksAmount
+           parent_task.*, count(children.id) as subTasksAmount,
+           SUM(children.isDone) as doneSubTasksAmount	
         FROM
            "Task" as parent_task 
            LEFT OUTER JOIN
@@ -24,7 +25,8 @@ abstract class TaskDao {
 
     @Query("""
         SELECT
-           parent_task.*, count(children.id) as subTasksAmount
+           parent_task.*, count(children.id) as subTasksAmount,           
+           SUM(children.isDone) as doneSubTasksAmount	
         FROM
            "Task" as parent_task 
            LEFT OUTER JOIN

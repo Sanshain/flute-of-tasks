@@ -73,20 +73,24 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     Widget listTileGenerate(int index, {
         BuildContext? parentContext,
         List<BuildContext?>? childContextWrapper,
-        List<Task>? parentTasks
+        List<Task>? parentTasks,
+        Task? parentTask,
+        int deep = 0
     }) {
 
         parentContext = parentContext ?? rootContext;
         childContextWrapper = childContextWrapper ?? subContextWrapper;
-        parentTasks = parentTasks ?? tasks;
+        var tasks = parentTasks ?? this.tasks;
 
 //        return createListViewPoint(
         return ListViewItem(
             context,
             index,
-            subContextWrapper: subContextWrapper,
+            subContextWrapper: childContextWrapper,
+            parentTask: parentTask,
             tasks: tasks,
             parent: this,
+            deep: deep,
             toLeft: const SwipeBackground(
                 Colors.orangeAccent, Icon(Icons.unarchive_outlined)),
             toRight: const SwipeBackground(
@@ -241,26 +245,29 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                                 else {
                                     return Stack(
                                         children: [
-                                            Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 32),
+                                              child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
 //                          Center(
 //                              child: Text(
 //                                  _tabInfo[index].title,  // '( selected $selectedIndex)',
 //                                style: Theme.of(context).textTheme.headline6,
 //                              )
 //                          ),
-                                                    Expanded(child: ListView.separated(
-                                                        padding: const EdgeInsets.all(8),
-                                                        itemCount: tasks.length,
-                                                        separatorBuilder: (BuildContext context,
-                                                            int index) => const Divider(),
-                                                        itemBuilder: (BuildContext context, int index) {
+                                                      Expanded(child: ListView.separated(
+                                                          padding: const EdgeInsets.all(8),
+                                                          itemCount: tasks.length,
+                                                          separatorBuilder: (BuildContext context,
+                                                              int index) => const Divider(),
+                                                          itemBuilder: (BuildContext context, int index) {
 //                                return createListViewPoint(context, index);
-                                                            return listTileGenerate(index);
-                                                        }
-                                                    )),
-                                                ],
+                                                              return listTileGenerate(index);
+                                                          }
+                                                      )),
+                                                  ],
+                                              ),
                                             ),
                                             _createQuickTask(),
                                         ]

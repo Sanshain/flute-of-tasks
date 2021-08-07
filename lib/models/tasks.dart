@@ -17,7 +17,10 @@ class Task {
 
     static TaskDao? tasks;
 
-    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, { this.subTasksAmount });
+    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, {
+        this.subTasksAmount,
+        this.doneSubTasksAmount
+    });
 
     Task.init(this.title, {this.id, this.description = '', this.parent}){
         created = DateTime.now();
@@ -38,6 +41,8 @@ class Task {
     @ignore
 //    @ColumnInfo(name: '')
     int? subTasksAmount;
+    int? doneSubTasksAmount;
+    int get activeSubTasksAmount => (subTasksAmount ?? 0) - (doneSubTasksAmount ?? 0);
 
 
     Future<List<Task>?> get children async {
@@ -49,6 +54,7 @@ class Task {
           throw Exception('static field database is not defined');
         }
     }
+
 
     @override
     bool operator ==(Object other) {

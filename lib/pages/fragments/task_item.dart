@@ -10,7 +10,13 @@ import 'package:some_app/widgets/popups.dart';
 
 
 abstract class IExpandedTaskList {
-    Widget listTileGenerate(int index);
+    Widget listTileGenerate(int index, {
+        BuildContext? parentContext,
+        List<BuildContext?>? childContextWrapper,
+        List<Task>? parentTasks,
+        Task? parentTask,
+        int deep = 0
+    });
 }
 
 
@@ -25,6 +31,7 @@ class SwipeBackground {
 
 class ListViewItem extends StatefulWidget {
 
+    final int deep;
     final int index;
     final List<BuildContext?>? subContextWrapper;
     final SwipeBackground? toLeft;
@@ -37,6 +44,7 @@ class ListViewItem extends StatefulWidget {
     final Function? expandAction;
     final IExpandedTaskList? parent;
     final BuildContext rootContext;
+    final Task? parentTask;
 
     const ListViewItem(BuildContext context, this.index, {
         key,
@@ -50,7 +58,9 @@ class ListViewItem extends StatefulWidget {
         required this.subTaskCreateAction,
         required this.expandAction,
         required this.parent,
-        required this.rootContext}) : super(key: key);
+        required this.rootContext,
+        this.parentTask,
+        this.deep = 0}) : super(key: key);
 
     @override
     ListViewItemState createState() => ListViewItemState();
@@ -60,7 +70,9 @@ class ListViewItem extends StatefulWidget {
 class ListViewItemState extends State<ListViewItem> {
 
     int? rootIndex;
+    late Task currentTask;
     List<Task> expandedCache = [];
+    int deep = 0;
 
     @override
     void initState() {
@@ -68,12 +80,11 @@ class ListViewItemState extends State<ListViewItem> {
 
     }
 
-    Widget _createListViewPoint(BuildContext context, ListViewItemState self)
-    {
+    Widget _createListViewPoint(BuildContext context, ListViewItemState self) {
         var widget = self.widget;
 
-        int index = widget.index;
-        rootIndex = index;
+        Task? parentTask = widget.parentTask;
+        int index = rootIndex = widget.index;
         List<BuildContext?>? subContextWrapper = widget.subContextWrapper;
         SwipeBackground? toLeft = widget.toLeft;
         SwipeBackground? toRight = widget.toRight;
@@ -86,12 +97,22 @@ class ListViewItemState extends State<ListViewItem> {
         Function? expandAction = widget.expandAction;
         IExpandedTaskList? parent = widget.parent;
         BuildContext rootContext = widget.rootContext;
+        deep = widget.deep;
 
+        currentTask = tasks[index];
 
         return Dismissible(
 //      key: Key(index.toString()),
             key: UniqueKey(),
-            onDismissed: onDismissed,
+            onDismissed: (direction){
+                if (parentTask != null){
+                    setState(() {
+                        parentTask.doneSubTasksAmount =
+                            (parentTask.doneSubTasksAmount ?? 0) + (direction == DismissDirection.startToEnd ? 1 : -1);
+                    });
+                }
+                onDismissed(direction);
+            },
             confirmDismiss: confirmDismiss,
             secondaryBackground: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -109,38 +130,55 @@ class ListViewItemState extends State<ListViewItem> {
                 onTap: () {
 
                 },
+//                child: const Text('123'),
+
                 child: Container(
+//                    height: 60.0,
                     margin: const EdgeInsets.symmetric(vertical: 1),
                     padding: const EdgeInsets.symmetric(vertical: 1),
 //            color: index == selectedIndex ? Colors.white60: Colors.white60,
                     color: Colors.white60,
+//                    child: const Text('1235'),
+
                     child: ExpansionTile(
+//                        trailing: const SizedBox.shrink(),
+//                        tilePadding: EdgeInsets.all(0),
+//                        childrenPadding: const EdgeInsets.all(0),
+                        collapsedIconColor: (currentTask.subTasksAmount ?? 0) > 0 ? Colors.black54 : Colors.transparent,
+//                        trailing: null,
+//                        trailing: Visibility(
+//                            visible: (currentTask.subTasksAmount ?? 0) > 0 ? true : false,
+//                            child: const Icon(Icons.add_comment)
+//                        ),
+//                        collapsedIconColor: expandedCache[rootIndex!].subTasksAmount == 0 ? Colors.black12 : Colors.black54,
                         key: PageStorageKey<String>(rootIndex!.toString()),
 //                        key: Key(index.toString()),
                         onExpansionChanged: (bool expanded) async {
-
                             var startAmount = tasks[index].subTasksAmount;
 
                             if (expanded && startAmount != expandedCache.length) {
 //                                expandedCache = (await tasks[index].children) ?? [];
                                 var _index = index;
-                                var subTasks = (await tasks[_index].children) ?? [];
+                                var subTasks = (await tasks[_index].children)?.where((element) => !element.isDone) ?? [];
                                 setState(() {
 //                                    expandedCache = expandedCache;
 //                                    expandedCache = subTasks;
+                                    expandedCache = [];
                                     expandedCache.insertAll(expandedCache.length, subTasks);
                                 });
                             }
                         },
+//                        title: const Text('234'),
                         title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                                Padding(
-                                    padding: const EdgeInsets.only(left: 15.0),
+                                Container(
+                                    width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
+                                    padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
 //                      child: Icon(Icons.phone, color: Colors.black26)
                                     child: Text(
-                                        '${tasks[index].title} (${tasks[index].subTasksAmount})',
-                                        style: const TextStyle(fontSize: 16, color: Colors.black54)
+                                        '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask.subTasksAmount})',
+                                        style: TextStyle(fontSize: 16 - deep.toDouble(), color: Colors.black54.withAlpha(100 - deep * 10))
                                     ),
                                 ),
                                 Row(
@@ -158,14 +196,14 @@ class ListViewItemState extends State<ListViewItem> {
 
                                                 /// add
                                                 child: const Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                                  child: Icon(Icons.add, color: Colors.black26),
+                                                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                                    child: Icon(Icons.add, color: Colors.black26),
                                                 ),
                                                 onTap: () {
 //                                            popup(context, 'content');
-                                                    subTaskCreateAction?.call(onApply: (Task task){
+                                                    subTaskCreateAction?.call(onApply: (Task task) {
                                                         setState(() {
-                                                          expandedCache.add(task);
+                                                            expandedCache.add(task);
                                                         });
                                                     });
                                                 },
@@ -217,10 +255,15 @@ class ListViewItemState extends State<ListViewItem> {
                                 itemBuilder: (BuildContext context, int _index) {
 //                                return parent?.listTileGenerate(index) ?? const Text('Parent element is not defined');
 
-                                    return parent?.listTileGenerate(_index) ?? Padding(
-                                        padding: const EdgeInsets.only(left: 32),
-                                        child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 12, color: Colors.black54),),
-                                    );
+//                                    var children = tasks[index].children;
+
+                                    return parent?.listTileGenerate(
+                                        _index, parentTasks: expandedCache, deep: deep + 1, parentTask: currentTask
+                                    ) ?? Padding(
+                                            padding: const EdgeInsets.only(left: 32),
+                                            child: Text(expandedCache[_index].title,
+                                                style: const TextStyle(fontSize: 12, color: Colors.black54),),
+                                        );
 //                                    return Padding(
 //                                      padding: const EdgeInsets.only(left: 32, bottom: 3, top: 3),
 //                                      child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 14, color: Colors.black54),),
@@ -313,7 +356,7 @@ Widget createListViewPoint(BuildContext context, int index, {
                                 padding: const EdgeInsets.only(left: 15.0),
 //                      child: Icon(Icons.phone, color: Colors.black26)
                                 child: Text(
-                                    '${tasks[index].title} (${tasks[index].subTasksAmount})',
+                                    '${tasks[index].title} (${tasks[index].doneSubTasksAmount}/${tasks[index].subTasksAmount})',
                                     style: const TextStyle(fontSize: 16, color: Colors.black54)
                                 ),
                             ),

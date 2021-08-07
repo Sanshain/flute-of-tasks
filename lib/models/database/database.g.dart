@@ -165,7 +165,7 @@ class _$TaskDao extends TaskDao {
   @override
   Future<List<Task>> readWChildren() async {
     return _queryAdapter.queryList(
-        'SELECT            parent_task.*, count(children.id) as subTasksAmount         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent is NULL         GROUP BY parent_task.id;',
+        'SELECT            parent_task.*, count(children.id) as subTasksAmount, SUM(children.isDone) as doneSubTasksAmount         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent is NULL         GROUP BY parent_task.id;',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['title'] as String,
@@ -174,14 +174,15 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['created'] as int),
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
-            subTasksAmount: row['subTasksAmount'] as int?
+            subTasksAmount: row['subTasksAmount'] as int?,
+            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
         ));
   }
 
   @override
   Future<List<Task>> getChildren(int id) async {
     return _queryAdapter.queryList(
-        'SELECT            parent_task.*, count(children.id) as subTasksAmount         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
+        'SELECT            parent_task.*, count(children.id) as subTasksAmount, SUM(children.isDone) as doneSubTasksAmount         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['title'] as String,
@@ -190,7 +191,8 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['created'] as int),
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
-            subTasksAmount: row['subTasksAmount'] as int?
+            subTasksAmount: row['subTasksAmount'] as int?,
+            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
         ),
         arguments: [id]);
   }
