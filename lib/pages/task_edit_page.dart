@@ -91,9 +91,11 @@ class TaskEditState extends State<TaskEdit> {
                                                         ),
                                                     child: const Icon(Icons.plus_one),
                                                 ),
-                                                CircleAvatar(
-                                                    radius: 15,
-                                                    backgroundColor: const Color(0xff94d500),
+                                                Material(
+                                                    type: MaterialType.circle,
+                                                    color: Colors.deepOrangeAccent,
+//                                                    radius: 15,
+//                                                    backgroundColor: const Color(0xff94d500),
                                                     child: IconButton(
                                                         onPressed: () =>
                                                             selectDate(context, null,
