@@ -19,6 +19,12 @@ samples, guidance on mobile development, and a full API reference.
 ## Database struct update:
 
 - `flutter packages pub run build_runner build`
+- Then add following lines to constructors with queries having according fields:
+    ```
+            subTasksAmount: row['subTasksAmount'] as int?,
+            doneSubTasksAmount: row['doneSubTasksAmount'] as int?  
+    ```
+- 
 
 ## Build to release:
 

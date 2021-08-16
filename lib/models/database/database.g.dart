@@ -266,7 +266,24 @@ class _$TaskDao extends TaskDao {
 
 class _$Places extends Places {
   _$Places(this.database, this.changeListener)
-      : _queryAdapter = QueryAdapter(database);
+      : _queryAdapter = QueryAdapter(database),
+        _placeInsertionAdapter = InsertionAdapter(
+            database,
+            'Place',
+            (Place item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'isActive': item.isActive ? 1 : 0
+                }),
+        _placeUpdateAdapter = UpdateAdapter(
+            database,
+            'Place',
+            ['id'],
+            (Place item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'isActive': item.isActive ? 1 : 0
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -274,32 +291,32 @@ class _$Places extends Places {
 
   final QueryAdapter _queryAdapter;
 
+  final InsertionAdapter<Place> _placeInsertionAdapter;
+
+  final UpdateAdapter<Place> _placeUpdateAdapter;
+
   @override
-  Future<List<Task>> all() async {
+  Future<List<Place>> all() async {
     return _queryAdapter.queryList('SELECT * FROM Place',
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?,
-            row['title'] as String,
-            row['description'] as String,
-            (row['isDone'] as int) != 0,
-            _dateTimeConverter.decode(row['created'] as int),
-            _nullableDateTimeConverter.decode(row['deadline'] as int?),
-            row['parent'] as int?,
-            row['place'] as int?));
+        mapper: (Map<String, Object?> row) => Place(row['id'] as int?,
+            row['name'] as String, (row['isActive'] as int) != 0));
   }
 
   @override
-  Future<List<Task>> getAll() async {
+  Future<List<Place>> getAll() async {
     return _queryAdapter.queryList('SELECT * FROM Place',
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?,
-            row['title'] as String,
-            row['description'] as String,
-            (row['isDone'] as int) != 0,
-            _dateTimeConverter.decode(row['created'] as int),
-            _nullableDateTimeConverter.decode(row['deadline'] as int?),
-            row['parent'] as int?,
-            row['place'] as int?));
+        mapper: (Map<String, Object?> row) => Place(row['id'] as int?,
+            row['name'] as String, (row['isActive'] as int) != 0));
+  }
+
+  @override
+  Future<void> insertNew(Place place) async {
+    await _placeInsertionAdapter.insert(place, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateItem(Place place) async {
+    await _placeUpdateAdapter.update(place, OnConflictStrategy.abort);
   }
 }
 

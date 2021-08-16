@@ -22,15 +22,17 @@ void main() async {
         .build();
 
     final TaskDao tasks = Task.tasks = database.taskDao;
+    final Places places = Place.objects = database.placesHandler;
 
-    runApp(App(tasks));
+    runApp(App(tasks, places));
 //    runApp(const App(tasks));
 }
 
 class App extends StatelessWidget {
-    const App(this.tasks, {Key? key}) : super(key: key);
+    const App(this.tasks, this.places, {Key? key}) : super(key: key);
 
     final TaskDao tasks;
+    final Places places;
 
     @override
     Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class App extends StatelessWidget {
                 primarySwatch: Colors.blue,
             ),
 //      home: const MainPage(tasks, title: 'The Tasks'),
-            home: MainPage(tasks, title: 'The Tasks'),
+            home: MainPage(tasks, places, title: 'The Tasks'),
         );
     }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:some_app/models/tasks.dart';
 import 'package:some_app/pages/task_edit_page.dart';
 import 'package:some_app/transitions/instant.dart';
@@ -341,7 +342,7 @@ Widget createListViewPoint(BuildContext context, int index, {
             },
             child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 1),
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 6),
 //            color: index == selectedIndex ? Colors.white60: Colors.white60,
                 color: Colors.white70,
                 child: ListTile(
@@ -354,7 +355,7 @@ Widget createListViewPoint(BuildContext context, int index, {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                             Padding(
-                                padding: const EdgeInsets.only(left: 15.0),
+                                padding: const EdgeInsets.only(left: 12.0),
 //                      child: Icon(Icons.phone, color: Colors.black26)
                                 child: Text(
 //                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
@@ -362,22 +363,24 @@ Widget createListViewPoint(BuildContext context, int index, {
                                     style: const TextStyle(fontSize: 16, color: Colors.black54)
                                 ),
                             ),
-//                            Row(
-//                                mainAxisAlignment: MainAxisAlignment.end,
-//                                children: [
-//                                    Padding(
-//                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//                                        child: GestureDetector(
-//
-//                                            /// expand
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                    Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                        child: GestureDetector(
+
 //                                            child: const Icon(Icons.expand_less, color: Colors.black26),
-//                                            onTap: () {
-//
-//                                            },
-//                                        ),
-//                                    ),
-//                                ],
-//                            )
+                                            child: Text(
+//                                                tasks[index].deadline.toString(),
+                                                tasks[index].deadline != null ? DateFormat("H:m M E d").format(tasks[index].deadline!) : '',
+                                                style: const TextStyle(fontSize: 12, color: Colors.black38)
+                                            ),
+                                            onTap: () {},
+                                        ),
+                                    ),
+                                ],
+                            )
                         ],
                     ),
 //                    children: const [

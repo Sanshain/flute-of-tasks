@@ -78,8 +78,16 @@ abstract class TaskDao {
 @dao
 abstract class Places {
     @Query('SELECT * FROM Place')
-    Future<List<Task>> all();
+    Future<List<Place>> all();
 
     /// todo annotate to count of active tasks:
-    @Query('SELECT * FROM Place') Future<List<Task>> getAll();
+    @Query('SELECT * FROM Place') Future<List<Place>> getAll();
+
+    @insert
+    Future<void> insertNew(Place place);
+
+    @update
+    Future<void> updateItem(Place place);
 }
+
+

@@ -19,9 +19,10 @@ void main() {
 //    WidgetsFlutterBinding.ensureInitialized();
     final database = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
     final TaskDao tasks = database.taskDao;
+    final Places places = database.placesHandler;
 
     // Build our app and trigger a frame.
-    await tester.pumpWidget(App(tasks));
+    await tester.pumpWidget(App(tasks, places));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

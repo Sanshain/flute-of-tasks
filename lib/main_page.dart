@@ -7,6 +7,9 @@ import 'package:some_app/controller.dart';
 
 import 'package:some_app/pages/fragments/quick_new.dart';
 import 'package:some_app/pages/fragments/task_item.dart';
+import 'package:some_app/pages/placed_tasks.dart';
+import 'package:some_app/pages/places_page.dart';
+import 'package:some_app/pages/settings_page.dart';
 
 //import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:some_app/transitions/instant.dart';
@@ -22,10 +25,12 @@ import 'package:collection/collection.dart';
 
 /// MainPage
 class MainPage extends StatefulWidget {
-    const MainPage(this.tasks, {Key? key, required this.title}) : super(key: key);
+    const MainPage(this.tasks, this.places, {Key? key, required this.title}) : super(key: key);
 
     final String title;
+
     final TaskDao tasks;
+    final Places places;
 
     @override
     State<MainPage> createState() => MainPageState();
@@ -36,6 +41,11 @@ class MainPage extends StatefulWidget {
 /// MainPageState
 class MainPageState extends State<MainPage> implements IExpandedTaskList {
 
+    List<String> tabTitle = [
+        'Задачи',
+        'Места',
+        'Архив',
+    ];
 
     int selectedTab = 0;
     int selectedIndex = -1;
@@ -59,6 +69,10 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     @override
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
+
+        widget.places.all().then((_places) {
+           controller.initPlaces(_places);
+        });
 
         widget.tasks.all().then((_tasks) {
             controller.setTasks(_tasks);
@@ -133,6 +147,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                 if (direction == DismissDirection.startToEnd) { // Right Swipe
 
                     tasks[index].isDone = true;
+                    tasks[index].deadline = DateTime.now();
                     await widget.tasks.updateItem(tasks[index]);
 
                     setState(() {
@@ -168,14 +183,44 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         );
     }
 
-
     @override
     Widget build(BuildContext context) {
         rootContext = context;
 
         return Scaffold(
             appBar: AppBar(
-                title: Text("${widget.title} + ${selectedTab.toString()}"),
+//                title: Text("${widget.title} + ${selectedTab.toString()}"),
+                title: Text(tabTitle[selectedTab]),
+                actions: [
+                    const Icon(Icons.search),
+                    PopupMenuButton<Text>(
+                        itemBuilder: (context){
+                            return [
+                                PopupMenuItem(
+                                    child: GestureDetector(
+                                        onTap: (){
+                                            popup(context, 'todo');
+                                            Navigator.push(context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(),
+                                                transitionsBuilder: instantTransition,
+                                              )
+                                            //                                              MaterialPageRoute(builder: (context) => SettingsPage()
+                                            );
+                                        },
+                                        child: const Text("Settings")
+                                    )
+                                ),
+                                PopupMenuItem(
+                                    child: GestureDetector(
+                                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PlacesPage())),
+                                        child: const Text("My places")
+                                    )
+                                )
+                            ];
+                        },
+                    )
+                ],
             ),
             body: CupertinoTabScaffold(
                 restorationId: 'cupertino_tab_scaffold',
@@ -209,6 +254,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                             restorationScopeId: 'cupertino_tab_view_$index',
                             builder: (context) {
                                 if (index == 1) {
+                                    return const PlacedTasksPage();
                                     return CupertinoDemoTab(
                                         title: tabInfo[index].title,
                                         icon: tabInfo[index].icon,

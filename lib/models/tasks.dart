@@ -6,13 +6,28 @@ import 'database/database.dart';
 @entity
 class Place{
 
-    const Place(this.id, this.name, this.isActive);
+    static Places? objects;
+//    static TaskDao? tasksHand;
+
+    Place(this.id, this.name, this.isActive);
     Place.init(this.name, {this.id, this.isActive = true});
 
     @PrimaryKey(autoGenerate: true)
     final int? id;
     final String name;
     final bool isActive;
+
+    @ignore List<Task> activeTasks = <Task>[];
+
+    Future<List<Task>?> get tasks async {
+        if (Task.tasks != null){
+            var _tasks = await Task.tasks?.getTasksFromPlace(id!);
+            return _tasks;
+        }
+        else {
+            throw Exception('static field database is not defined');
+        }
+    }
 }
 
 
