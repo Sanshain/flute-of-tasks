@@ -69,7 +69,8 @@ class TaskEditState extends State<TaskEdit> {
                                 height: 96,
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                         Column(
 //                                        mainAxisAlignment: MainAxisAlignment.start,
@@ -79,7 +80,7 @@ class TaskEditState extends State<TaskEdit> {
                                                         fixedSize: const Size(30, 30),
                                                         shape: const CircleBorder(),
 ////                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                                                        shadowColor: Colors.orange,
+                                                        shadowColor: Colors.transparent,
                                                         primary: Colors.black12
                                                     ),
                                                     onPressed: () =>
@@ -91,63 +92,88 @@ class TaskEditState extends State<TaskEdit> {
                                                         ),
                                                     child: const Icon(Icons.plus_one),
                                                 ),
-                                                Material(
-                                                    type: MaterialType.circle,
-                                                    color: Colors.deepOrangeAccent,
-//                                                    radius: 15,
-//                                                    backgroundColor: const Color(0xff94d500),
-                                                    child: IconButton(
-                                                        onPressed: () =>
-                                                            selectDate(context, null,
-                                                                setState: (datetime) {
-                                                                    updated = updated ?? widget.task;
-                                                                    setState(() => widget.task.deadline = datetime);
-                                                                }
-                                                            ),
-                                                        icon: const Icon(Icons.exposure_minus_1),
+                                                ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                        fixedSize: const Size(30, 30),
+                                                        shape: const CircleBorder(),
+////                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                                        shadowColor: Colors.transparent,
+                                                        primary: Colors.black12
                                                     ),
+                                                    onPressed: () =>
+                                                        selectDate(context, null,
+                                                            setState: (datetime) {
+                                                                updated = updated ?? widget.task;
+                                                                setState(() => widget.task.deadline = datetime);
+                                                            }
+                                                        ),
+                                                    child: const Icon(Icons.exposure_minus_1),
+                                                )
+                                            ],
+                                        ),
+                                        Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child: Text("Важность"),
+                                                ),
+                                                ClipRRect(
+                                                    borderRadius: BorderRadius.circular(30.0),
+                                                    child: Container(
+                                                        color: Colors.black12,
+                                                        width: 50,
+                                                        height: 50,
+                                                        child: const Center(child: Text("156"))
+                                                    )
                                                 ),
                                             ],
                                         ),
-//                                    Column(
-//                                        mainAxisSize: MainAxisSize.min,
-//                                        children: <Widget>[
-//                                            Text("${widget.task.deadline ?? ''}".split(' ')[0]),
+                                        Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                                Text("${widget.task.deadline ?? ''}".split(' ')[0]),
+                                                const SizedBox(height: 20.0,),
+                                                ElevatedButton(
+                                                    onPressed: () =>
+                                                        selectDate(
+                                                            context, null,
+                                                            setState: (datetime) {
+//                                                selectedDate = datetime;
+                                                                updated = updated ?? widget.task;
+                                                                setState(() {
+                                                                    widget.task.deadline = datetime;
+                                                                });
+                                                            }
+                                                        ),
+                                                    child: const Text('Select date'),
+                                                ),
+                                            ],
+                                        ),
+                                        Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                                const Text("-"),
 //                                            const SizedBox(height: 20.0,),
-//                                            ElevatedButton(
-//                                                onPressed: () =>
-//                                                    selectDate(
-//                                                        context, null,
-//                                                        setState: (datetime) {
-////                                                selectedDate = datetime;
-//                                                            updated = updated ?? widget.task;
-//                                                            setState(() {
-//                                                                widget.task.deadline = datetime;
-//                                                            });
-//                                                        }
-//                                                    ),
-//                                                child: const Text('Select date'),
-//                                            ),
-//                                        ],
-//                                    ),
-//                                    Column(
-//                                        mainAxisSize: MainAxisSize.min,
-//                                        children: <Widget>[
-//                                            Text("${widget.task.deadline ?? ''}".split(' ')[0]),
-//                                            const SizedBox(height: 20.0,),
-//                                            ElevatedButton(
-//                                                onPressed: () =>
-//                                                    selectDate(
-//                                                        context, null,
-//                                                        setState: (datetime) {
-//                                                            updated = updated ?? widget.task;
-//                                                            setState(() => widget.task.deadline = datetime);
-//                                                        }
-//                                                    ),
-//                                                child: const Icon((Icons.place)),
-//                                            ),
-//                                        ],
-//                                    ),
+                                                ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                        fixedSize: const Size(30, 30),
+                                                        shape: const CircleBorder(),
+////                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                                        shadowColor: Colors.transparent,
+                                                        primary: Colors.black12
+                                                    ),
+                                                    onPressed: () =>
+                                                        selectDate(context, null,
+                                                            setState: (datetime) {
+                                                                updated = updated ?? widget.task;
+                                                                setState(() => widget.task.deadline = datetime);
+                                                            }
+                                                        ),
+                                                    child: const Icon(Icons.place),
+                                                ),
+                                            ],
+                                        ),
                                     ],
                                 ),
                             ),

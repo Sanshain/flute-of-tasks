@@ -83,7 +83,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent` INTEGER, `place` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER, FOREIGN KEY (`place`) REFERENCES `Place` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`parent`) REFERENCES `Task` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent` INTEGER, `place` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `gravity` INTEGER NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER, FOREIGN KEY (`place`) REFERENCES `Place` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`parent`) REFERENCES `Task` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Place` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `isActive` INTEGER NOT NULL)');
 
@@ -116,6 +116,7 @@ class _$TaskDao extends TaskDao {
                   'place': item.place,
                   'title': item.title,
                   'description': item.description,
+                  'gravity': item.gravity,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
@@ -130,6 +131,7 @@ class _$TaskDao extends TaskDao {
                   'place': item.place,
                   'title': item.title,
                   'description': item.description,
+                  'gravity': item.gravity,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
@@ -144,6 +146,7 @@ class _$TaskDao extends TaskDao {
                   'place': item.place,
                   'title': item.title,
                   'description': item.description,
+                  'gravity': item.gravity,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
@@ -172,14 +175,15 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['created'] as int),
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
-            row['place'] as int?));
+            row['place'] as int?,
+            row['gravity'] as int));
   }
 
   @override
   Future<List<Task>> getTasksFromPlace(int place) async {
     return _queryAdapter.queryList(
         'SELECT EndPointTasks.* FROM              Task as EndPointTasks              LEFT JOIN Task as child ON EndPointTasks.id = child.parent         WHERE              child.id is NULL AND EndPointTasks.place = ?1',
-        mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?),
+        mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int),
         arguments: [place]);
   }
 
@@ -195,7 +199,8 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['created'] as int),
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
-            row['place'] as int?));
+            row['place'] as int?,
+            row['gravity'] as int));
   }
 
   @override
@@ -211,6 +216,7 @@ class _$TaskDao extends TaskDao {
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
             row['place'] as int?,
+            row['gravity'] as int,
             subTasksAmount: row['subTasksAmount'] as int?,
             doneSubTasksAmount: row['doneSubTasksAmount'] as int?
         ));
@@ -221,7 +227,7 @@ class _$TaskDao extends TaskDao {
     return _queryAdapter.queryList(
         'SELECT            parent_task.*, count(children.id) as subTasksAmount,                       SUM(children.isDone) as doneSubTasksAmount	         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
         mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?,
+            row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int,
             subTasksAmount: row['subTasksAmount'] as int?,
             doneSubTasksAmount: row['doneSubTasksAmount'] as int?
         ),
@@ -239,7 +245,8 @@ class _$TaskDao extends TaskDao {
             _dateTimeConverter.decode(row['created'] as int),
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
-            row['place'] as int?),
+            row['place'] as int?,
+            row['gravity'] as int),
         arguments: [id]);
   }
 

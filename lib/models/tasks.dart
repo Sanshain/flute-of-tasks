@@ -50,12 +50,12 @@ class Task {
 
     static TaskDao? tasks;
 
-    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, this.place, {
+    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, this.place, this.gravity, {
         this.subTasksAmount,
         this.doneSubTasksAmount
     });
 
-    Task.init(this.title, {this.id, this.description = '', this.parent, this.place}){
+    Task.init(this.title, {this.id, this.description = '', this.parent, this.place, this.gravity = 0}){
         created = DateTime.now();
         isDone = false;
     }
@@ -67,7 +67,9 @@ class Task {
 
     String title;
     String description;
+    int gravity = 0;
     late bool isDone;
+
     late final DateTime created;
     DateTime? deadline;
 
