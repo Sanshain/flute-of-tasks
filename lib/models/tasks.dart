@@ -4,12 +4,14 @@ import 'dao/tasks_dao.dart';
 import 'database/database.dart';
 
 @entity
-class Place{
+class Place {
 
     static Places? objects;
+
 //    static TaskDao? tasksHand;
 
     Place(this.id, this.name, this.isActive);
+
     Place.init(this.name, {this.id, this.isActive = true});
 
     @PrimaryKey(autoGenerate: true)
@@ -20,7 +22,7 @@ class Place{
     @ignore List<Task> activeTasks = <Task>[];
 
     Future<List<Task>?> get tasks async {
-        if (Task.tasks != null){
+        if (Task.tasks != null) {
             var _tasks = await Task.tasks?.getTasksFromPlace(id!);
             return _tasks;
         }
@@ -50,10 +52,11 @@ class Task {
 
     static TaskDao? tasks;
 
-    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, this.place, this.gravity, {
-        this.subTasksAmount,
-        this.doneSubTasksAmount
-    });
+    Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, this.place,
+        this.gravity, {
+            this.subTasksAmount,
+            this.doneSubTasksAmount
+        });
 
     Task.init(this.title, {this.id, this.description = '', this.parent, this.place, this.gravity = 0}){
         created = DateTime.now();
@@ -62,35 +65,42 @@ class Task {
 
 //    @primaryKey
     @PrimaryKey(autoGenerate: true) final int? id;
-    final int? parent;
-    final int? place;
 
+    int? parent;
+    int? place;
     String title;
     String description;
     int gravity = 0;
-    late bool isDone;
 
+    late bool isDone;
     late final DateTime created;
     DateTime? deadline;
 
     @ignore String? parentName;
-    @ignore int? subTasksAmount;    //    @ColumnInfo(name: '')
+    @ignore int? subTasksAmount; //    @ColumnInfo(name: '')
     @ignore int? doneSubTasksAmount;
+
     int get activeSubTasksAmount => (subTasksAmount ?? 0) - (doneSubTasksAmount ?? 0);
 
     //TODO:
 //    Place? get actionPlace => this.place
 
     Future<List<Task>?> get children async {
-        if (tasks != null){
+        if (tasks != null) {
             var _tasks = await tasks?.getChildren(id!);
             return _tasks;
         }
         else {
-          throw Exception('static field database is not defined');
+            throw Exception('static field database is not defined');
         }
     }
 
+    bool save() {
+        if (Task.tasks != null) {
+            Task.tasks?.updateItem.call(this);
+        }
+        return false;
+    }
 
     @override
     bool operator ==(Object other) {
@@ -99,10 +109,10 @@ class Task {
     }
 
     @override int get hashCode => id.hashCode ^ title.hashCode;
+
     @override String toString() => 'Task {id: $id, message: $title, isDone: $isDone}';
 
 }
-
 
 
 //class Task {

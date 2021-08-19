@@ -1,9 +1,15 @@
+import 'package:collection/src/iterable_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:some_app/controller.dart';
 import 'package:some_app/models/tasks.dart';
 import 'package:some_app/task_view.dart';
 import 'package:some_app/widgets/button.dart';
 import 'package:some_app/widgets/fields.dart';
 import 'package:some_app/widgets/popups.dart';
+
+import 'fragments/grvity_handler.dart';
 
 
 class TaskEdit extends TaskPage {
@@ -30,9 +36,19 @@ class TaskEditState extends State<TaskEdit> {
 
     @override
     Widget build(BuildContext context) {
+        final Controller controller = Get.find();
+
         widget.taskContext![0] = context;
-        DateTime selectedDate;
+
+        String? placeName;
         Task? updated;
+
+        if (widget.task.place != null) {
+            var _place = controller.places
+                .where((p0) => p0.id == widget.task.place)
+                .first;
+            placeName = _place.name;
+        }
 
         return WillPopScope(
             onWillPop: () async {
@@ -72,88 +88,84 @@ class TaskEditState extends State<TaskEdit> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                        Column(
-//                                        mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                                ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                        fixedSize: const Size(30, 30),
-                                                        shape: const CircleBorder(),
-////                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                                                        shadowColor: Colors.transparent,
-                                                        primary: Colors.black12
-                                                    ),
-                                                    onPressed: () =>
-                                                        selectDate(context, null,
-                                                            setState: (datetime) {
-                                                                updated = updated ?? widget.task;
-                                                                setState(() => widget.task.deadline = datetime);
-                                                            }
-                                                        ),
-                                                    child: const Icon(Icons.plus_one),
-                                                ),
-                                                ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                        fixedSize: const Size(30, 30),
-                                                        shape: const CircleBorder(),
-////                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                                                        shadowColor: Colors.transparent,
-                                                        primary: Colors.black12
-                                                    ),
-                                                    onPressed: () =>
-                                                        selectDate(context, null,
-                                                            setState: (datetime) {
-                                                                updated = updated ?? widget.task;
-                                                                setState(() => widget.task.deadline = datetime);
-                                                            }
-                                                        ),
-                                                    child: const Icon(Icons.exposure_minus_1),
-                                                )
-                                            ],
-                                        ),
+                                        // RATE INCREASE
+
+                                        /// IMPORTANCE VIEW
                                         Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.all(8.0),
-                                                  child: Text("Важность"),
-                                                ),
-                                                ClipRRect(
-                                                    borderRadius: BorderRadius.circular(30.0),
-                                                    child: Container(
-                                                        color: Colors.black12,
-                                                        width: 50,
-                                                        height: 50,
-                                                        child: const Center(child: Text("156"))
-                                                    )
+//                                                const Padding(
+//                                                  padding: EdgeInsets.all(8.0),
+//                                                  child: Text("Важность"),
+//                                                ),
+                                                GestureDetector(
+                                                    onTap: () async {
+                                                        int? gravity = await increasingDialog(
+                                                            context, value: widget.task.gravity, title: "Set importance");
+                                                        if (gravity != null) {
+                                                            setState(() => widget.task.gravity = gravity);
+                                                            Task.tasks?.updateItem.call(widget.task);
+                                                        }
+                                                    },
+                                                    child: ClipRRect(
+                                                        borderRadius: BorderRadius.circular(30.0),
+                                                        child: Container(
+                                                            color: Colors.black12,
+                                                            width: 50,
+                                                            height: 50,
+                                                            child: Center(child: Text(widget.task.gravity.toString()),)
+                                                        )
+                                                    ),
                                                 ),
                                             ],
                                         ),
+
+                                        /// DATETIME VIEW
                                         Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                                Text("${widget.task.deadline ?? ''}".split(' ')[0]),
-                                                const SizedBox(height: 20.0,),
+//                                                Text("${widget.task.deadline ?? ''}".split(' ')[0]),
+//                                                const SizedBox(height: 20.0,),
                                                 ElevatedButton(
+//                                                    ElevatedButton.styleFrom(primary: Colors.red)
+                                                    style: ButtonStyle(
+                                                        shape: MaterialStateProperty.resolveWith((states) => const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(25.0))
+                                                        )),
+                                                        shadowColor:  MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                                                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                                                (Set<MaterialState> states) {
+                                                                    if (states.contains(MaterialState.pressed)) { return Colors.lightBlueAccent; }
+                                                                    return Colors.black26;
+                                                                },
+                                                            )
+                                                        ),
                                                     onPressed: () =>
                                                         selectDate(
                                                             context, null,
                                                             setState: (datetime) {
-//                                                selectedDate = datetime;
+//                                                              selectedDate = datetime;
                                                                 updated = updated ?? widget.task;
                                                                 setState(() {
                                                                     widget.task.deadline = datetime;
                                                                 });
                                                             }
                                                         ),
-                                                    child: const Text('Select date'),
+                                                    child: Text(
+                                                        widget.task.deadline != null
+                                                            ? DateFormat("dd.MM E y").format(widget.task.deadline!)
+                                                            : 'Select date',
+                                                        style: const TextStyle(decorationColor: Colors.red),
+                                                    ),
                                                 ),
                                             ],
                                         ),
+
+                                        /// LOCATION VIEW
                                         Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                                const Text("-"),
+                                                Text(placeName ?? '-'),
 //                                            const SizedBox(height: 20.0,),
                                                 ElevatedButton(
                                                     style: ElevatedButton.styleFrom(
@@ -163,13 +175,25 @@ class TaskEditState extends State<TaskEdit> {
                                                         shadowColor: Colors.transparent,
                                                         primary: Colors.black12
                                                     ),
-                                                    onPressed: () =>
-                                                        selectDate(context, null,
-                                                            setState: (datetime) {
-                                                                updated = updated ?? widget.task;
-                                                                setState(() => widget.task.deadline = datetime);
-                                                            }
-                                                        ),
+                                                    onPressed: () async {
+                                                        var prePlace = widget.task.place;
+
+                                                        var location = await choiceDialog(
+                                                            context, controller.places.map((p) => p.name),
+                                                            title: 'Select task location'
+                                                        );
+
+                                                        var place = controller.places
+                                                            .where((p0) => p0.name == location)
+                                                            .firstOrNull;
+
+                                                        if (prePlace != place?.id) {
+                                                            setState(() => placeName = place?.name ?? 'is not specified');
+
+                                                            widget.task.place = place?.id;
+                                                            widget.task.save();
+                                                        }
+                                                    },
                                                     child: const Icon(Icons.place),
                                                 ),
                                             ],

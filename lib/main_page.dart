@@ -333,7 +333,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                                                   ],
                                               ),
                                             ),
-                                            _createQuickTask(),
+//                                            _createQuickTask(),
                                         ]
                                     );
                                 }
@@ -353,10 +353,28 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton(
-                            onPressed: () {
-                                setState(() {
-                                    quickNew = true;
-                                });
+                            onPressed: () async {
+
+                                var newTaskNameTitle = await inputDialog(context, title: 'Enter new task title');
+                                if (newTaskNameTitle?.isNotEmpty ?? false){
+
+                                    var task = Task.init(newTaskNameTitle!, parent: rootTaskId);
+                                    await widget.tasks.insertItem(task);
+
+                                    setState(() {
+
+                                            if (rootTaskId == null){tasks.insert(0, task);}
+                                            else {
+                                                tasks[rootTaskIndex!].subTasksAmount = tasks[rootTaskIndex!].subTasksAmount! + 1;
+                                                useSubTasksUpdate?.call(task);
+                                            }
+                                        }
+                                    );
+                                }
+
+//                                setState(() {
+//                                    quickNew = true;
+//                                });
 
 //                  Navigator.push(
 //                      context,

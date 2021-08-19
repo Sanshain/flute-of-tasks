@@ -32,25 +32,81 @@ void input(BuildContext context, String content, {String title = ''}) {
             return Positioned(
                 top: 10,
                 child: AlertDialog(
-                      title: Text(title),
-                      content: const SizedBox(
-                          height: 50,
-                          child: TextField(
-                              autofocus: true,
-                              style: TextStyle(fontSize: 22, color: Colors.blue),
-                          ),
-                      ),
-                      actions: [
-                          TextButton(
-                              child: const Text("OK"),
-                              onPressed: () {
-                                  Navigator.pop(context);
-                              },
-                          )
-                      ],
+                    title: Text(title),
+                    content: const SizedBox(
+                        height: 50,
+                        child: TextField(
+                            autofocus: true,
+                            style: TextStyle(fontSize: 22, color: Colors.blue),
+                        ),
+                    ),
+                    actions: [
+                        TextButton(
+                            child: const Text("OK"),
+                            onPressed: () {
+                                Navigator.pop(context);
+                            },
+                        )
+                    ],
                 ),
             );
         },
+    );
+}
+
+
+Future<String?> inputDialog(BuildContext context, {title = 'Title', label = '', hint = ''}) async {
+
+    String returnValue = '';
+
+    return showDialog(
+        context: context,
+        barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+
+        builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(title),
+                content: Row(
+                    children: <Widget>[
+                        Expanded(
+                            child: TextField( autofocus: true,
+                                decoration: InputDecoration(labelText: label, hintText: hint),
+                                onChanged: (value) => returnValue = value,
+                            ))
+                    ],
+                ),
+                actions: <Widget>[
+                    // ignore: deprecated_member_use
+                    FlatButton(
+                        child: const Text('Ok'),
+                        onPressed: () => Navigator.of(context).pop(returnValue),
+                    ),
+                ],
+            );
+        },
+    );
+}
+
+
+Future<String?> choiceDialog(BuildContext context, Iterable<String> options, {title = ''}) async {
+    return await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+            return SimpleDialog(
+                title: Text(title),
+                children: [
+                    for (var option in options)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SimpleDialogOption(
+                              onPressed: () => Navigator.pop(context, option),
+                              child: Text(option),
+                          ),
+                        )
+                ]
+            );
+        }
     );
 }
 
@@ -92,9 +148,7 @@ Future<bool?> showConfirmationDialog(BuildContext rootContext, String action, {S
 }
 
 
-
 Future<void> selectDate(BuildContext context, DateTime? selectedDate, {required Function(DateTime) setState}) async {
-
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate ?? DateTime.now(),
@@ -103,5 +157,4 @@ Future<void> selectDate(BuildContext context, DateTime? selectedDate, {required 
     );
 
     if (picked != null && picked != selectedDate) setState(picked);
-
 }
