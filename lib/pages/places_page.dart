@@ -9,18 +9,29 @@ import '../models/database/database.dart';
 
 import '../controller.dart';
 
+
 class PlacesPage extends StatelessWidget {
 
     const PlacesPage({Key? key, this.pageTitle = "Places"}) : super(key: key);
 
     final String pageTitle;
 
-    Widget itemBuilder(BuildContext context, Controller controller, int index){
-
+    Widget itemBuilder(BuildContext context, Controller controller, int index) {
         return Dismissible(
             key: UniqueKey(),
-            onDismissed: (direction) {
-                popup(context, 'todo');
+            onDismissed: (direction) async
+            {
+
+                Place _place = controller.places[index];
+                int _tasksAmount = (await Task.tasks?.getTasksFromPlace(_place.id!))?.length ?? 0;
+
+                if (_tasksAmount > 0){
+                    var _approve = await showConfirmationDialog(context, 'Вы уверены, что хотите удалить данную локацию?');
+                    if (_approve == true){ return; }
+                }
+
+                await Place.objects?.deleteItem(_place);
+                controller.places.remove(_place);
             },
             background: Container(padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 color: Colors.deepOrangeAccent,
@@ -30,7 +41,8 @@ class PlacesPage extends StatelessWidget {
             child: GestureDetector(
                 onTap: () async {
                     String placeName = await Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => InputPage(initValue: controller.places[index].name))
+                        MaterialPageRoute(
+                            builder: (context) => InputPage(initValue: controller.places[index].name, title: 'Edit place',))
                     );
                     if (placeName.isNotEmpty) {
                         var place = Place(controller.places[index].id, placeName, true);
@@ -38,9 +50,15 @@ class PlacesPage extends StatelessWidget {
                         await Place.objects?.updateItem(place);
                     }
                 },
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(controller.places[index].name),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(controller.places[index].name),
+                        ),
+                        const Divider(color: Colors.lightBlueAccent)
+                    ],
                 ),
             ),
         );
@@ -79,27 +97,27 @@ class PlacesPage extends StatelessWidget {
         );
     }
 
-    Widget buildFloatingActionButton(BuildContext context, Controller controller) {
-      return Container(
-          padding: const EdgeInsets.only(bottom: 15.0, right: 15.0),
-          child: Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                  onPressed: () async {
-                      String placeName = await Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const InputPage())
-                      );
-                      if (placeName.isNotEmpty) {
-                          var place = Place.init(placeName);
+    Widget buildFloatingActionButton(BuildContext context, Controller controller, {double bottom = 15}) {
+        return Container(
+            padding: EdgeInsets.only(bottom: bottom, right: 15.0),
+            child: Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                    onPressed: () async {
+                        String placeName = await Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const InputPage(title: 'New place'))
+                        );
+                        if (placeName.isNotEmpty) {
+                            var place = Place.init(placeName);
 //                                    controller.places.add(place);
-                          controller.appendPlace(place);
-                          await Place.objects?.insertNew(place);
-                      }
+                            controller.appendPlace(place);
+                            await Place.objects?.insertNew(place);
+                        }
 //                                popup(context, placeName);
-                  },
-                  child: const Icon(Icons.add),
-              )
-          )
-      );
+                    },
+                    child: const Icon(Icons.add),
+                )
+            )
+        );
     }
 }

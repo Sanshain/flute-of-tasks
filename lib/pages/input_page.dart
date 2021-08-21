@@ -10,8 +10,9 @@ import '../controller.dart';
 
 class InputPage extends StatelessWidget {
 
-    const InputPage({Key? key, this.initValue = ''}) : super(key: key);
+    const InputPage({Key? key, this.initValue = '', this.title = ''}) : super(key: key);
 
+    final String title;
     final String initValue;
 
     @override
@@ -29,7 +30,7 @@ class InputPage extends StatelessWidget {
             child: Scaffold(
                 // Use Obx(()=> to update Text() whenever count is changed.
 //            appBar: AppBar(title: Obx(() => Text("Clicks: ${c.count}"))),
-                appBar: AppBar(title: const Text("Places")),
+                appBar: title.isNotEmpty ? AppBar(title: Text(title)) : null,
 
                 // Replace the 8 lines Navigator.push by a simple Get.to(). You don't need context
 //            body: Center(child: ElevatedButton(

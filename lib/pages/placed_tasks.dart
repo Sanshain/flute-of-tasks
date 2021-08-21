@@ -14,6 +14,11 @@ class PlacedTasksPage extends PlacesPage {
 
     const PlacedTasksPage({Key? key}) : super(key: key, pageTitle: "");
 
+    @override Widget buildFloatingActionButton(BuildContext context, Controller controller, {double bottom = 15})
+    {
+        return super.buildFloatingActionButton(context, controller, bottom: 50);
+    }
+
     @override
     Widget itemBuilder(BuildContext context, Controller controller, int index) {
 

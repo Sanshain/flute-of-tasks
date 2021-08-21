@@ -10,7 +10,7 @@ class Place {
 
 //    static TaskDao? tasksHand;
 
-    Place(this.id, this.name, this.isActive);
+    Place(this.id, this.name, this.isActive, {this.tasksAmount = 0});
 
     Place.init(this.name, {this.id, this.isActive = true});
 
@@ -19,7 +19,9 @@ class Place {
     final String name;
     final bool isActive;
 
-    @ignore List<Task> activeTasks = <Task>[];
+    @ignore @Deprecated('useless') List<Task> activeTasks = <Task>[];
+
+    @ignore int tasksAmount = 0;
 
     Future<List<Task>?> get tasks async {
         if (Task.tasks != null) {

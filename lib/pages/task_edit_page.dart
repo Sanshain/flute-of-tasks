@@ -36,7 +36,9 @@ class TaskEditState extends State<TaskEdit> {
 
     @override
     Widget build(BuildContext context) {
+
         final Controller controller = Get.find();
+        final TextEditingController inputController = TextEditingController(text: '');
 
         widget.taskContext![0] = context;
 
@@ -69,6 +71,7 @@ class TaskEditState extends State<TaskEdit> {
 //                            'Your tas is:',
 //                        ),
                             inputField(hint: 'Title', value: widget.task.title, onChanged: (String text) {
+                                updated = updated ?? widget.task;
                                 widget.task.title = text;
                             }),
                             inputField(hint: 'Description',
@@ -101,8 +104,10 @@ class TaskEditState extends State<TaskEdit> {
                                                 GestureDetector(
                                                     onTap: () async {
                                                         int? gravity = await increasingDialog(
-                                                            context, value: widget.task.gravity, title: "Set importance");
+                                                            context, value: widget.task.gravity, title: "Set importance"
+                                                        );
                                                         if (gravity != null) {
+//                                                            updated = updated ?? widget.task;
                                                             setState(() => widget.task.gravity = gravity);
                                                             Task.tasks?.updateItem.call(widget.task);
                                                         }
@@ -188,6 +193,7 @@ class TaskEditState extends State<TaskEdit> {
                                                             .firstOrNull;
 
                                                         if (prePlace != place?.id) {
+//                                                            updated = updated ?? widget.task;
                                                             setState(() => placeName = place?.name ?? 'is not specified');
 
                                                             widget.task.place = place?.id;

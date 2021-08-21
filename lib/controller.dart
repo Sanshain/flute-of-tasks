@@ -6,7 +6,9 @@ class Controller extends GetxController{
     //    increment() => count++;
 
     RxMap<String, String> settings = RxMap();
+
     RxList<Place> places = RxList();
+    var maxImportance = 0.obs;
     RxList<Task> tasks = RxList<Task>();    // (GetStorage().read<List<int>?>('listInt') ?? []).obs
 
 

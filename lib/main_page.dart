@@ -7,6 +7,7 @@ import 'package:some_app/controller.dart';
 
 import 'package:some_app/pages/fragments/quick_new.dart';
 import 'package:some_app/pages/fragments/task_item.dart';
+import 'package:some_app/pages/input_page.dart';
 import 'package:some_app/pages/placed_tasks.dart';
 import 'package:some_app/pages/places_page.dart';
 import 'package:some_app/pages/settings_page.dart';
@@ -70,9 +71,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
 
-        widget.places.all().then((_places) {
-           controller.initPlaces(_places);
-        });
+        widget.places.all().then((_places) => controller.initPlaces(_places));
 
         widget.tasks.all().then((_tasks) {
             controller.setTasks(_tasks);
@@ -80,17 +79,24 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
             stdout.write(_tasks.toString());
             archive.addAll(
                 _tasks.where((task) {
-                    task.parentName = _tasks.where((t) => task.parent == t.id).firstOrNull?.title;
-                    return task.isDone && _tasks.where((t) => task.id == t.parent).isEmpty;
+                    task.parentName = _tasks
+                        .where((t) => task.parent == t.id)
+                        .firstOrNull
+                        ?.title;
+                    return task.isDone && _tasks
+                        .where((t) => task.id == t.parent)
+                        .isEmpty;
                 })
             );
         });
 
         widget.tasks.readWChildren().then((_tasks) {
-
             stdout.write(_tasks.toString());
             setState(() {
                 tasks.addAll(_tasks.where((task) => task.isDone == false));
+
+                controller.maxImportance = tasks.reduce((a, b) => a.gravity > b.gravity ? a : b).gravity.obs;
+
 //                archive.addAll(
 //                    _tasks.where((task) {
 //                        return task.isDone && _tasks.where((t) => t.parent == task.id).isEmpty;
@@ -108,25 +114,22 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         Task? parentTask,
         int deep = 0
     }) {
-
         parentContext = parentContext ?? rootContext;
         childContextWrapper = childContextWrapper ?? subContextWrapper;
         var tasks = parentTasks ?? this.tasks;
 
 //        return createListViewPoint(
-        return ListViewItem(
-            context,
+        return ListViewItem(context,
             index,
             subContextWrapper: childContextWrapper,
             parentTask: parentTask,
             tasks: tasks,
             parent: this,
             deep: deep,
-            toRight: const SwipeBackground(
-                Colors.orangeAccent, Icon(Icons.unarchive_outlined)),
-            toLeft: const SwipeBackground(
-                Colors.redAccent, Icon(Icons.delete_forever)),
-            confirmDismiss: (DismissDirection direction) async {
+            toRight: const SwipeBackground(Colors.orangeAccent, Icon(Icons.unarchive_outlined)),
+            toLeft: const SwipeBackground(Colors.redAccent, Icon(Icons.delete_forever)),
+            confirmDismiss: (DismissDirection direction) async
+            {
                 if (direction == DismissDirection.endToStart) {
 //                  var poll = await showConfirmationDialog(context, 'Вы уверены, что желаете удалить task-у?');
 //                  return poll ?? false;
@@ -136,7 +139,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                             setState(() => tasks.removeAt(index));
 
 //                          ScaffoldMessenger.of(context).showSnackBar(
-//                              const SnackBar(content widget: Text("item dismissed"))
+//                              const SnackBar(content widget: Text("The task was removed"))
 //                          );
                         }
                     });
@@ -151,7 +154,10 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     await widget.tasks.updateItem(tasks[index]);
 
                     setState(() {
-                        tasks[index].parentName = controller.tasks.where((t) => tasks[index].parent == t.id).firstOrNull?.title;
+                        tasks[index].parentName = controller.tasks
+                            .where((t) => tasks[index].parent == t.id)
+                            .firstOrNull
+                            ?.title;
                         archive.add(tasks[index]);
                         tasks.removeAt(index);
                     });
@@ -169,16 +175,17 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     setState(() => inDetail = false);
                 };
             },
-//            subTaskCreateAction: (void Function(Task)? callbackUpState) {
-            subTaskCreateAction: ({void Function(Task)? onApply}) {
-                setState(() => quickNew = true);
-                useSubTasksUpdate = onApply;
+            subTaskCreateAction: ({void Function(Task)? onApply}) async
+            {
+//                setState(() => quickNew = true);
+//                useSubTasksUpdate = onApply;
+
                 rootTaskId = tasks[index].id;
                 rootTaskIndex = index;
-            },
-            expandAction: () {
 
+                await createTask(context, parent: tasks[index]);
             },
+            expandAction: () {},
             rootContext: parentContext!
         );
     }
@@ -194,18 +201,18 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                 actions: [
                     const Icon(Icons.search),
                     PopupMenuButton<Text>(
-                        itemBuilder: (context){
+                        itemBuilder: (context) {
                             return [
                                 PopupMenuItem(
                                     child: GestureDetector(
-                                        onTap: (){
+                                        onTap: () {
                                             popup(context, 'todo');
                                             Navigator.push(context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(),
-                                                transitionsBuilder: instantTransition,
-                                              )
-                                            //                                              MaterialPageRoute(builder: (context) => SettingsPage()
+                                                PageRouteBuilder(
+                                                    pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(),
+                                                    transitionsBuilder: instantTransition,
+                                                )
+                                                //                                              MaterialPageRoute(builder: (context) => SettingsPage()
                                             );
                                         },
                                         child: const Text("Settings")
@@ -213,7 +220,9 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                                 ),
                                 PopupMenuItem(
                                     child: GestureDetector(
-                                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PlacesPage())),
+                                        onTap: () =>
+                                            Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => const PlacesPage())),
                                         child: const Text("My places")
                                     )
                                 )
@@ -253,14 +262,35 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                         child: CupertinoTabView(
                             restorationScopeId: 'cupertino_tab_view_$index',
                             builder: (context) {
-                                if (index == 1) {
-                                    return const PlacedTasksPage();
-                                    return CupertinoDemoTab(
-                                        title: tabInfo[index].title,
-                                        icon: tabInfo[index].icon,
+                                if (index == 0) {
+                                    /// TASKS
+                                    return Stack(
+                                        children: [
+                                            Padding(
+                                                padding: const EdgeInsets.only(bottom: 32),
+                                                child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                        Expanded(child: ListView.separated(
+                                                            padding: const EdgeInsets.all(8),
+                                                            itemCount: tasks.length,
+                                                            separatorBuilder: (BuildContext context,
+                                                                int index) => const Divider(),
+                                                            itemBuilder: (BuildContext context, int index) =>
+                                                                listTileGenerate(index)
+                                                        )),
+                                                    ],
+                                                ),
+                                            ),
+//                                            _createQuickTask(),
+                                        ]
                                     );
                                 }
-                                else if (index == 2) {
+                                else if (index == 1) {
+                                    return const PlacedTasksPage();
+                                }
+                                else { //  if (index == 2)
+                                    /// ARCHIVE
                                     return Column(
                                         children: [
                                             Expanded(child: ListView.separated(
@@ -306,37 +336,6 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                                         ],
                                     );
                                 }
-                                else {
-                                    return Stack(
-                                        children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(bottom: 32),
-                                              child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-//                          Center(
-//                              child: Text(
-//                                  _tabInfo[index].title,  // '( selected $selectedIndex)',
-//                                style: Theme.of(context).textTheme.headline6,
-//                              )
-//                          ),
-                                                      Expanded(child: ListView.separated(
-                                                          padding: const EdgeInsets.all(8),
-                                                          itemCount: tasks.length,
-                                                          separatorBuilder: (BuildContext context,
-                                                              int index) => const Divider(),
-                                                          itemBuilder: (BuildContext context, int index) {
-//                                return createListViewPoint(context, index);
-                                                              return listTileGenerate(index);
-                                                          }
-                                                      )),
-                                                  ],
-                                              ),
-                                            ),
-//                                            _createQuickTask(),
-                                        ]
-                                    );
-                                }
                             },
                             defaultTitle: tabInfo[index].title,
                         ),
@@ -354,23 +353,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton(
                             onPressed: () async {
-
-                                var newTaskNameTitle = await inputDialog(context, title: 'Enter new task title');
-                                if (newTaskNameTitle?.isNotEmpty ?? false){
-
-                                    var task = Task.init(newTaskNameTitle!, parent: rootTaskId);
-                                    await widget.tasks.insertItem(task);
-
-                                    setState(() {
-
-                                            if (rootTaskId == null){tasks.insert(0, task);}
-                                            else {
-                                                tasks[rootTaskIndex!].subTasksAmount = tasks[rootTaskIndex!].subTasksAmount! + 1;
-                                                useSubTasksUpdate?.call(task);
-                                            }
-                                        }
-                                    );
-                                }
+                                await createTask(context);
 
 //                                setState(() {
 //                                    quickNew = true;
@@ -401,8 +384,36 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         );
     }
 
+    Future<void> createTask(BuildContext context, {Task? parent}) async {
 
-    Visibility _createQuickTask() {
+        var titleSuffix = parent == null ? '' : ' (for ${parent.title})';
+
+        String? newTaskNameTitle = await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => InputPage(initValue: '', title: 'New Task' + titleSuffix))
+        );
+//        var newTaskNameTitle = await inputDialog(context, title: 'Enter new task title');
+        if (newTaskNameTitle?.isNotEmpty ?? false) {
+            var task = Task.init(newTaskNameTitle!, parent: rootTaskId);
+            await widget.tasks.insertItem(task);
+
+            setState(() {
+                if (rootTaskId == null) {
+                    tasks.insert(0, task);
+                }
+                else {
+                    tasks[rootTaskIndex!].subTasksAmount = tasks[rootTaskIndex!].subTasksAmount! + 1;
+                    useSubTasksUpdate?.call(task);
+                }
+            }
+            );
+        }
+
+        rootTaskId = null;
+        useSubTasksUpdate = null;
+    }
+
+
+    @Deprecated("change to inputPage") Visibility _createQuickTask() {
         return Visibility(
             visible: quickNew == true,
             child: createQuickTask(
@@ -423,7 +434,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     setState(() {
 //                    if (newTaskName != null && newTaskName!.isNotEmpty) tasks.insert(0, Task(newTaskName!));
                         if (newTaskNameTitle?.isNotEmpty ?? false) {
-                            if (rootTaskId == null){
+                            if (rootTaskId == null) {
                                 tasks.insert(0, task);
                             }
                             else {

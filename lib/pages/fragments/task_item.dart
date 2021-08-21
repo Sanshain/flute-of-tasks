@@ -84,6 +84,8 @@ class ListViewItemState extends State<ListViewItem> {
     Widget _createListViewPoint(BuildContext context, ListViewItemState self) {
         var widget = self.widget;
 
+        const roundCorners = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25.0)));
+
         Task? parentTask = widget.parentTask;
         int index = rootIndex = widget.index;
         List<BuildContext?>? subContextWrapper = widget.subContextWrapper;
@@ -93,7 +95,6 @@ class ListViewItemState extends State<ListViewItem> {
         Function(DismissDirection) onDismissed = widget.onDismissed;
         Future<bool> Function(DismissDirection)? confirmDismiss = widget.confirmDismiss;
         Function(Task?) Function() onTap = widget.onTap;
-//        Function(Function(Task)?)? subTaskCreateAction = widget.subTaskCreateAction;
         Function({Function(Task)? onApply})? subTaskCreateAction = widget.subTaskCreateAction;
         Function? expandAction = widget.expandAction;
         IExpandedTaskList? parent = widget.parent;
@@ -105,8 +106,8 @@ class ListViewItemState extends State<ListViewItem> {
         return Dismissible(
 //      key: Key(index.toString()),
             key: UniqueKey(),
-            onDismissed: (direction){
-                if (parentTask != null){
+            onDismissed: (direction) {
+                if (parentTask != null) {
                     setState(() {
                         parentTask.doneSubTasksAmount =
                             (parentTask.doneSubTasksAmount ?? 0) + (direction == DismissDirection.startToEnd ? 1 : -1);
@@ -128,9 +129,7 @@ class ListViewItemState extends State<ListViewItem> {
                 child: toRight?.icon ?? const Icon(Icons.check),
             ),
             child: GestureDetector(
-                onTap: () {
-
-                },
+                onTap: () {},
 //                child: const Text('123'),
 
                 child: Container(
@@ -170,77 +169,108 @@ class ListViewItemState extends State<ListViewItem> {
                             }
                         },
 //                        title: const Text('234'),
-                        title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        title: Column(
                             children: [
-                                Container(
-//                                    width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
-                                    width: MediaQuery.of(context).size.width - 220,
-                                    padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
-//                      child: Icon(Icons.phone, color: Colors.black26)
-                                    child: Text(
-                                        '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask.subTasksAmount})',
-                                        style: TextStyle(fontSize: 16 - deep.toDouble(), color: Colors.black54.withAlpha(100 - deep * 10))
-                                    ),
-                                ),
                                 Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                         Container(
-                                            decoration: const BoxDecoration(
-//                                        borderRadius: BorderRadius.circular(16),
-//                                        color: Colors.orange,
-                                                boxShadow: [
-                                                    BoxShadow(color: Colors.white, spreadRadius: 8),
-                                                ],
+//                                        width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
+                                            width: MediaQuery
+                                                .of(context)
+                                                .size
+                                                .width - 220,
+                                            padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
+//                                          child: Icon(Icons.phone, color: Colors.black26)
+                                            child: Text(
+                                                '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask
+                                                    .subTasksAmount})',
+                                                style: TextStyle(fontSize: 16 - deep.toDouble(),
+                                                    color: Colors.black54.withAlpha(100 - deep * 10))
                                             ),
-                                            child: GestureDetector(
+                                        ),
+                                        Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
 
-                                                /// add
-                                                child: const Padding(
-                                                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                                    child: Icon(Icons.add, color: Colors.black26),
+                                                /// ADD
+                                                Container(
+                                                    decoration: const BoxDecoration(
+//                                                        borderRadius: BorderRadius.circular(16),
+//                                                       color: Colors.orange,
+                                                        boxShadow: [
+                                                            BoxShadow(color: Colors.white, spreadRadius: 8),
+                                                        ],
+                                                    ),
+                                                    child: GestureDetector(
+                                                        child: const Padding(
+                                                            padding: EdgeInsets.symmetric(horizontal: 14.0),
+                                                            child: Icon(Icons.add, color: Colors.black26),
+                                                        ),
+                                                        onTap: () => subTaskCreateAction?.call(onApply: (Task task) {
+                                                                setState(() => expandedCache.add(task));
+                                                            }
+                                                        ),
+                                                    ),
                                                 ),
-                                                onTap: () {
-//                                            popup(context, 'content');
-                                                    subTaskCreateAction?.call(onApply: (Task task) {
-                                                        setState(() {
-                                                            expandedCache.add(task);
-                                                        });
-                                                    });
-                                                },
-                                            ),
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                            child: GestureDetector(
 
-                                                /// expand
-//                                                child: const Icon(Icons.expand_less, color: Colors.black26),
-                                                child: const Icon(Icons.edit_outlined, color: Colors.black26),
-                                                onTap: () {
-                                                    void Function(Task?) onPop = onTap();
+                                                /// EDIT
+                                                Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                                                    child: ElevatedButton(
+                                                        style: ButtonStyle(
+                                                            shape: MaterialStateProperty.resolveWith((states) => const CircleBorder()),
+                                                            shadowColor:  MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                                                            backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                                                                return states.contains(MaterialState.pressed)
+                                                                    ? Colors.lightBlueAccent
+                                                                    : const Color(0xffEEEEEE);
+//                                                                    : Colors.black12;
+                                                                },
+                                                            )
+                                                        ),
+                                                        /// expand
+//                                                    child: const Icon(Icons.expand_less, color: Colors.black26),
+                                                        child: const Icon(Icons.edit_outlined, color: Colors.black26),
+                                                        onPressed: () {
+                                                            void Function(Task?) onPop = onTap();
 
-                                                    Navigator.push(
-                                                        rootContext,
-//                                                      MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
-                                                        PageRouteBuilder(
-//                                                          pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
-                                                            pageBuilder: (rootContext, animation, secondaryAnimation) =>
-                                                                TaskEdit(
-                                                                    subContextWrapper,
-                                                                    index: index,
-                                                                    tasks: tasks,
-                                                                    onPop: onPop,
-                                                                ),
-                                                            transitionsBuilder: instantTransition,
-                                                        )
-                                                    );
-                                                },
-                                            ),
-                                        ),
+                                                            Navigator.push(
+                                                                rootContext,
+//                                                              MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
+                                                                PageRouteBuilder(
+//                                                                pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
+                                                                    pageBuilder: (rootContext, animation,
+                                                                        secondaryAnimation) =>
+                                                                        TaskEdit(
+                                                                            subContextWrapper,
+                                                                            index: index,
+                                                                            tasks: tasks,
+                                                                            onPop: onPop,
+                                                                        ),
+                                                                    transitionsBuilder: instantTransition,
+                                                                )
+                                                            );
+                                                        },
+                                                    ),
+                                                ),
+                                            ],
+                                        )
                                     ],
-                                )
+                                ),
+                                if (currentTask.deadline != null)
+                                    Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                            Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8),
+                                                child: Text(
+                                                    DateFormat("dd.MM E y").format(currentTask.deadline!),
+                                                    style: const TextStyle(color: Colors.black26, fontSize: 13),
+                                                ),
+                                            ),
+                                        ],
+                                    )
                             ],
                         ),
 //                    children: const [
@@ -262,10 +292,10 @@ class ListViewItemState extends State<ListViewItem> {
                                     return parent?.listTileGenerate(
                                         _index, parentTasks: expandedCache, deep: deep + 1, parentTask: currentTask
                                     ) ?? Padding(
-                                            padding: const EdgeInsets.only(left: 32),
-                                            child: Text(expandedCache[_index].title,
-                                                style: const TextStyle(fontSize: 12, color: Colors.black54),),
-                                        );
+                                        padding: const EdgeInsets.only(left: 32),
+                                        child: Text(expandedCache[_index].title,
+                                            style: const TextStyle(fontSize: 12, color: Colors.black54),),
+                                    );
 //                                    return Padding(
 //                                      padding: const EdgeInsets.only(left: 32, bottom: 3, top: 3),
 //                                      child: Text(expandedCache[_index].title, style: const TextStyle(fontSize: 14, color: Colors.black54),),
@@ -284,7 +314,6 @@ class ListViewItemState extends State<ListViewItem> {
         var item = _createListViewPoint(context, this);
         return item;
     }
-
 }
 
 
@@ -359,7 +388,9 @@ Widget createListViewPoint(BuildContext context, int index, {
 //                      child: Icon(Icons.phone, color: Colors.black26)
                                 child: Text(
 //                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
-                                    '${tasks[index].title} ${tasks[index].parentName != null ? '(${tasks[index].parentName})' : ''}',
+                                    '${tasks[index].title} ${tasks[index].parentName != null
+                                        ? '(${tasks[index].parentName})'
+                                        : ''}',
                                     style: const TextStyle(fontSize: 16, color: Colors.black54)
                                 ),
                             ),
@@ -373,7 +404,8 @@ Widget createListViewPoint(BuildContext context, int index, {
 //                                            child: const Icon(Icons.expand_less, color: Colors.black26),
                                             child: Text(
 //                                                tasks[index].deadline.toString(),
-                                                tasks[index].deadline != null ? DateFormat("H:m M E d").format(tasks[index].deadline!) : '',
+                                                tasks[index].deadline != null ? DateFormat("H:m M E d").format(
+                                                    tasks[index].deadline!) : '',
                                                 style: const TextStyle(fontSize: 12, color: Colors.black38)
                                             ),
                                             onTap: () {},

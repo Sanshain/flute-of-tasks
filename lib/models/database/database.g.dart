@@ -290,6 +290,15 @@ class _$Places extends Places {
                   'id': item.id,
                   'name': item.name,
                   'isActive': item.isActive ? 1 : 0
+                }),
+        _placeDeletionAdapter = DeletionAdapter(
+            database,
+            'Place',
+            ['id'],
+            (Place item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'isActive': item.isActive ? 1 : 0
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -302,6 +311,8 @@ class _$Places extends Places {
 
   final UpdateAdapter<Place> _placeUpdateAdapter;
 
+  final DeletionAdapter<Place> _placeDeletionAdapter;
+
   @override
   Future<List<Place>> all() async {
     return _queryAdapter.queryList('SELECT * FROM Place',
@@ -311,9 +322,14 @@ class _$Places extends Places {
 
   @override
   Future<List<Place>> getAll() async {
-    return _queryAdapter.queryList('SELECT * FROM Place',
-        mapper: (Map<String, Object?> row) => Place(row['id'] as int?,
-            row['name'] as String, (row['isActive'] as int) != 0));
+    return _queryAdapter.queryList(
+        'SELECT              Place.*,              count(Task.id) as tasksAmount         FROM Place              LEFT JOIN (SELECT * FROM Task WHERE isDone = 1) as Task ON place.id = Task.place          GROUP BY Place.id',
+        mapper: (Map<String, Object?> row) => Place(
+            row['id'] as int?,
+            row['name'] as String,
+            (row['isActive'] as int) != 0,
+            tasksAmount: row['tasksAmount'] as int
+        ));
   }
 
   @override
@@ -324,6 +340,11 @@ class _$Places extends Places {
   @override
   Future<void> updateItem(Place place) async {
     await _placeUpdateAdapter.update(place, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteItem(Place place) async {
+    await _placeDeletionAdapter.delete(place);
   }
 }
 

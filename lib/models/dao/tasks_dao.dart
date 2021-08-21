@@ -81,13 +81,19 @@ abstract class Places {
     Future<List<Place>> all();
 
     /// todo annotate to count of active tasks:
-    @Query('SELECT * FROM Place') Future<List<Place>> getAll();
+    @Query('''        
+        SELECT 
+            Place.*, 
+            count(Task.id) as tasksAmount
+        FROM Place 
+            LEFT JOIN (SELECT * FROM Task WHERE isDone = 1) as Task ON place.id = Task.place 
+        GROUP BY Place.id    
+    ''')
+    Future<List<Place>> getAll();
 
-    @insert
-    Future<void> insertNew(Place place);
-
-    @update
-    Future<void> updateItem(Place place);
+    @insert Future<void> insertNew(Place place);
+    @update Future<void> updateItem(Place place);
+    @delete Future<void> deleteItem(Place place);
 }
 
 
