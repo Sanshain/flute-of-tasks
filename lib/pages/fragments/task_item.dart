@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:some_app/models/tasks.dart';
 import 'package:some_app/pages/task_edit_page.dart';
 import 'package:some_app/transitions/instant.dart';
-import 'package:some_app/widgets/popups.dart';
 
 
 //typedef ChangeState = Function Function();
@@ -101,6 +100,8 @@ class ListViewItemState extends State<ListViewItem> {
         BuildContext rootContext = widget.rootContext;
         deep = widget.deep;
 
+        const btnColors = Color(0xffEEEEEE); // Colors.black26;
+
         currentTask = tasks[index];
 
         return Dismissible(
@@ -144,6 +145,8 @@ class ListViewItemState extends State<ListViewItem> {
 //                        trailing: const SizedBox.shrink(),
 //                        tilePadding: EdgeInsets.all(0),
 //                        childrenPadding: const EdgeInsets.all(0),
+//                        collapsedBackgroundColor: Colors.grey,
+                        backgroundColor: Colors.black12,
                         collapsedIconColor: (currentTask.subTasksAmount ?? 0) > 0 ? Colors.black54 : Colors.transparent,
                         trailing: null,
 //                        trailing: Visibility(
@@ -194,41 +197,67 @@ class ListViewItemState extends State<ListViewItem> {
                                             children: [
 
                                                 /// ADD
-                                                Container(
-                                                    decoration: const BoxDecoration(
-//                                                        borderRadius: BorderRadius.circular(16),
-//                                                       color: Colors.orange,
-                                                        boxShadow: [
-                                                            BoxShadow(color: Colors.white, spreadRadius: 8),
-                                                        ],
-                                                    ),
-                                                    child: GestureDetector(
-                                                        child: const Padding(
-                                                            padding: EdgeInsets.symmetric(horizontal: 14.0),
-                                                            child: Icon(Icons.add, color: Colors.black26),
-                                                        ),
-                                                        onTap: () => subTaskCreateAction?.call(onApply: (Task task) {
-                                                                setState(() => expandedCache.add(task));
-                                                            }
+                                                GestureDetector(
+                                                    child: const Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                                                        child: Card(
+                                                            shadowColor: Colors.transparent,
+                                                            color: btnColors,
+                                                            shape: CircleBorder(),
+                                                            child: Padding(
+                                                              padding: EdgeInsets.all(6.0),
+                                                              child: Icon(Icons.add, color: Colors.black26),
+                                                            )
                                                         ),
                                                     ),
+                                                    onTap: () =>
+                                                        subTaskCreateAction?.call(onApply: (Task task) {
+                                                            setState(() => expandedCache.add(task));
+                                                        }),
                                                 ),
+
+//                                                Container(
+//                                                    decoration: BoxDecoration(
+//                                                        borderRadius: BorderRadius.circular(32),
+////                                                       color: Colors.orange,
+//                                                        boxShadow: const [
+//                                                            BoxShadow(color: Colors.white, spreadRadius: 8),
+//                                                        ],
+//                                                    ),
+//                                                    child: GestureDetector(
+//                                                        child: const Padding(
+//                                                            padding: EdgeInsets.symmetric(horizontal:4.0),
+//                                                            child: Card(
+//                                                                shape: CircleBorder(),
+//                                                                child: Icon(Icons.add, color: Colors.black26)
+//                                                            ),
+//                                                        ),
+//                                                        onTap: () => subTaskCreateAction?.call(onApply: (Task task) {
+//                                                                setState(() => expandedCache.add(task));
+//                                                            }
+//                                                        ),
+//                                                    ),
+//                                                ),
 
                                                 /// EDIT
                                                 Padding(
                                                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
                                                     child: ElevatedButton(
                                                         style: ButtonStyle(
-                                                            shape: MaterialStateProperty.resolveWith((states) => const CircleBorder()),
-                                                            shadowColor:  MaterialStateProperty.resolveWith((states) => Colors.transparent),
-                                                            backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                                                            shape: MaterialStateProperty.resolveWith((
+                                                                states) => const CircleBorder()),
+                                                            shadowColor: MaterialStateProperty.resolveWith((states) =>
+                                                            Colors.transparent),
+                                                            backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                                                                states) {
                                                                 return states.contains(MaterialState.pressed)
                                                                     ? Colors.lightBlueAccent
                                                                     : const Color(0xffEEEEEE);
 //                                                                    : Colors.black12;
-                                                                },
+                                                            },
                                                             )
                                                         ),
+
                                                         /// expand
 //                                                    child: const Icon(Icons.expand_less, color: Colors.black26),
                                                         child: const Icon(Icons.edit_outlined, color: Colors.black26),

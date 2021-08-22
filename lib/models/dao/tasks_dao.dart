@@ -8,23 +8,24 @@ abstract class TaskDao {
     @Query("SELECT * FROM Task")
     Future<List<Task>> all();
 
-
+    /// get end point tasks
     @Query("""
-        SELECT EndPointTasks.* FROM 
-            Task as EndPointTasks 
-            LEFT JOIN Task as child ON EndPointTasks.id = child.parent
+        SELECT Task.* FROM 
+            Task 
+            LEFT JOIN Task as childTask ON Task.id = childTask.parent
         WHERE 
-            child.id is NULL AND EndPointTasks.place = :place
+            childTask.id is NULL AND Task.place = :place
     """)
 //    @Query("SELECT * FROM Task WHERE place = :place")
     Future<List<Task>> getTasksFromPlace(int place);
 
 
-    @Query("SELECT * FROM Task as EndPointTask WHERE (SELECT Count(*) FROM Task WHERE parent = EndPointTask.id) = 0")
+    @Query("SELECT * FROM Task as endPoint WHERE (SELECT Count(*) FROM Task WHERE parent = endPoint.id) = 0")
     Future<List<Task>> endPointTasks();
 
 
     // todo rename to rootTasks:
+    /// get root tasks
     @Query("""
         SELECT
            parent_task.*, count(children.id) as subTasksAmount,
@@ -81,12 +82,18 @@ abstract class Places {
     Future<List<Place>> all();
 
     /// todo annotate to count of active tasks:
+    /// LEFT JOIN (SELECT * FROM Task WHERE isDone = 0) as Task ON place.id = Task.place
     @Query('''        
         SELECT 
             Place.*, 
             count(Task.id) as tasksAmount
-        FROM Place 
-            LEFT JOIN (SELECT * FROM Task WHERE isDone = 1) as Task ON place.id = Task.place 
+        FROM Place                                
+            LEFT JOIN 
+                (
+                    SELECT * FROM Task as Parent WHERE (SELECT Count(*) FROM Task WHERE parent = Parent.id) = 0 AND isDone = 0
+                ) as Task
+            ON 
+                place.id = Task.place                  
         GROUP BY Place.id    
     ''')
     Future<List<Place>> getAll();

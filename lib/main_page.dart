@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:some_app/controller.dart';
+import 'package:some_app/utils/speech.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import 'package:some_app/pages/fragments/quick_new.dart';
 import 'package:some_app/pages/fragments/task_item.dart';
@@ -53,6 +57,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     bool inDetail = false;
 
     bool quickNew = false;
+    bool searchBar = false;
     int? rootTaskId;
     int? rootTaskIndex;
 
@@ -71,7 +76,9 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
 
-        widget.places.all().then((_places) => controller.initPlaces(_places));
+        widget.places.getAll().then((_places) {
+            controller.initPlaces(_places);
+        });
 
         widget.tasks.all().then((_tasks) {
             controller.setTasks(_tasks);
@@ -95,7 +102,10 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
             setState(() {
                 tasks.addAll(_tasks.where((task) => task.isDone == false));
 
-                controller.maxImportance = tasks.reduce((a, b) => a.gravity > b.gravity ? a : b).gravity.obs;
+                controller.maxImportance = tasks
+                    .reduce((a, b) => a.gravity > b.gravity ? a : b)
+                    .gravity
+                    .obs;
 
 //                archive.addAll(
 //                    _tasks.where((task) {
@@ -199,7 +209,21 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
 //                title: Text("${widget.title} + ${selectedTab.toString()}"),
                 title: Text(tabTitle[selectedTab]),
                 actions: [
-                    const Icon(Icons.search),
+                    Visibility(
+                        visible: searchBar,
+                        child: TextField(
+                            style: const TextStyle(fontSize: 16, color: Colors.black54),
+                            onChanged: (String text){
+
+                            },
+                        )
+                    ),
+                    GestureDetector(
+                        onTap: (){
+                            setState(() => searchBar = !searchBar);
+                        },
+                        child: const Icon(Icons.search)
+                    ),
                     PopupMenuButton<Text>(
                         itemBuilder: (context) {
                             return [
@@ -351,9 +375,30 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                     padding: const EdgeInsets.only(bottom: 50.0, right: 15.0),
                     child: Align(
                         alignment: Alignment.bottomRight,
-                        child: FloatingActionButton(
-                            onPressed: () async {
-                                await createTask(context);
+                        child: GestureDetector(
+                            onLongPress: () async {
+
+
+                                bool available = await speech.initialize(onStatus: speechStatusListener, onError: speechErrorListener);
+                                if ( available ) {
+                                    speech.listen( onResult: (SpeechRecognitionResult result){
+
+                                        popup(context, result.recognizedWords);
+                                    });
+                                }
+                                else{
+                                    var r = await showConfirmationDialog(context, 'content');
+                                    if (r == true){
+                                        await createTask(context);
+                                    }
+                                }
+
+//                                speech.stop();
+                            },
+                            child: FloatingActionButton(
+
+                                onPressed: () async {
+                                    await createTask(context);
 
 //                                setState(() {
 //                                    quickNew = true;
@@ -372,10 +417,11 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
 //                  input(context, 'some content', title: 'title');
 
 
-                            },
-                            child: const Icon(Icons.add),
+                                },
+                                child: const Icon(Icons.add),
 //              icon: const Icon(Icons.phone_android),
 //              label: const Text("Authenticate using Phone"),
+                            ),
                         ),
                     ),
                 ),
@@ -385,7 +431,6 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
     }
 
     Future<void> createTask(BuildContext context, {Task? parent}) async {
-
         var titleSuffix = parent == null ? '' : ' (for ${parent.title})';
 
         String? newTaskNameTitle = await Navigator.of(context).push(

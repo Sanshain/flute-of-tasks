@@ -182,7 +182,7 @@ class _$TaskDao extends TaskDao {
   @override
   Future<List<Task>> getTasksFromPlace(int place) async {
     return _queryAdapter.queryList(
-        'SELECT EndPointTasks.* FROM              Task as EndPointTasks              LEFT JOIN Task as child ON EndPointTasks.id = child.parent         WHERE              child.id is NULL AND EndPointTasks.place = ?1',
+        'SELECT Task.* FROM              Task              LEFT JOIN Task as childTask ON Task.id = childTask.parent         WHERE              childTask.id is NULL AND Task.place = ?1',
         mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int),
         arguments: [place]);
   }
@@ -190,7 +190,7 @@ class _$TaskDao extends TaskDao {
   @override
   Future<List<Task>> endPointTasks() async {
     return _queryAdapter.queryList(
-        'SELECT * FROM Task as EndPointTask WHERE (SELECT Count(*) FROM Task WHERE parent = EndPointTask.id) = 0',
+        'SELECT * FROM Task as endPoint WHERE (SELECT Count(*) FROM Task WHERE parent = endPoint.id) = 0',
         mapper: (Map<String, Object?> row) => Task(
             row['id'] as int?,
             row['title'] as String,
@@ -323,7 +323,7 @@ class _$Places extends Places {
   @override
   Future<List<Place>> getAll() async {
     return _queryAdapter.queryList(
-        'SELECT              Place.*,              count(Task.id) as tasksAmount         FROM Place              LEFT JOIN (SELECT * FROM Task WHERE isDone = 1) as Task ON place.id = Task.place          GROUP BY Place.id',
+        'SELECT              Place.*,              count(Task.id) as tasksAmount         FROM Place                                             LEFT JOIN                  (                     SELECT * FROM Task as Parent WHERE (SELECT Count(*) FROM Task WHERE parent = Parent.id) = 0 AND isDone = 0                 ) as Task             ON                  place.id = Task.place                           GROUP BY Place.id',
         mapper: (Map<String, Object?> row) => Place(
             row['id'] as int?,
             row['name'] as String,

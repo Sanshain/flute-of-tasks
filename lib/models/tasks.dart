@@ -19,8 +19,8 @@ class Place {
     final String name;
     final bool isActive;
 
-    @ignore @Deprecated('useless') List<Task> activeTasks = <Task>[];
-
+//    @Deprecated('useless')
+    @ignore List<Task> activeTasks = <Task>[];
     @ignore int tasksAmount = 0;
 
     Future<List<Task>?> get tasks async {

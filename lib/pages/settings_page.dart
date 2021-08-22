@@ -28,16 +28,17 @@ class SettingsPage extends StatelessWidget {
                 child: ListView(
                     padding: const EdgeInsets.all(8),
                     children: <Widget>[
-
-                        ListTile(
-                            title: const Text('Enable Feature'),
-                            trailing: Checkbox(
-                                value: false,
+                        Obx(() => ListTile(
+                            title: const Text('Dark theme'),
+                            trailing: CupertinoSwitch(
+                                value: controller.settings.containsKey('theme')
+                                    ? controller.settings['theme'] == true.toString()
+                                    : false,
                                 onChanged: (val) {
                                     //                                setState(() {
                                     //                                    PrefService.setBool('feature_enabled', val);
                                     //                                });
-
+                                    controller.settings['theme'] = val.toString();
                                 },
                             ),
                             onTap: () {
@@ -46,7 +47,7 @@ class SettingsPage extends StatelessWidget {
                                 //                                    'feature_enabled', !PrefService.getBool('feature_enabled'));
                                 //                            });
                             },
-                        )
+                        ))
                     ]
                 ),
                 onWillPop: () async {

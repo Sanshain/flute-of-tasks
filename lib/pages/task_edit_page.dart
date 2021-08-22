@@ -188,13 +188,19 @@ class TaskEditState extends State<TaskEdit> {
                                                             title: 'Select task location'
                                                         );
 
-                                                        var place = controller.places
-                                                            .where((p0) => p0.name == location)
-                                                            .firstOrNull;
+                                                        int _placeIndex = controller.places
+                                                            .indexWhere((element) => element.name == location);
+
+                                                        Place? place = _placeIndex >= 0 ? controller.places[_placeIndex] : null;
+
+//                                                        var place = controller.places
+//                                                            .where((p0) => p0.name == location)
+//                                                            .firstOrNull;
 
                                                         if (prePlace != place?.id) {
 //                                                            updated = updated ?? widget.task;
                                                             setState(() => placeName = place?.name ?? 'is not specified');
+                                                            controller.places[_placeIndex].tasksAmount += 1;
 
                                                             widget.task.place = place?.id;
                                                             widget.task.save();

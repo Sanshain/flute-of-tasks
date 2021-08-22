@@ -58,14 +58,14 @@ class InputPage extends StatelessWidget {
                     ),
                 ),
                 floatingActionButton: Container(
-                    padding: const EdgeInsets.only(bottom: 15.0, right: 15.0),
+                    padding: EdgeInsets.only(bottom: 40.0, right: MediaQuery.of(context).size.width / 2 - 50),
                     child: Align(
                         alignment: Alignment.bottomRight,
-                        child: FloatingActionButton(
-                            onPressed: () {
-                                Navigator.of(context).pop(inputController.text);
-                            },
-                            child: const Icon(Icons.save),
+                        child: FloatingActionButton.extended(
+                            onPressed: () => Navigator.of(context).pop(inputController.text),
+                            label: const Icon(Icons.save, color: Colors.white,),
+                            backgroundColor: Colors.black12,
+//                          child: const Icon(Icons.save, color: Colors.white,),
                         )
                     )
                 ),
