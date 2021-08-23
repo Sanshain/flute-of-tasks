@@ -15,6 +15,17 @@ class SettingsPage extends StatelessWidget {
         // Instantiate your class using Get.put() to make it available for all "child" routes there.
         final Controller controller = Get.find();
 
+        Text _buildItem(String text) {
+            return Text(text,
+//              style: TextStyle(fontSize: 16, color: Colors.black38),
+                style: TextStyle(
+                    fontSize: 16,
+//                   color: (themeNotifier?.value == ThemeMode.dark) ? Theme.of(context).primaryColor : Colors.black38
+                    color: (themeNotifier?.value == ThemeMode.dark) ? Colors.white54 : Colors.black38
+                ),
+            );
+        }
+
         return Scaffold(
             // Use Obx(()=> to update Text() whenever count is changed.
 //            appBar: AppBar(title: Obx(() => Text("Clicks: ${c.count}"))),
@@ -30,15 +41,7 @@ class SettingsPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     children: <Widget>[
                         Obx(() => ListTile(
-                            title: Text(
-                                'Dark theme',
-//                                style: TextStyle(fontSize: 16, color: Colors.black38),
-                                style: TextStyle(
-                                    fontSize: 16,
-//                                    color: (themeNotifier?.value == ThemeMode.dark) ? Theme.of(context).primaryColor : Colors.black38
-                                    color: (themeNotifier?.value == ThemeMode.dark) ? Colors.white54 : Colors.black38
-                                ),
-                            ),
+                            title: _buildItem('Dark theme'),
                             trailing: CupertinoSwitch(
                                 value: controller.settings.containsKey('theme')
                                     ? controller.settings['theme'] == true.toString()
@@ -46,10 +49,6 @@ class SettingsPage extends StatelessWidget {
                                 activeColor: CupertinoColors.secondarySystemFill,
                                 trackColor: CupertinoColors.systemTeal,
                                 onChanged: (val) {
-                                    //                                setState(() {
-                                    //                                    PrefService.setBool('feature_enabled', val);
-                                    //                                });
-
 //                                    popup(context, 'in process (to do)');
 //                                    MediaQuery.of(context).platformBrightness == Brightness.dark;
                                     var curTheme =  MediaQuery.of(context).platformBrightness;
@@ -57,12 +56,34 @@ class SettingsPage extends StatelessWidget {
                                     controller.settings['theme'] = val.toString();
                                 },
                             ),
-                            onTap: () {
-                                //                            setState(() {
-                                //                                PrefService.setBool(
-                                //                                    'feature_enabled', !PrefService.getBool('feature_enabled'));
-                                //                            });
-                            },
+                            onTap: () {},
+                        )),
+                        Obx(() => Row(
+                          children: [
+                            DropdownButton<int>(
+                                value: int.parse(controller.settings['order'] ?? '1'),
+                                items: const [
+                                    DropdownMenuItem(
+                                        child: Text("By time of creation"),
+                                        value: 1,
+                                    ),
+//                                    DropdownMenuItem(
+//                                        child: Text("By importance"),
+//                                        value: 2,
+//                                    ),
+//                                    DropdownMenuItem(
+//                                        child: Text("By expiration time"),
+//                                        value: 3,
+//                                    )
+                                ],
+                                onChanged: (int? value){
+                                    if (value != null){
+                                        controller.settings['order'] = value.toString();
+                                    }
+                                    popup(context, 'only By time of creation is available now');
+                                },
+                            ),
+                          ],
                         ))
                     ]
                 ),
@@ -72,6 +93,7 @@ class SettingsPage extends StatelessWidget {
             )
         );
     }
+
 }
 
 
