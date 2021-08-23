@@ -403,7 +403,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                                     speech.listen(onResult: (SpeechRecognitionResult result) async {
                                         if (result.finalResult && result.recognizedWords.isNotEmpty)
                                         {
-                                            await _createTask(result.recognizedWords);
+                                            await _createTask(result.recognizedWords.capitalizeFirst!);
 //                                            popup(context, result.recognizedWords);
                                         }
                                     });

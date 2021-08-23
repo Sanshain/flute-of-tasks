@@ -1,11 +1,8 @@
-
-
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controller.dart';
-
 
 
 class InputPage extends StatelessWidget {
@@ -44,10 +41,10 @@ class InputPage extends StatelessWidget {
                     maxLines: 1,
                     minLines: 1,
                     style: const TextStyle(fontSize: 16, color: Colors.black54),
-                    onChanged: (String text){},
+                    onChanged: (String text) {},
                     decoration: const InputDecoration(
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide( color: Colors.black38, width: 2.0),
+                            borderSide: BorderSide(color: Colors.black38, width: 2.0),
                         ),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(25.0))
@@ -58,12 +55,20 @@ class InputPage extends StatelessWidget {
                     ),
                 ),
                 floatingActionButton: Container(
-                    padding: EdgeInsets.only(bottom: 40.0, right: MediaQuery.of(context).size.width / 2 - 50),
+                    padding: EdgeInsets.only(bottom: 40.0, right: MediaQuery
+                        .of(context)
+                        .size
+                        .width / 2 - 50),
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton.extended(
                             onPressed: () => Navigator.of(context).pop(inputController.text),
-                            label: const Icon(Icons.save, color: Colors.white,),
+                            label: Row(
+                                children: const [
+                                    Text('Save'),
+                                    Icon(Icons.save, color: Colors.white,),
+                                ],
+                            ),
                             backgroundColor: Colors.black12,
 //                          child: const Icon(Icons.save, color: Colors.white,),
                         )
