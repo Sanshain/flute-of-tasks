@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:some_app/widgets/popups.dart';
 
 import '../controller.dart';
 
 class SettingsPage extends StatelessWidget {
 
-    const SettingsPage({Key? key}) : super(key: key);
+    const SettingsPage({Key? key, this.themeNotifier}) : super(key: key);
 
-    @override
-    Widget build(context) {
+    final ValueNotifier<ThemeMode>? themeNotifier;
+    @override Widget build(context) {
 
         // Instantiate your class using Get.put() to make it available for all "child" routes there.
         final Controller controller = Get.find();
@@ -29,19 +30,30 @@ class SettingsPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     children: <Widget>[
                         Obx(() => ListTile(
-                            title: const Text(
+                            title: Text(
                                 'Dark theme',
-                                style: TextStyle(fontSize: 16, color: Colors.white54),
+//                                style: TextStyle(fontSize: 16, color: Colors.black38),
+                                style: TextStyle(
+                                    fontSize: 16,
+//                                    color: (themeNotifier?.value == ThemeMode.dark) ? Theme.of(context).primaryColor : Colors.black38
+                                    color: (themeNotifier?.value == ThemeMode.dark) ? Colors.white54 : Colors.black38
+                                ),
                             ),
                             trailing: CupertinoSwitch(
                                 value: controller.settings.containsKey('theme')
                                     ? controller.settings['theme'] == true.toString()
                                     : false,
-                                activeColor: CupertinoColors.systemTeal,
+                                activeColor: CupertinoColors.secondarySystemFill,
+                                trackColor: CupertinoColors.systemTeal,
                                 onChanged: (val) {
                                     //                                setState(() {
                                     //                                    PrefService.setBool('feature_enabled', val);
                                     //                                });
+
+//                                    popup(context, 'in process (to do)');
+//                                    MediaQuery.of(context).platformBrightness == Brightness.dark;
+                                    var curTheme =  MediaQuery.of(context).platformBrightness;
+                                    themeNotifier?.value = val ? ThemeMode.dark : ThemeMode.light;
                                     controller.settings['theme'] = val.toString();
                                 },
                             ),

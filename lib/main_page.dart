@@ -30,10 +30,11 @@ import 'package:collection/collection.dart';
 
 /// MainPage
 class MainPage extends StatefulWidget {
-    const MainPage(this.tasks, this.places, {Key? key, required this.title}) : super(key: key);
+    const MainPage(this.tasks, this.places, {Key? key, required this.title, this.themeNotifier}) : super(key: key);
 
     final String title;
 
+    final ValueNotifier<ThemeMode>? themeNotifier;
     final TaskDao tasks;
     final Places places;
 
@@ -253,7 +254,9 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
 //                                            popup(context, 'todo');
                                             Navigator.push(context,
                                                 PageRouteBuilder(
-                                                    pageBuilder: (context, animation, secondaryAnimation) => const SettingsPage(),
+                                                    pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(
+                                                        themeNotifier: widget.themeNotifier
+                                                    ),
                                                     transitionsBuilder: instantTransition,
                                                 )
                                                 //                                              MaterialPageRoute(builder: (context) => SettingsPage()

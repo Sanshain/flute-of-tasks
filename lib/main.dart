@@ -36,14 +36,27 @@ class App extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
+
+        final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.light);
+
 //        return MaterialApp(
-        return GetMaterialApp(
-            title: 'Some Awesome App',
-            theme: ThemeData(
-                primarySwatch: Colors.blue,
-            ),
-//      home: const MainPage(tasks, title: 'The Tasks'),
-            home: MainPage(tasks, places, title: 'The Tasks'),
+        return ValueListenableBuilder(
+          valueListenable: _notifier,
+          builder: (BuildContext context, ThemeMode value, Widget? child) {
+              return GetMaterialApp(
+                  title: 'Some Awesome App',
+                  themeMode: value,
+                  darkTheme: ThemeData.dark(),
+//                  darkTheme: ThemeData(
+//                      primarySwatch: Colors.black,
+//                  ),
+                  theme: ThemeData(
+                      primarySwatch: Colors.blue,
+                  ),
+//                  home: const MainPage(tasks, title: 'The Tasks'),
+                  home: MainPage(tasks, places, title: 'The Tasks', themeNotifier: _notifier,),
+              );
+          },
         );
     }
 }
