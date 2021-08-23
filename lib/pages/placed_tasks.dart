@@ -110,7 +110,7 @@ class PlacedTasksPage extends PlacesPage {
                     ],
                     onExpansionChanged: (bool expanded) async {
                         if (expanded) {
-                            controller.places[index].activeTasks = await controller.places[index].tasks ?? <Task>[];
+                            controller.places[index].activeTasks = (await controller.places[index].tasks) ?? <Task>[];
                         }
                     }
                 )

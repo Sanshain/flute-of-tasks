@@ -29,11 +29,15 @@ class SettingsPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     children: <Widget>[
                         Obx(() => ListTile(
-                            title: const Text('Dark theme'),
+                            title: const Text(
+                                'Dark theme',
+                                style: TextStyle(fontSize: 16, color: Colors.white54),
+                            ),
                             trailing: CupertinoSwitch(
                                 value: controller.settings.containsKey('theme')
                                     ? controller.settings['theme'] == true.toString()
                                     : false,
+                                activeColor: CupertinoColors.systemTeal,
                                 onChanged: (val) {
                                     //                                setState(() {
                                     //                                    PrefService.setBool('feature_enabled', val);

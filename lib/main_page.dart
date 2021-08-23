@@ -58,6 +58,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
 
     bool quickNew = false;
     bool searchBar = false;
+    late FocusNode searchFocusNode;
     int? rootTaskId;
     int? rootTaskIndex;
 
@@ -70,15 +71,16 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
 
     void Function(Task)? useSubTasksUpdate;
     final Controller controller = Get.put(Controller());
+    static final GlobalKey<FormFieldState<String>> _searchFormKey = GlobalKey<FormFieldState<String>>();
 
 
     @override
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
 
-        widget.places.getAll().then((_places) {
-            controller.initPlaces(_places);
-        });
+        searchFocusNode = FocusNode();
+
+        widget.places.getAll().then((_places) => controller.initPlaces(_places));
 
         widget.tasks.all().then((_tasks) {
             controller.setTasks(_tasks);
@@ -116,6 +118,14 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         });
     }
 
+
+    @override
+    void dispose() {
+
+        searchFocusNode.dispose();
+        super.dispose();
+    }
+
     @override
     Widget listTileGenerate(int index, {
         BuildContext? parentContext,
@@ -124,6 +134,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         Task? parentTask,
         int deep = 0
     }) {
+
         parentContext = parentContext ?? rootContext;
         childContextWrapper = childContextWrapper ?? subContextWrapper;
         var tasks = parentTasks ?? this.tasks;
@@ -193,47 +204,56 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                 rootTaskId = tasks[index].id;
                 rootTaskIndex = index;
 
-                await createTask(context, parent: tasks[index]);
+                await createTaskPage(context, parent: tasks[index]);
             },
             expandAction: () {},
             rootContext: parentContext!
         );
     }
 
+
     @override
     Widget build(BuildContext context) {
         rootContext = context;
 
         return Scaffold(
+//            key: UniqueKey(),
             appBar: AppBar(
+//                key: UniqueKey(),
 //                title: Text("${widget.title} + ${selectedTab.toString()}"),
                 title: Text(tabTitle[selectedTab]),
                 actions: [
-                    Visibility(
-                        visible: searchBar,
-                        child: TextField(
-                            style: const TextStyle(fontSize: 16, color: Colors.black54),
-                            onChanged: (String text){
-
-                            },
-                        )
-                    ),
-                    GestureDetector(
-                        onTap: (){
-                            setState(() => searchBar = !searchBar);
-                        },
-                        child: const Icon(Icons.search)
-                    ),
+//                    if (searchBar == true)
+//                        Expanded(
+//    //                      key: UniqueKey(),
+//                            child: Padding(
+//    //                          key: UniqueKey(),
+//                                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+//                                child: TextField(
+//    //                              key: _searchFormKey,
+//                                    decoration: const InputDecoration(hintText: "Поиск"),
+//                                    style: const TextStyle(fontSize: 16, color: Colors.white54),
+//                                    autofocus: true,
+//                                    onChanged: (String text) {}
+//                                ),
+//                            ),
+//                        ),
+//                    GestureDetector(
+//                        onTap: () {
+//                            setState(() => searchBar = !searchBar);
+//                        },
+//                        child: const Icon(Icons.search)
+//                    ),
                     PopupMenuButton<Text>(
                         itemBuilder: (context) {
                             return [
                                 PopupMenuItem(
                                     child: GestureDetector(
                                         onTap: () {
-                                            popup(context, 'todo');
+//                                            popup(context, 'todo');
                                             Navigator.push(context,
                                                 PageRouteBuilder(
-                                                    pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(),
+                                                    pageBuilder: (context, animation, secondaryAnimation) => const SettingsPage(),
                                                     transitionsBuilder: instantTransition,
                                                 )
                                                 //                                              MaterialPageRoute(builder: (context) => SettingsPage()
@@ -377,19 +397,21 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                         alignment: Alignment.bottomRight,
                         child: GestureDetector(
                             onLongPress: () async {
-
-
-                                bool available = await speech.initialize(onStatus: speechStatusListener, onError: speechErrorListener);
-                                if ( available ) {
-                                    speech.listen( onResult: (SpeechRecognitionResult result){
-
-                                        popup(context, result.recognizedWords);
+                                bool available = await speech.initialize(
+                                    onStatus: speechStatusListener, onError: speechErrorListener);
+                                if (available) {
+                                    speech.listen(onResult: (SpeechRecognitionResult result) async {
+                                        if (result.finalResult && result.recognizedWords.isNotEmpty)
+                                        {
+                                            await _createTask(result.recognizedWords);
+//                                            popup(context, result.recognizedWords);
+                                        }
                                     });
                                 }
-                                else{
+                                else {
                                     var r = await showConfirmationDialog(context, 'content');
-                                    if (r == true){
-                                        await createTask(context);
+                                    if (r == true) {
+                                        await createTaskPage(context);
                                     }
                                 }
 
@@ -398,7 +420,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
                             child: FloatingActionButton(
 
                                 onPressed: () async {
-                                    await createTask(context);
+                                    await createTaskPage(context);
 
 //                                setState(() {
 //                                    quickNew = true;
@@ -430,7 +452,7 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         );
     }
 
-    Future<void> createTask(BuildContext context, {Task? parent}) async {
+    Future<void> createTaskPage(BuildContext context, {Task? parent}) async {
         var titleSuffix = parent == null ? '' : ' (for ${parent.title})';
 
         String? newTaskNameTitle = await Navigator.of(context).push(
@@ -438,23 +460,26 @@ class MainPageState extends State<MainPage> implements IExpandedTaskList {
         );
 //        var newTaskNameTitle = await inputDialog(context, title: 'Enter new task title');
         if (newTaskNameTitle?.isNotEmpty ?? false) {
-            var task = Task.init(newTaskNameTitle!, parent: rootTaskId);
-            await widget.tasks.insertItem(task);
-
-            setState(() {
-                if (rootTaskId == null) {
-                    tasks.insert(0, task);
-                }
-                else {
-                    tasks[rootTaskIndex!].subTasksAmount = tasks[rootTaskIndex!].subTasksAmount! + 1;
-                    useSubTasksUpdate?.call(task);
-                }
-            }
-            );
+            await _createTask(newTaskNameTitle!);
         }
 
         rootTaskId = null;
         useSubTasksUpdate = null;
+    }
+
+    Future<void> _createTask(String newTaskNameTitle) async {
+      var task = Task.init(newTaskNameTitle, parent: rootTaskId);
+      await widget.tasks.insertItem(task);
+
+      setState(() {
+          if (rootTaskId == null) {
+              tasks.insert(0, task);
+          }
+          else {
+              tasks[rootTaskIndex!].subTasksAmount = tasks[rootTaskIndex!].subTasksAmount! + 1;
+              useSubTasksUpdate?.call(task);
+          }
+      });
     }
 
 
