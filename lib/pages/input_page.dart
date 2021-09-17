@@ -35,6 +35,7 @@ class InputPage extends StatelessWidget {
 //            ),
 
                 body: TextField(
+                    textCapitalization: TextCapitalization.sentences,
                     controller: inputController,
 //                    initialValue: '',
                     autofocus: true,
@@ -58,7 +59,7 @@ class InputPage extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: 40.0, right: MediaQuery
                         .of(context)
                         .size
-                        .width / 2 - 50),
+                        .width / 2 - 40),
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton.extended(
