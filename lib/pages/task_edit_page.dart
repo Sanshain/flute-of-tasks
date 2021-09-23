@@ -10,7 +10,10 @@ import 'package:sanshain_tasks/widgets/fields.dart';
 import 'package:sanshain_tasks/widgets/popups.dart';
 
 import 'fragments/grvity_handler.dart';
+import 'fragments/slider_dialog.dart';
 
+
+const hoursDayLimit = 2;
 
 class TaskEditPage extends TaskPage {
 //  const TaskPage({Key? key, required this.title}) : super(key: key);
@@ -44,7 +47,8 @@ class TaskEditPage extends TaskPage {
 //                    topLeft: Radius.circular(25.0)
                 ))
             ),
-            padding: MaterialStateProperty.resolveWith((states) => left
+            padding: MaterialStateProperty.resolveWith((states) =>
+            left
                 ? const EdgeInsets.only(left: 10, right: 0)
                 : const EdgeInsets.only(left: 0, right: 10)
             ),
@@ -65,6 +69,20 @@ class TaskEditPage extends TaskPage {
 class TaskEditState extends State<TaskEditPage> {
 
     var textController = TextEditingController();
+
+    void durUp(_updated) async {
+        var delta = widget.task.deadline!.difference(widget.task.created);
+        var units = delta.inDays > hoursDayLimit ? TimeUnits.day : TimeUnits.hour;
+        var max = units == TimeUnits.day ? delta.inDays : delta.inHours;
+
+        int? value = await sliderDialog(
+            context, value: widget.task.duration ?? 0, units: units, options: SliderOptions(max: max), title: 'Duration'
+        );
+        _updated = _updated ?? widget.task;
+        setState(() => widget.task.duration = value);
+
+        await Task.tasks?.updateItem.call(widget.task);
+    }
 
 //    var elevatedButtonStyle = TaskEditPage.getElevatedButtonStyle();
 
@@ -159,25 +177,52 @@ class TaskEditState extends State<TaskEditPage> {
                                         Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                                 if (widget.task.deadline != null)
-                                                    IconButton(icon: const Icon(Icons.receipt_long, color: Colors.black12,),
-                                                        onPressed: (){
-                                                            popup(context, 'выбрать примерное время выполнения задачи (туду)');
-                                                        }
-                                                    ),
+                                                if (widget.task.deadline != null)
+                                                    if (widget.task.duration == null || widget.task.duration == 0)
+                                                        IconButton(
+                                                            icon: const Icon(Icons.receipt_long, color: Colors.black12,),
+                                                            onPressed: () => durUp(updated),
+                                                        )
+                                                    else
+                                                        GestureDetector(
+                                                            onTap: () => durUp(updated),
+                                                            child: Text('${widget.task.duration} ${
+//                                                                widget.task.deadline!.difference(widget.task.created).inDays > hoursDayLimit
+                                                                widget.task.deadline!.difference(widget.task.created).inDays > hoursDayLimit
+                                                                    ? 'days'
+                                                                    : 'hours'
+                                                            } inside ${
+                                                                widget.task.deadline!.difference(widget.task.created).inDays > hoursDayLimit
+                                                                    ? "${widget.task.deadline!.difference(DateTime.now()).inDays} days"
+                                                                    : "${widget.task.deadline!.difference(DateTime.now()).inHours} hours"
+                                                            }',
+                                                                style: const TextStyle(color: Colors.black26)
+                                                            ),
+                                                        ),
                                                 Row(
                                                     children: [
                                                         ElevatedButton(
                                                             style: TaskEditPage.getElevatedButtonStyle(left: true),
                                                             // ElevatedButton.styleFrom(primary: Colors.red)
                                                             onPressed: () =>
-                                                                selectDate(
-                                                                    context, null,
+                                                                selectDate(context,
+                                                                    widget.task.deadline,
+                                                                    start: DateTime.now().add(Duration(
+                                                                        hours: widget.task.getDuration() ?? 1
+                                                                    )),
                                                                     setState: (datetime) {
-        //                                                              selectedDate = datetime;
+                                                                        //                                                              selectedDate = datetime;
                                                                         updated = updated ?? widget.task;
                                                                         setState(() {
-                                                                            widget.task.deadline = datetime;
+//                                                                            if (widget.task.deadline != null){
+//                                                                                datetime = datetime.add(Duration(hours: widget.task.deadline!.hour));
+//                                                                            }
+                                                                            widget.task.deadline = datetime.add(
+                                                                                Duration(
+                                                                                    hours: widget.task.deadline?.hour ?? 0,
+                                                                                    minutes: widget.task.deadline?.minute ?? 0,
+                                                                                ),
+                                                                            );
                                                                         });
                                                                     }
                                                                 ),
@@ -190,7 +235,8 @@ class TaskEditState extends State<TaskEditPage> {
                                                         ),
                                                         ElevatedButton(
                                                             style: TaskEditPage.getElevatedButtonStyle(),
-                                                            child: widget.task.deadline != null && widget.task.deadline!.hour != 0
+                                                            child: widget.task.deadline != null &&
+                                                                widget.task.deadline!.hour != 0
                                                                 ? Text(DateFormat("HH:mm").format(widget.task.deadline!))
                                                                 : const Icon(Icons.access_time, color: Colors.white54),
 //                                                            icon: const Icon(Icons.access_time),
@@ -212,20 +258,30 @@ class TaskEditState extends State<TaskEditPage> {
 //                                                                    widget.task.deadline
 //                                                                    expirationTime.hour
 
-                                                                    if (widget.task.deadline == null){
-                                                                        DateTime now = DateTime.now();
+                                                                    DateTime now = DateTime.now();
+
+                                                                    if (widget.task.deadline == null) {
                                                                         setState(() {
                                                                             widget.task.deadline = DateTime(
-                                                                                now.year, now.month, now.day,
+                                                                                now.year, now.month,
+                                                                                (expirationTime.hour > now.hour
+                                                                                    ? now
+                                                                                    : DateTime.now().add(const Duration(days: 1))
+                                                                                ).day,
                                                                                 expirationTime.hour, expirationTime.minute
                                                                             );
                                                                         });
                                                                     }
-                                                                    else{
+                                                                    else {
+
+                                                                        var tomorrow = 0;
+                                                                        if (widget.task.deadline!.day == now.day && expirationTime.hour < DateTime.now().hour) {
+                                                                            tomorrow = 1;
+                                                                        }
+
                                                                         setState(() => widget.task.deadline = DateTime(
-                                                                            widget.task.deadline!.year,
-                                                                            widget.task.deadline!.month,
-                                                                            widget.task.deadline!.day,
+                                                                            widget.task.deadline!.year, widget.task.deadline!.month,
+                                                                            widget.task.deadline!.day + tomorrow,
                                                                             expirationTime.hour,
                                                                             expirationTime.minute
                                                                         ));

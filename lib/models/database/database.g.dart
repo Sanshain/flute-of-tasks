@@ -83,7 +83,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent` INTEGER, `place` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `gravity` INTEGER NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `deadline` INTEGER, FOREIGN KEY (`place`) REFERENCES `Place` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`parent`) REFERENCES `Task` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
+            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent` INTEGER, `place` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `gravity` INTEGER NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `duration` INTEGER, `deadline` INTEGER, FOREIGN KEY (`place`) REFERENCES `Place` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`parent`) REFERENCES `Task` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Place` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `isActive` INTEGER NOT NULL)');
 
@@ -119,6 +119,7 @@ class _$TaskDao extends TaskDao {
                   'gravity': item.gravity,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
+                  'duration': item.duration,
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
                 }),
         _taskUpdateAdapter = UpdateAdapter(
@@ -134,6 +135,7 @@ class _$TaskDao extends TaskDao {
                   'gravity': item.gravity,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
+                  'duration': item.duration,
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
                 }),
         _taskDeletionAdapter = DeletionAdapter(
@@ -149,6 +151,7 @@ class _$TaskDao extends TaskDao {
                   'gravity': item.gravity,
                   'isDone': item.isDone ? 1 : 0,
                   'created': _dateTimeConverter.encode(item.created),
+                  'duration': item.duration,
                   'deadline': _nullableDateTimeConverter.encode(item.deadline)
                 });
 
@@ -176,14 +179,15 @@ class _$TaskDao extends TaskDao {
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
             row['place'] as int?,
-            row['gravity'] as int));
+            row['gravity'] as int,
+            row['duration'] as int?));
   }
 
   @override
   Future<List<Task>> getTasksFromPlace(int place) async {
     return _queryAdapter.queryList(
         'SELECT Task.* FROM              Task              LEFT JOIN Task as childTask ON Task.id = childTask.parent         WHERE              childTask.id is NULL AND Task.place = ?1',
-        mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int),
+        mapper: (Map<String, Object?> row) => Task(row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int, row['duration'] as int?),
         arguments: [place]);
   }
 
@@ -200,7 +204,8 @@ class _$TaskDao extends TaskDao {
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
             row['place'] as int?,
-            row['gravity'] as int));
+            row['gravity'] as int,
+            row['duration'] as int?));
   }
 
   @override
@@ -217,6 +222,7 @@ class _$TaskDao extends TaskDao {
             row['parent'] as int?,
             row['place'] as int?,
             row['gravity'] as int,
+            row['duration'] as int?,
             subTasksAmount: row['subTasksAmount'] as int?,
             doneSubTasksAmount: row['doneSubTasksAmount'] as int?
         ));
@@ -226,11 +232,12 @@ class _$TaskDao extends TaskDao {
   Future<List<Task>> getChildren(int id) async {
     return _queryAdapter.queryList(
         'SELECT            parent_task.*, count(children.id) as subTasksAmount,                       SUM(children.isDone) as doneSubTasksAmount	         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
-        mapper: (Map<String, Object?> row) => Task(
-            row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int,
-            subTasksAmount: row['subTasksAmount'] as int?,
-            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
-        ),
+        mapper: (Map<String, Object?> row) =>
+            Task(
+                row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int, row['duration'] as int?,
+                subTasksAmount: row['subTasksAmount'] as int?,
+                doneSubTasksAmount: row['doneSubTasksAmount'] as int?
+            ),
         arguments: [id]);
   }
 
@@ -246,7 +253,8 @@ class _$TaskDao extends TaskDao {
             _nullableDateTimeConverter.decode(row['deadline'] as int?),
             row['parent'] as int?,
             row['place'] as int?,
-            row['gravity'] as int),
+            row['gravity'] as int,
+            row['duration'] as int?),
         arguments: [id]);
   }
 
@@ -321,7 +329,8 @@ class _$Places extends Places {
   }
 
   @override
-  Future<List<Place>> getAll() async {
+  Future<List<Place>> getAll() async
+  {
     return _queryAdapter.queryList(
         'SELECT              Place.*,              count(Task.id) as tasksAmount         FROM Place                                             LEFT JOIN                  (                     SELECT * FROM Task as Parent WHERE (SELECT Count(*) FROM Task WHERE parent = Parent.id) = 0 AND isDone = 0                 ) as Task             ON                  place.id = Task.place                           GROUP BY Place.id',
         mapper: (Map<String, Object?> row) => Place(
@@ -329,7 +338,8 @@ class _$Places extends Places {
             row['name'] as String,
             (row['isActive'] as int) != 0,
             tasksAmount: row['tasksAmount'] as int
-        ));
+        )
+    );
   }
 
   @override

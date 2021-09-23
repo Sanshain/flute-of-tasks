@@ -55,7 +55,7 @@ class Task {
     static TaskDao? tasks;
 
     Task(this.id, this.title, this.description, this.isDone, this.created, this.deadline, this.parent, this.place,
-        this.gravity, {
+        this.gravity, this.duration, {
             this.subTasksAmount,
             this.doneSubTasksAmount
         });
@@ -76,6 +76,7 @@ class Task {
 
     late bool isDone;
     late final DateTime created;
+    int? duration;
     DateTime? deadline;
 
     @ignore String? parentName;
@@ -114,6 +115,17 @@ class Task {
 
     @override String toString() => 'Task {id: $id, message: $title, isDone: $isDone}';
 
+    /// return duration in hours:
+    int? getDuration() {
+        if (duration == null || deadline == null) return null;
+        var difference = deadline!.difference(created);
+
+        if (difference.inHours < 0) {
+            throw Exception('Wrong deadline value ${deadline.toString()}');
+        }
+
+        return difference.inDays < 3 ? duration : duration! * 24;
+    }
 }
 
 

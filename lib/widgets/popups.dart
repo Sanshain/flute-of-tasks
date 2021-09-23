@@ -148,12 +148,17 @@ Future<bool?> showConfirmationDialog(BuildContext rootContext, String action, {S
 }
 
 
-Future<void> selectDate(BuildContext context, DateTime? selectedDate, {required Function(DateTime) setState}) async {
+Future<void> selectDate(BuildContext context, DateTime? selectedDate,
+    {
+        required Function(DateTime) setState, DateTime? start
+    }) async
+{
     final DateTime? picked = await showDatePicker(
+
         context: context,
-        initialDate: selectedDate ?? DateTime.now(),
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101)
+        initialDate: selectedDate ?? (start != null && start.isAfter(DateTime.now()) ? start : DateTime.now()),
+        firstDate: start ?? DateTime(2015, 8),
+        lastDate: DateTime(2112)
     );
 
     if (picked != null && picked != selectedDate) setState(picked);
