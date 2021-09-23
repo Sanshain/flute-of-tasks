@@ -1,6 +1,6 @@
 
 import 'package:floor/floor.dart';
-import 'package:some_app/models/tasks.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
 
 @dao
 abstract class TaskDao {

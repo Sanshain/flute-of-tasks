@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:some_app/widgets/popups.dart';
+import 'package:sanshain_tasks/widgets/popups.dart';
 
 import '../controller.dart';
 

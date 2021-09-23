@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:some_app/models/tasks.dart';
-import 'package:some_app/pages/task_edit_page.dart';
-import 'package:some_app/transitions/instant.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
+import 'package:sanshain_tasks/pages/task_edit_page.dart';
+import 'package:sanshain_tasks/transitions/instant.dart';
 
 
 //typedef ChangeState = Function Function();
@@ -271,7 +271,7 @@ class ListViewItemState extends State<ListViewItem> {
 //                                                                pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
                                                                     pageBuilder: (rootContext, animation,
                                                                         secondaryAnimation) =>
-                                                                        TaskEdit(
+                                                                        TaskEditPage(
                                                                             subContextWrapper,
                                                                             index: index,
                                                                             tasks: tasks,
@@ -388,7 +388,7 @@ Widget createListViewPoint(BuildContext context, int index, {
                     PageRouteBuilder(
 //                    pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
                         pageBuilder: (rootContext, animation, secondaryAnimation) =>
-                            TaskEdit(
+                            TaskEditPage(
                                 subContextWrapper,
                                 index: index,
                                 tasks: tasks,

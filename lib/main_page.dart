@@ -3,22 +3,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:some_app/controller.dart';
-import 'package:some_app/utils/speech.dart';
+import 'package:sanshain_tasks/controller.dart';
+import 'package:sanshain_tasks/utils/speech.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import 'package:some_app/pages/fragments/quick_new.dart';
-import 'package:some_app/pages/fragments/task_item.dart';
-import 'package:some_app/pages/input_page.dart';
-import 'package:some_app/pages/placed_tasks.dart';
-import 'package:some_app/pages/places_page.dart';
-import 'package:some_app/pages/settings_page.dart';
+import 'package:sanshain_tasks/pages/fragments/quick_new.dart';
+import 'package:sanshain_tasks/pages/fragments/task_item.dart';
+import 'package:sanshain_tasks/pages/input_page.dart';
+import 'package:sanshain_tasks/pages/placed_tasks.dart';
+import 'package:sanshain_tasks/pages/places_page.dart';
+import 'package:sanshain_tasks/pages/settings_page.dart';
 
 //import 'package:keyboard_visibility/keyboard_visibility.dart';
-import 'package:some_app/transitions/instant.dart';
-import 'package:some_app/widgets/popups.dart';
+import 'package:sanshain_tasks/transitions/instant.dart';
+import 'package:sanshain_tasks/widgets/popups.dart';
 
 
 import 'models/dao/tasks_dao.dart';

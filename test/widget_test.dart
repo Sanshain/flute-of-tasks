@@ -7,11 +7,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:some_app/main.dart';
+import 'package:sanshain_tasks/main.dart';
 
-import 'package:some_app/main_page.dart';
-import 'package:some_app/models/dao/tasks_dao.dart';
-import 'package:some_app/models/database/database.dart';
+import 'package:sanshain_tasks/main_page.dart';
+import 'package:sanshain_tasks/models/dao/tasks_dao.dart';
+import 'package:sanshain_tasks/models/database/database.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

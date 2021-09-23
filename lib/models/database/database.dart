@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:floor/floor.dart';
-import 'package:some_app/models/converters/datetime.dart';
-import 'package:some_app/models/dao/tasks_dao.dart';
-import 'package:some_app/models/tasks.dart';
+import 'package:sanshain_tasks/models/converters/datetime.dart';
+import 'package:sanshain_tasks/models/dao/tasks_dao.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'database.g.dart'; // the generated code will be there

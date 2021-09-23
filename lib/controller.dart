@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:some_app/models/tasks.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
 
 class Controller extends GetxController{
     //    var count = 0.obs;

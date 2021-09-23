@@ -2,20 +2,20 @@ import 'package:collection/src/iterable_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:some_app/controller.dart';
-import 'package:some_app/models/tasks.dart';
-import 'package:some_app/task_view.dart';
-import 'package:some_app/widgets/button.dart';
-import 'package:some_app/widgets/fields.dart';
-import 'package:some_app/widgets/popups.dart';
+import 'package:sanshain_tasks/controller.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
+import 'package:sanshain_tasks/task_view.dart';
+import 'package:sanshain_tasks/widgets/button.dart';
+import 'package:sanshain_tasks/widgets/fields.dart';
+import 'package:sanshain_tasks/widgets/popups.dart';
 
 import 'fragments/grvity_handler.dart';
 
 
-class TaskEdit extends TaskPage {
+class TaskEditPage extends TaskPage {
 //  const TaskPage({Key? key, required this.title}) : super(key: key);
 
-    TaskEdit(taskContext, {Key? key, required this.index, required this.tasks, Function(Task?)? onPop}) : super(
+    TaskEditPage(taskContext, {Key? key, required this.index, required this.tasks, Function(Task?)? onPop}) : super(
         taskContext,
         tasks[index],
         key: key,
@@ -26,17 +26,50 @@ class TaskEdit extends TaskPage {
     final List<Task> tasks;
 
     @override
-    State<TaskEdit> createState() => TaskEditState();
+    State<TaskEditPage> createState() => TaskEditState();
+
+
+    static ButtonStyle getElevatedButtonStyle({bool left = false}) {
+        return ButtonStyle(
+            // (states) => const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25.0)))
+            shape: MaterialStateProperty.resolveWith((states) =>
+                RoundedRectangleBorder(borderRadius:
+                left ? const BorderRadius.only(
+                    bottomLeft: Radius.circular(25.0),
+                    topLeft: Radius.circular(25.0)
+                ) : const BorderRadius.only(
+                    bottomRight: Radius.circular(25.0),
+                    topRight: Radius.circular(25.0)
+//                    bottomLeft: Radius.circular(25.0),
+//                    topLeft: Radius.circular(25.0)
+                ))
+            ),
+            padding: MaterialStateProperty.resolveWith((states) => left
+                ? const EdgeInsets.only(left: 10, right: 0)
+                : const EdgeInsets.only(left: 0, right: 10)
+            ),
+//            maximumSize: MaterialStateProperty.resolveWith((states) => const Size(150, 30)),
+            shadowColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+            backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                if (states.contains(MaterialState.pressed)) {
+                    return Colors.lightBlueAccent;
+                }
+                return Colors.black26;
+            })
+        );
+    }
+
 }
 
 
-class TaskEditState extends State<TaskEdit> {
+class TaskEditState extends State<TaskEditPage> {
 
     var textController = TextEditingController();
 
+//    var elevatedButtonStyle = TaskEditPage.getElevatedButtonStyle();
+
     @override
     Widget build(BuildContext context) {
-
         final Controller controller = Get.find();
         final TextEditingController inputController = TextEditingController(text: '');
 
@@ -67,9 +100,6 @@ class TaskEditState extends State<TaskEdit> {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-//                        Text(
-//                            'Your tas is:',
-//                        ),
                             inputField(hint: 'Title', value: widget.task.title, onChanged: (String text) {
                                 updated = updated ?? widget.task;
                                 widget.task.title = text;
@@ -129,39 +159,82 @@ class TaskEditState extends State<TaskEdit> {
                                         Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-//                                                Text("${widget.task.deadline ?? ''}".split(' ')[0]),
-//                                                const SizedBox(height: 20.0,),
-                                                ElevatedButton(
-//                                                    ElevatedButton.styleFrom(primary: Colors.red)
-                                                    style: ButtonStyle(
-                                                        shape: MaterialStateProperty.resolveWith((states) => const RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.all(Radius.circular(25.0))
-                                                        )),
-                                                        shadowColor:  MaterialStateProperty.resolveWith((states) => Colors.transparent),
-                                                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                                                (Set<MaterialState> states) {
-                                                                    if (states.contains(MaterialState.pressed)) { return Colors.lightBlueAccent; }
-                                                                    return Colors.black26;
-                                                                },
-                                                            )
-                                                        ),
-                                                    onPressed: () =>
-                                                        selectDate(
-                                                            context, null,
-                                                            setState: (datetime) {
-//                                                              selectedDate = datetime;
-                                                                updated = updated ?? widget.task;
-                                                                setState(() {
-                                                                    widget.task.deadline = datetime;
-                                                                });
-                                                            }
-                                                        ),
-                                                    child: Text(
-                                                        widget.task.deadline != null
-                                                            ? DateFormat("dd.MM E y").format(widget.task.deadline!)
-                                                            : 'Select date',
-                                                        style: const TextStyle(decorationColor: Colors.red),
+                                                 if (widget.task.deadline != null)
+                                                    IconButton(icon: const Icon(Icons.receipt_long, color: Colors.black12,),
+                                                        onPressed: (){
+                                                            popup(context, 'выбрать примерное время выполнения задачи (туду)');
+                                                        }
                                                     ),
+                                                Row(
+                                                    children: [
+                                                        ElevatedButton(
+                                                            style: TaskEditPage.getElevatedButtonStyle(left: true),
+                                                            // ElevatedButton.styleFrom(primary: Colors.red)
+                                                            onPressed: () =>
+                                                                selectDate(
+                                                                    context, null,
+                                                                    setState: (datetime) {
+        //                                                              selectedDate = datetime;
+                                                                        updated = updated ?? widget.task;
+                                                                        setState(() {
+                                                                            widget.task.deadline = datetime;
+                                                                        });
+                                                                    }
+                                                                ),
+                                                            child: Text(
+                                                                widget.task.deadline != null
+                                                                    ? DateFormat("dd.MM E y").format(widget.task.deadline!)
+                                                                    : 'Select date',
+                                                                style: const TextStyle(decorationColor: Colors.red)
+                                                            ),
+                                                        ),
+                                                        ElevatedButton(
+                                                            style: TaskEditPage.getElevatedButtonStyle(),
+                                                            child: widget.task.deadline != null && widget.task.deadline!.hour != 0
+                                                                ? Text(DateFormat("HH:mm").format(widget.task.deadline!))
+                                                                : const Icon(Icons.access_time, color: Colors.white54),
+//                                                            icon: const Icon(Icons.access_time),
+                                                            onPressed: () async {
+                                                                var expirationTime = await showTimePicker(context: context,
+                                                                    initialTime: TimeOfDay.fromDateTime(
+                                                                        DateTime.now().add(const Duration(hours: 1))
+                                                                    ),
+                                                                    builder: (context, child) {
+                                                                        return MediaQuery(
+                                                                            data: MediaQuery.of(context).copyWith(
+                                                                                alwaysUse24HourFormat: true
+                                                                            ),
+                                                                            child: child as Widget,
+                                                                        );
+                                                                    }
+                                                                );
+                                                                if (expirationTime != null) {
+//                                                                    widget.task.deadline
+//                                                                    expirationTime.hour
+
+                                                                    if (widget.task.deadline == null){
+                                                                        DateTime now = DateTime.now();
+                                                                        setState(() {
+                                                                            widget.task.deadline = DateTime(
+                                                                                now.year, now.month, now.day,
+                                                                                expirationTime.hour, expirationTime.minute
+                                                                            );
+                                                                        });
+                                                                    }
+                                                                    else{
+                                                                        setState(() => widget.task.deadline = DateTime(
+                                                                            widget.task.deadline!.year,
+                                                                            widget.task.deadline!.month,
+                                                                            widget.task.deadline!.day,
+                                                                            expirationTime.hour,
+                                                                            expirationTime.minute
+                                                                        ));
+                                                                    }
+//                                                                    popup(context, expirationTime.toString());
+                                                                }
+                                                            }
+                                                        )
+                                                    ],
                                                 ),
                                             ],
                                         ),
@@ -191,7 +264,9 @@ class TaskEditState extends State<TaskEdit> {
                                                         int _placeIndex = controller.places
                                                             .indexWhere((element) => element.name == location);
 
-                                                        Place? place = _placeIndex >= 0 ? controller.places[_placeIndex] : null;
+                                                        Place? place = _placeIndex >= 0
+                                                            ? controller.places[_placeIndex]
+                                                            : null;
 
 //                                                        var place = controller.places
 //                                                            .where((p0) => p0.name == location)

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:some_app/models/tasks.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
 
 
 class TaskPage extends StatefulWidget {

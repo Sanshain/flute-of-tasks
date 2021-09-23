@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:some_app/models/dao/tasks_dao.dart';
-import 'package:some_app/models/tasks.dart';
-import 'package:some_app/pages/input_page.dart';
-import 'package:some_app/widgets/popups.dart';
+import 'package:sanshain_tasks/models/dao/tasks_dao.dart';
+import 'package:sanshain_tasks/models/tasks.dart';
+import 'package:sanshain_tasks/pages/input_page.dart';
+import 'package:sanshain_tasks/widgets/popups.dart';
 import '../models/database/database.dart';
 
 import '../controller.dart';
