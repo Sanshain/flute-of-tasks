@@ -5,11 +5,21 @@ import 'package:sanshain_tasks/widgets/popups.dart';
 
 import '../controller.dart';
 
+
+final List<String> orders = [
+    "By time of creation",
+    "By importance",
+    "By expiration time",
+    "By urgency",
+];
+
+
 class SettingsPage extends StatelessWidget {
 
     const SettingsPage({Key? key, this.themeNotifier}) : super(key: key);
 
     final ValueNotifier<ThemeMode>? themeNotifier;
+
     @override Widget build(context) {
 
         // Instantiate your class using Get.put() to make it available for all "child" routes there.
@@ -58,24 +68,35 @@ class SettingsPage extends StatelessWidget {
                             ),
                             onTap: () {},
                         )),
-                        Obx(() => Row(
-                          children: [
-                            DropdownButton<int>(
+                        Obx(() => ListTile(
+                            title: _buildItem('Default order'),
+                            trailing: DropdownButton<int>(
                                 value: int.parse(controller.settings['order'] ?? '1'),
-                                items: const [
-                                    DropdownMenuItem(
-                                        child: Text("By time of creation"),
-                                        value: 1,
-                                    ),
-//                                    DropdownMenuItem(
-//                                        child: Text("By importance"),
-//                                        value: 2,
-//                                    ),
-//                                    DropdownMenuItem(
-//                                        child: Text("By expiration time"),
-//                                        value: 3,
-//                                    )
+                                items:[
+                                    for (var order in orders)
+                                        DropdownMenuItem(
+                                            child: Text(order, style: const TextStyle(color: Colors.black45),),
+                                            value: 1,
+                                        )
                                 ],
+//                                        [
+//                                            DropdownMenuItem(
+//                                                child: Text("By time of creation", style: TextStyle(color: Colors.black45),),
+//                                                value: 1,
+//                                            ),
+//                                            DropdownMenuItem(
+//                                                child: Text("By importance", style: TextStyle(color: Colors.black)),
+//                                                value: 2,
+//                                            ),
+//                                            DropdownMenuItem(
+//                                                child: Text("By expiration time", style: TextStyle(color: Colors.black45)),
+//                                                value: 3,
+//                                            ),
+//                                            DropdownMenuItem(
+//                                                child: Text("By urgency", style: TextStyle(color: Colors.black45)),
+//                                                value: 4,
+//                                            )
+//                                    ],
                                 onChanged: (int? value){
                                     if (value != null){
                                         controller.settings['order'] = value.toString();
@@ -83,7 +104,6 @@ class SettingsPage extends StatelessWidget {
                                     popup(context, 'only By time of creation is available now');
                                 },
                             ),
-                          ],
                         ))
                     ]
                 ),
