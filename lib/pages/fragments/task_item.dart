@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sanshain_tasks/pages/task_edit_page.dart';
@@ -7,6 +8,10 @@ import 'package:sanshain_tasks/transitions/instant.dart';
 
 
 //typedef ChangeState = Function Function();
+
+
+
+var controller = Get.find();
 
 
 abstract class IExpandedTaskList {
@@ -101,6 +106,8 @@ class ListViewItemState extends State<ListViewItem> {
         deep = widget.deep;
 
         const btnColors = Color(0xffEEEEEE); // Colors.black26;
+
+        var order = controller.settings['order'];
 
         currentTask = tasks[index];
 

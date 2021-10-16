@@ -75,31 +75,14 @@ class SettingsPage extends StatelessWidget {
                                 items:[
                                     for (var order in orders)
                                         DropdownMenuItem(
-                                            child: Text(order, style: const TextStyle(color: Colors.black45),),
-                                            value: 1,
+                                            child: Text('$order (${orders.indexOf(order)})', style: const TextStyle(color: Colors.black26), ),
+                                            value: orders.indexOf(order),
                                         )
                                 ],
-//                                        [
-//                                            DropdownMenuItem(
-//                                                child: Text("By time of creation", style: TextStyle(color: Colors.black45),),
-//                                                value: 1,
-//                                            ),
-//                                            DropdownMenuItem(
-//                                                child: Text("By importance", style: TextStyle(color: Colors.black)),
-//                                                value: 2,
-//                                            ),
-//                                            DropdownMenuItem(
-//                                                child: Text("By expiration time", style: TextStyle(color: Colors.black45)),
-//                                                value: 3,
-//                                            ),
-//                                            DropdownMenuItem(
-//                                                child: Text("By urgency", style: TextStyle(color: Colors.black45)),
-//                                                value: 4,
-//                                            )
-//                                    ],
                                 onChanged: (int? value){
                                     if (value != null){
                                         controller.settings['order'] = value.toString();
+                                        // amd save here
                                     }
                                     popup(context, 'only By time of creation is available now');
                                 },

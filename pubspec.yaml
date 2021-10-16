@@ -48,6 +48,7 @@ dev_dependencies:
     sdk: flutter
   floor_generator: ^1.1.0
   build_runner: ^2.0.0
+  build_config: ^1.0.0
 
 
 

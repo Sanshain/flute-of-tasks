@@ -48,7 +48,7 @@ class TaskPageState extends State<TaskPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Text(
-                'Your tas is:',
+                'Your task is:',
               ),
               Text(
                 '$_counter',

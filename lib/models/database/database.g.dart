@@ -64,6 +64,8 @@ class _$AppDatabase extends AppDatabase {
 
   Places? _placesHandlerInstance;
 
+  SettingsManager? _settingsManagerInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -86,6 +88,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `parent` INTEGER, `place` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `gravity` INTEGER NOT NULL, `isDone` INTEGER NOT NULL, `created` INTEGER NOT NULL, `duration` INTEGER, `deadline` INTEGER, FOREIGN KEY (`place`) REFERENCES `Place` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`parent`) REFERENCES `Task` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Place` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `isActive` INTEGER NOT NULL)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Setting` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `value` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -101,6 +105,12 @@ class _$AppDatabase extends AppDatabase {
   @override
   Places get placesHandler {
     return _placesHandlerInstance ??= _$Places(database, changeListener);
+  }
+
+  @override
+  SettingsManager get settingsManager {
+    return _settingsManagerInstance ??=
+        _$SettingsManager(database, changeListener);
   }
 }
 
@@ -232,12 +242,11 @@ class _$TaskDao extends TaskDao {
   Future<List<Task>> getChildren(int id) async {
     return _queryAdapter.queryList(
         'SELECT            parent_task.*, count(children.id) as subTasksAmount,                       SUM(children.isDone) as doneSubTasksAmount	         FROM            "Task" as parent_task             LEFT OUTER JOIN               "Task" AS children                ON children.parent = parent_task.id         WHERE            parent_task.parent = ?1         GROUP BY parent_task.id;',
-        mapper: (Map<String, Object?> row) =>
-            Task(
-                row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int, row['duration'] as int?,
-                subTasksAmount: row['subTasksAmount'] as int?,
-                doneSubTasksAmount: row['doneSubTasksAmount'] as int?
-            ),
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?, row['title'] as String, row['description'] as String, (row['isDone'] as int) != 0, _dateTimeConverter.decode(row['created'] as int), _nullableDateTimeConverter.decode(row['deadline'] as int?), row['parent'] as int?, row['place'] as int?, row['gravity'] as int, row['duration'] as int?,
+            subTasksAmount: row['subTasksAmount'] as int?,
+            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
+        ),
         arguments: [id]);
   }
 
@@ -329,17 +338,13 @@ class _$Places extends Places {
   }
 
   @override
-  Future<List<Place>> getAll() async
-  {
+  Future<List<Place>> getAll() async {
     return _queryAdapter.queryList(
         'SELECT              Place.*,              count(Task.id) as tasksAmount         FROM Place                                             LEFT JOIN                  (                     SELECT * FROM Task as Parent WHERE (SELECT Count(*) FROM Task WHERE parent = Parent.id) = 0 AND isDone = 0                 ) as Task             ON                  place.id = Task.place                           GROUP BY Place.id',
-        mapper: (Map<String, Object?> row) => Place(
-            row['id'] as int?,
-            row['name'] as String,
-            (row['isActive'] as int) != 0,
+        mapper: (Map<String, Object?> row) => Place(row['id'] as int?,
+            row['name'] as String, (row['isActive'] as int) != 0,
             tasksAmount: row['tasksAmount'] as int
-        )
-    );
+        ));
   }
 
   @override
@@ -355,6 +360,60 @@ class _$Places extends Places {
   @override
   Future<void> deleteItem(Place place) async {
     await _placeDeletionAdapter.delete(place);
+  }
+}
+
+class _$SettingsManager extends SettingsManager {
+  _$SettingsManager(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database),
+        _settingInsertionAdapter = InsertionAdapter(
+            database,
+            'Setting',
+            (Setting item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'value': item.value
+                }),
+        _settingUpdateAdapter = UpdateAdapter(
+            database,
+            'Setting',
+            ['id'],
+            (Setting item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'value': item.value
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Setting> _settingInsertionAdapter;
+
+  final UpdateAdapter<Setting> _settingUpdateAdapter;
+
+  @override
+  Future<List<Setting>> all() async {
+    return _queryAdapter.queryList('SELECT * FROM Setting',
+        mapper: (Map<String, Object?> row) => Setting(
+            row['id'] as int?, row['name'] as String, row['value'] as String));
+  }
+
+  @override
+  Future<void> insertItem(Setting option) async {
+    await _settingInsertionAdapter.insert(option, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateItem(Setting option) async {
+    await _settingUpdateAdapter.update(option, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateItems(List<Setting> option) async {
+    await _settingUpdateAdapter.updateList(option, OnConflictStrategy.abort);
   }
 }
 

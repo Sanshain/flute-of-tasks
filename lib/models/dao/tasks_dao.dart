@@ -2,6 +2,8 @@
 import 'package:floor/floor.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
 
+import '../settings.dart';
+
 @dao
 abstract class TaskDao {
 
@@ -103,4 +105,18 @@ abstract class Places {
     @delete Future<void> deleteItem(Place place);
 }
 
+@dao
+abstract class SettingsManager {
 
+    @Query('SELECT * FROM Setting')
+    Future<List<Setting>> all();
+
+    @insert
+    Future<void> insertItem(Setting option);
+
+    @update
+    Future<void> updateItem(Setting option);
+
+    @update
+    Future<void> updateItems(List<Setting> option);
+}
