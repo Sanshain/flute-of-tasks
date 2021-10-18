@@ -6,16 +6,18 @@ import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sanshain_tasks/pages/task_edit_page.dart';
 import 'package:sanshain_tasks/transitions/instant.dart';
 
+import '../../controller.dart';
+import '../../main_page.dart';
+
 
 //typedef ChangeState = Function Function();
 
 
 
-var controller = Get.find();
-
-
 abstract class IExpandedTaskList {
-    Widget listTileGenerate(int index, {
+    Widget listTileGenerate(BuildContext context, int index, {
+        required MainPage widget,
+        required void Function(VoidCallback cb) stateUpdate,
         BuildContext? parentContext,
         List<BuildContext?>? childContextWrapper,
         List<Task>? parentTasks,
@@ -34,8 +36,12 @@ class SwipeBackground {
 }
 
 
+
+
+
 class ListViewItem extends StatefulWidget {
 
+    final MainPage page;
     final int deep;
     final int index;
     final List<BuildContext?>? subContextWrapper;
@@ -53,6 +59,7 @@ class ListViewItem extends StatefulWidget {
 
     const ListViewItem(BuildContext context, this.index, {
         key,
+        required this.page,
         required this.subContextWrapper,
         required this.toLeft,
         required this.toRight,
@@ -79,10 +86,12 @@ class ListViewItemState extends State<ListViewItem> {
     List<Task> expandedCache = [];
     int deep = 0;
 
+    late Controller controller;
+
     @override
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
-
+//        controller = Get.find();
     }
 
     Widget _createListViewPoint(BuildContext context, ListViewItemState self) {
@@ -107,9 +116,11 @@ class ListViewItemState extends State<ListViewItem> {
 
         const btnColors = Color(0xffEEEEEE); // Colors.black26;
 
-        var order = controller.settings['order'];
+//        var order = controller.settings['order'];
 
         currentTask = tasks[index];
+
+//        return Text(index.toString());
 
         return Dismissible(
 //      key: Key(index.toString()),
@@ -326,7 +337,7 @@ class ListViewItemState extends State<ListViewItem> {
 //                                    var children = tasks[index].children;
 
                                     return parent?.listTileGenerate(
-                                        _index, parentTasks: expandedCache, deep: deep + 1, parentTask: currentTask
+                                        context, _index, widget: self.widget.page, stateUpdate: setState, parentTasks: expandedCache, deep: deep + 1, parentTask: currentTask
                                     ) ?? Padding(
                                         padding: const EdgeInsets.only(left: 32),
                                         child: Text(expandedCache[_index].title,
@@ -349,6 +360,7 @@ class ListViewItemState extends State<ListViewItem> {
     Widget build(BuildContext context) {
         var item = _createListViewPoint(context, this);
         return item;
+//        return Text(widget.index.toString());
     }
 }
 
@@ -471,4 +483,74 @@ Widget createListViewPoint(BuildContext context, int index, {
             ),
         ),
     );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// альтернативная реализация ListViewItem
+class TaskItemView extends StatefulWidget {
+
+    final int deep;
+    final int index;
+    final List<BuildContext?>? subContextWrapper;
+    final SwipeBackground? toLeft;
+    final SwipeBackground? toRight;
+    final List<Task> tasks;
+    final Function(DismissDirection) onDismissed;
+    final Future<bool> Function(DismissDirection)? confirmDismiss;
+    final Function(Task?) Function() onTap;
+    final void Function({void Function(Task)? onApply})? subTaskCreateAction;
+    final Function? expandAction;
+    final IExpandedTaskList? parent;
+    final BuildContext rootContext;
+    final Task? parentTask;
+
+    const TaskItemView(this.index, {
+        Key? key,
+        required this.subContextWrapper,
+        required this.toLeft,
+        required this.toRight,
+        required this.tasks,
+        required this.onDismissed,
+        required this.confirmDismiss,
+        required this.onTap,
+        required this.subTaskCreateAction,
+        required this.expandAction,
+        required this.parent,
+        required this.rootContext,
+        this.parentTask,
+        this.deep = 0
+    }) : super(key: key);
+
+
+
+    @override
+    State<StatefulWidget> createState() {
+        return TaskItemViewState();
+    }
+}
+
+class TaskItemViewState extends State<TaskItemView>{
+    @override
+    Widget build(BuildContext context)
+    {
+        return Text(widget.index.toString());
+    }
+
 }

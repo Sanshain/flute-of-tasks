@@ -1,7 +1,35 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// todo sized:
 
+//ConstrainedBox v;
+//SizedBox v;
+//Container v;
+// ClipPath v;
+// RectPath v;
+
+/// todo border-radius:
+///
+/// RectRPath
+
+/// todo Buttons:
+
+//    ElevatedButton c;
+//    IconButton c;
+//    MaterialButton c;
+//    TextButton
+
+
+// todo styled:
+
+// DecoratedBox
+// ColoredBox
+
+
+///
+/// стилизованный Button
+///
 class StyledButton extends StatelessWidget{
 
     const StyledButton(this.text, {Key? key, this.padding, this.onPress}) : super(
@@ -14,6 +42,7 @@ class StyledButton extends StatelessWidget{
 
     @override
     Widget build(BuildContext context) {
+
         return Padding(
             padding: padding ?? const EdgeInsets.all(8.0),
             child: ElevatedButton(

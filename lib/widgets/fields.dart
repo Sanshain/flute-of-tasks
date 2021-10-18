@@ -5,6 +5,9 @@ typedef OnChangeEvent = Function(String text);
 //Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = false, value = '', TextEditingController? controller}){
 
 /// input field
+///
+/// Возвращает приукрашенное поле для ввода текста
+///
 Widget inputField({String hint = '', maxLines = 1, minLines = 1, autofocus = false, value = '', OnChangeEvent? onChanged}){
     return Padding(
         padding: const EdgeInsets.all(8.0),

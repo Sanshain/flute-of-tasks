@@ -75,7 +75,7 @@ class SettingsPage extends StatelessWidget {
                                 items:[
                                     for (var order in orders)
                                         DropdownMenuItem(
-                                            child: Text('$order (${orders.indexOf(order)})', style: const TextStyle(color: Colors.black26), ),
+                                            child: Text('$order (${orders.indexOf(order)})', style: const TextStyle(color: Colors.black45), ),
                                             value: orders.indexOf(order),
                                         )
                                 ],

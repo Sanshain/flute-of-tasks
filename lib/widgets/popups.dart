@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 
+///
+/// аналог alert
+///
 void popup(BuildContext context, String content, {String title = ''}) {
 // show the dialog
     showDialog(
@@ -23,7 +26,9 @@ void popup(BuildContext context, String content, {String title = ''}) {
     );
 }
 
-/// my custom
+///
+/// My custom input dialog (сдвигается при вызове клавиатуры. неудобно)
+///
 void input(BuildContext context, String content, {String title = ''}) {
 // show the dialog
     showDialog(
@@ -54,9 +59,10 @@ void input(BuildContext context, String content, {String title = ''}) {
     );
 }
 
-
+///
+/// окно ввода с какого-то интернет-ресурса (не особо отличается от того, что я сделал сам в `input`)
+///
 Future<String?> inputDialog(BuildContext context, {title = 'Title', label = '', hint = ''}) async {
-
     String returnValue = '';
 
     return showDialog(
@@ -69,7 +75,7 @@ Future<String?> inputDialog(BuildContext context, {title = 'Title', label = '', 
                 content: Row(
                     children: <Widget>[
                         Expanded(
-                            child: TextField( autofocus: true,
+                            child: TextField(autofocus: true,
                                 decoration: InputDecoration(labelText: label, hintText: hint),
                                 onChanged: (value) => returnValue = value,
                             ))
@@ -88,6 +94,9 @@ Future<String?> inputDialog(BuildContext context, {title = 'Title', label = '', 
 }
 
 
+///
+/// окно выбора из нескольких вариантов
+///
 Future<String?> choiceDialog(BuildContext context, Iterable<String> options, {title = ''}) async {
     return await showDialog(
         context: context,
@@ -98,11 +107,11 @@ Future<String?> choiceDialog(BuildContext context, Iterable<String> options, {ti
                 children: [
                     for (var option in options)
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SimpleDialogOption(
-                              onPressed: () => Navigator.pop(context, option),
-                              child: Text(option),
-                          ),
+                            padding: const EdgeInsets.all(8.0),
+                            child: SimpleDialogOption(
+                                onPressed: () => Navigator.pop(context, option),
+                                child: Text(option),
+                            ),
                         )
                 ]
             );
@@ -110,36 +119,28 @@ Future<String?> choiceDialog(BuildContext context, Iterable<String> options, {ti
     );
 }
 
-
+///
+/// show the dialog confirmation in [rootContext]
+///
 Future<bool?> showConfirmationDialog(BuildContext rootContext, String action, {String title = 'Подтверждение'}) {
-// show the dialog
-
     return showDialog<bool>(
         context: rootContext,
         barrierDismissible: true,
-//        barrierColor: Colors.lightBlueAccent,
+//      barrierColor: Colors.lightBlueAccent,
         builder: (BuildContext context) {
             return AlertDialog(
                 title: Text(title),
-                content: SizedBox(
-                    height: 50,
-                    child: Text(
-                        action,
-//               style: const TextStyle(fontSize: 22, color: Colors.blue),
+                content: SizedBox(height: 50,
+                    child: Text(action,
+//                      style: const TextStyle(fontSize: 22, color: Colors.blue),
                     ),
                 ),
                 actions: [
-                    TextButton(
-                        child: const Text("OK"),
-                        onPressed: () {
-                            Navigator.of(context).pop(true);
-                        },
+                    TextButton(child: const Text("OK"),
+                        onPressed: () => Navigator.of(context).pop(true),
                     ),
-                    TextButton(
-                        child: const Text("Cancel"),
-                        onPressed: () {
-                            Navigator.of(context).pop(false);
-                        },
+                    TextButton(child: const Text("Cancel"),
+                        onPressed: () => Navigator.of(context).pop(false),
                     )
                 ],
             );
@@ -148,10 +149,14 @@ Future<bool?> showConfirmationDialog(BuildContext rootContext, String action, {S
 }
 
 
+///
+/// вызывает окно выбора даты для указанного [context]
+///
 Future<void> selectDate(BuildContext context, DateTime? selectedDate,
     {
         required Function(DateTime) setState, DateTime? start
-    }) async
+    })
+async
 {
     final DateTime? picked = await showDatePicker(
 

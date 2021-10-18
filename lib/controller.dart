@@ -41,10 +41,10 @@ class Controller extends GetxController {
                 .isEmpty;
         })));
 
-        maxImportance = tasks
-            .reduce((a, b) => a.gravity > b.gravity ? a : b)
-            .gravity
-            .obs;
+        maxImportance = (tasks.isEmpty
+            ? 0
+            : tasks.reduce((a, b) => a.gravity > b.gravity ? a : b).gravity
+        ).obs;
     }
 
 }
