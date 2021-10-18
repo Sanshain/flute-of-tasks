@@ -33,7 +33,7 @@ mixin TasksListView implements IExpandedTaskList{
 
     final Controller controller = Get.put<Controller>(Controller()); // ссылка на стэйт-менеджер
 
-    final List<Task> tasks = []; // реактвнй список актуальных задач
+    List<Task> tasks = []; // реактвнй список актуальных задач
     final List<Task> archive = []; // реактвнй список выполненных задач
 
     // методы:
@@ -56,10 +56,8 @@ mixin TasksListView implements IExpandedTaskList{
                                 child: ListView.separated(
                                     padding: const EdgeInsets.all(8),
                                     itemCount: tasks.length,
-                                    separatorBuilder: (BuildContext context, int index)
-                                    => const Divider(),
-                                    itemBuilder: (BuildContext context, int index)
-                                    => listTileGenerate(context, index, widget: widget, stateUpdate: updateState)
+                                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                                    itemBuilder: (BuildContext context, int index) => listTileGenerate(context, index, widget: widget, stateUpdate: updateState)
                                 )
                             ),
                         ],

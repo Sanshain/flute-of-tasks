@@ -126,6 +126,20 @@ class Task {
 
         return difference.inDays < 3 ? duration : duration! * 24;
     }
+
+
+    ///
+    /// todo: `getDuration` + `gravity` grounds (to pro version will be appeared)
+    ///
+    int? getOptimum(){
+        var term = getDuration();
+        if (term == null) {
+            return term;
+        } else{
+
+        }
+    }
+
 }
 
 

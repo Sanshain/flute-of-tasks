@@ -7,10 +7,10 @@ import '../controller.dart';
 
 
 final List<String> orders = [
-    "By time of creation",
-    "By importance",
-    "By expiration time",
-    "By urgency",
+    "creation time",
+    "importance",
+    "urgency",
+    "expiration time",
 ];
 
 

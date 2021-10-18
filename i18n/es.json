@@ -1,0 +1,10 @@
+{
+  "title": "Mis tareas",
+
+  "sort by": "ordenar por",
+
+  "creation time": "fecha de creación",
+  "importance": "importancia",
+  "urgency":  "urgencia",
+  "expiration time": "tiempo de caducidad"
+}

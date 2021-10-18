@@ -1,7 +1,8 @@
-
 import 'package:floor/floor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 
 import 'main_page.dart';
 import 'models/dao/tasks_dao.dart';
@@ -13,7 +14,6 @@ import 'package:get/get.dart';
 
 
 void main() async {
-
     WidgetsFlutterBinding.ensureInitialized();
 
     final database = await $FloorAppDatabase
@@ -37,26 +37,37 @@ class App extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
 
-        final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.light);
+        final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 //        return MaterialApp(
         return ValueListenableBuilder(
-          valueListenable: _notifier,
-          builder: (BuildContext context, ThemeMode value, Widget? child) {
-              return GetMaterialApp(
-                  title: 'Some Awesome App',
-                  themeMode: value,
-                  darkTheme: ThemeData.dark(),
+            valueListenable: themeNotifier,
+            builder: (BuildContext context, ThemeMode value, Widget? child) {
+                return GetMaterialApp(
+                    title: 'Some Awesome App',
+                    themeMode: value,
+                    darkTheme: ThemeData.dark(),
 //                  darkTheme: ThemeData(
 //                      primarySwatch: Colors.black,
 //                  ),
-                  theme: ThemeData(
-                      primarySwatch: Colors.blue,
-                  ),
+                    theme: ThemeData(
+                        primarySwatch: Colors.blue,
+                    ),
+                    supportedLocales: const [
+                        Locale('en', 'US'),
+                        Locale('es', ''),
+                        Locale('ru', ''),
+                    ],
+                    localizationsDelegates: const [
+                        AppLocalizations.delegate,
+                        GlobalMaterialLocalizations.delegate,
+                        GlobalCupertinoLocalizations.delegate,
+                        GlobalWidgetsLocalizations.delegate,
+                    ],
 //                  home: const MainPage(tasks, title: 'The Tasks'),
-                  home: MainPage(tasks, places, title: 'The Tasks', themeNotifier: _notifier,),
-              );
-          },
+                    home: MainPage(tasks, places, title: 'The Tasks', themeNotifier: themeNotifier,),
+                );
+            },
         );
     }
 }

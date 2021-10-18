@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:sanshain_tasks/controller.dart';
 import 'package:sanshain_tasks/pages/mainpage_reef.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 
 import 'package:sanshain_tasks/utils/speech.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -51,55 +52,78 @@ class MainPage extends StatefulWidget {
 }
 
 
+///
 /// MainPageState
+///
 class MainPageState extends State<MainPage> with TasksListView {
 
-//    final Controller controller = Get.put<Controller>(Controller());
-    static final GlobalKey<FormFieldState<String>> _searchFormKey = GlobalKey<FormFieldState<String>>();
+    static final GlobalKey<FormFieldState<String>> _searchViewKey = GlobalKey<FormFieldState<String>>();
 
-    @override
-    Widget build(BuildContext context) {
+    @override Widget build(BuildContext context)
+    {
         rootContext = context;
 
         return Scaffold(
-//            key: UniqueKey(),
             appBar: AppBar(
+
                 title: Text(tabTitle[selectedTab]),
                 actions: [
                     GestureDetector(
                         onTap: () async {
-                            await choiceDialog(context, []);
+
+                            var order = await choiceDialog(context, orders, title: AppLocalizations.of(context)!.translate('sort by'));
+                            var _order = orders.indexOf(order ?? orders.first).toString();
+                            if (controller.settings['order'] != _order)
+                            {
+                                var defaultTime = DateTime.now();
+                                controller.settings['order'] = _order;
+
+                                tasks = tasks
+                                    ..sort((p, n) {
+                                        if (_order == '0') {
+                                            return n.created.compareTo(p.created);
+                                        } else if (_order == '1') {
+                                            return n.getDuration()?.compareTo(p.getDuration() ?? 0) ?? 0;
+                                        } else if (_order == '2') {
+                                            return n.gravity.compareTo(p.gravity);
+                                        } else {
+                                            return n.deadline?.compareTo(p.deadline ?? defaultTime) ?? 0;
+                                        }
+                                    });
+                            }
                         },
-                        child: const Icon(Icons.reorder_sharp)
+                        child: const Padding(padding: EdgeInsets.all(8.0), child: Icon(Icons.reorder_sharp))
                     ),
                     PopupMenuButton<Text>(itemBuilder: (context) => menu(context, widget))
                 ],
             ),
             body: CupertinoTabScaffold(
+
                 restorationId: 'cupertino_tab_scaffold',
                 tabBar: CupertinoTabBar(
+
                     items: [
                         for (final tabInfo in tabInfo) BottomNavigationBarItem(
                             label: tabInfo.title,
                             icon: Icon(tabInfo.icon),
                         )
                     ],
-                    onTap: (int index) =>
-                        setState(() => selectedTab = index),
+                    onTap: (int index) => setState(() => selectedTab = index),
                 ),
-                tabBuilder: (context, index) {
+                tabBuilder: (context, index)
+                {
                     return WillPopScope(
+
                         onWillPop: onPop,
                         child: CupertinoTabView(
+
                             restorationScopeId: 'cupertino_tab_view_$index',
                             builder: (context) {
                                 if (index == 0) {
                                     return tasksListView(widget: widget, updateState: setState);
-                                }
-                                else if (index == 1) {
+                                } else if (index == 1) {
                                     return const PlacedTasksPage();
-                                }
-                                else {
+                                } else {
                                     return buildArchiveTab(widget, subContextWrapper, rootContext, inDetail, setState);
                                 }
                             },
@@ -114,9 +138,8 @@ class MainPageState extends State<MainPage> with TasksListView {
     }
 
 
-
-
-    Future<bool> onPop() async {
+    Future<bool> onPop() async
+    {
         if (inDetail && selectedTab == 0) {
             setState(() => inDetail = false);
             if (subContextWrapper!.isNotEmpty && subContextWrapper!.last != null) {
@@ -144,23 +167,6 @@ class MainPageState extends State<MainPage> with TasksListView {
             }
         });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Deprecated("change to inputPage") Visibility _createQuickTask() {

@@ -19,6 +19,11 @@ class InputPage extends StatelessWidget {
 
         final TextEditingController inputController = TextEditingController(text: initValue);
 
+        var screenWidth = MediaQuery
+            .of(context)
+            .size
+            .width;
+
         return WillPopScope(
             onWillPop: () async {
                 Navigator.of(context).pop(inputController.text);
@@ -56,19 +61,20 @@ class InputPage extends StatelessWidget {
                     ),
                 ),
                 floatingActionButton: Container(
-                    padding: EdgeInsets.only(bottom: 40.0, right: MediaQuery
-                        .of(context)
-                        .size
-                        .width / 2 - 40),
+                    padding: EdgeInsets.only(bottom: 40.0, right: screenWidth / 3 - 40),
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton.extended(
                             onPressed: () => Navigator.of(context).pop(inputController.text),
-                            label: Row(
-                                children: const [
-                                    Text('Save'),
-                                    Icon(Icons.save, color: Colors.white,),
-                                ],
+                            label: SizedBox(
+                                width: screenWidth / 3,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: const [
+                                        Text('Save'),
+                                        Icon(Icons.save, color: Colors.white,),
+                                    ],
+                                ),
                             ),
                             backgroundColor: Colors.black12,
 //                          child: const Icon(Icons.save, color: Colors.white,),
