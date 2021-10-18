@@ -34,18 +34,18 @@ mixin TasksListView implements IExpandedTaskList{
     final Controller controller = Get.put<Controller>(Controller()); // ссылка на стэйт-менеджер
 
     List<Task> tasks = []; // реактвнй список актуальных задач
-    final List<Task> archive = []; // реактвнй список выполненных задач
+    late List<Task> archive = []; // реактвнй список выполненных задач
 
     // методы:
 
     Future<void> createTask(String newTaskNameTitle);
 
 
-    Stack tasksListView({required MainPage widget, required void Function(VoidCallback cb) updateState})
+    Widget tasksListView({required MainPage widget, required void Function(VoidCallback cb) updateState})
     {
         var _order = controller.settings['order'];
 
-        return Stack(
+        return Obx(() => Stack(
             children: [
                 Padding(
                     padding: const EdgeInsets.only(bottom: 32),
@@ -57,7 +57,8 @@ mixin TasksListView implements IExpandedTaskList{
                                     padding: const EdgeInsets.all(8),
                                     itemCount: tasks.length,
                                     separatorBuilder: (BuildContext context, int index) => const Divider(),
-                                    itemBuilder: (BuildContext context, int index) => listTileGenerate(context, index, widget: widget, stateUpdate: updateState)
+                                    itemBuilder: (BuildContext context, int index) =>
+                                        listTileGenerate(context, index, widget: widget, stateUpdate: updateState)
                                 )
                             ),
                         ],
@@ -65,7 +66,7 @@ mixin TasksListView implements IExpandedTaskList{
                 ),
                 // _createQuickTask(),
             ]
-        );
+        ));
     }
 
 
@@ -272,8 +273,8 @@ mixin TasksListView implements IExpandedTaskList{
                         },
                         child: FloatingActionButton(
 
-                            onPressed: ()
-                            async {
+                            onPressed: () async
+                            {
                                 await createTaskPage(context);
 //                                setState(() {
 //                                    quickNew = true;

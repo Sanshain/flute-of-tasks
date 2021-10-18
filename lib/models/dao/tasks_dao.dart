@@ -59,21 +59,18 @@ abstract class TaskDao {
     """)
     Future<List<Task>> getChildren(int id);
 
-    @Query('SELECT * FROM Task WHERE id = :id')
-    Future<Task?> findById(int id);
-//    Stream<Task?> findById(int id);
+    // Stream<Task?> findById(int id);
+    @Query('SELECT * FROM Task WHERE id = :id') Future<Task?> findById(int id);
 
-    @insert
-    Future<void> insertItem(Task task);
+    @Query('SELECT * FROM Task WHERE title LIKE :name') Future<Task?> findByName(String name);
 
-    @delete
-    Future<void> deleteItem(Task task);
+    @insert Future<int?> insertItem(Task task);  // int?
 
-    @update
-    Future<void> updateItem(Task task);
+    @delete Future<void> deleteItem(Task task);
 
-    @update
-    Future<void> updateTasks(List<Task> task);
+    @update Future<void> updateItem(Task task);
+
+    @update Future<void> updateTasks(List<Task> task);
 }
 
 

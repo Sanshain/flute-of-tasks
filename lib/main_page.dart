@@ -32,7 +32,7 @@ import 'package:collection/collection.dart';
 
 
 const List<String> tabTitle = [
-    'Задачи',
+    'Loved Tasks',
     'Места',
     'Архив',
 ];
@@ -59,22 +59,28 @@ class MainPageState extends State<MainPage> with TasksListView {
 
     static final GlobalKey<FormFieldState<String>> _searchViewKey = GlobalKey<FormFieldState<String>>();
 
+    @override void initState()
+    {
+        super.initState();
+        tasks = controller.tasks;
+        archive = controller.archive;
+    }
+
     @override Widget build(BuildContext context)
     {
         rootContext = context;
 
         return Scaffold(
+
             appBar: AppBar(
 
                 title: Text(tabTitle[selectedTab]),
                 actions: [
                     GestureDetector(
                         onTap: () async {
-
                             var order = await choiceDialog(context, orders, title: AppLocalizations.of(context)!.translate('sort by'));
                             var _order = orders.indexOf(order ?? orders.first).toString();
-                            if (controller.settings['order'] != _order)
-                            {
+                            if (controller.settings['order'] != _order) {
                                 var defaultTime = DateTime.now();
                                 controller.settings['order'] = _order;
 
@@ -155,7 +161,13 @@ class MainPageState extends State<MainPage> with TasksListView {
     @override Future<void> createTask(String newTaskNameTitle) async
     {
         var task = Task.init(newTaskNameTitle, parent: rootTaskId);
-        await widget.tasks.insertItem(task);
+        var r = await widget.tasks.insertItem(task);
+
+        // task = (await widget.tasks.findByName(newTaskNameTitle)) ?? task;
+        widget.tasks.findByName(newTaskNameTitle).then((lastTasks)
+        {
+            task.id = lastTasks?.id;
+        });
 
         setState(() {
             if (rootTaskId == null) {
@@ -167,6 +179,13 @@ class MainPageState extends State<MainPage> with TasksListView {
             }
         });
     }
+
+
+
+
+
+
+
 
 
     @Deprecated("change to inputPage") Visibility _createQuickTask() {

@@ -6,5 +6,9 @@
   "creation time": "fecha de creación",
   "importance": "importancia",
   "urgency":  "urgencia",
-  "expiration time": "tiempo de caducidad"
+  "expiration time": "tiempo de caducidad",
+
+  "places": "Mis asientos",
+  "settings": "Sintonización",
+  "exit": "Salir"
 }

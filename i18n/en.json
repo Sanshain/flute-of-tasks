@@ -5,7 +5,11 @@
   "creation time": "creation time",
   "importance": "importance",
   "urgency":  "urgency",
-  "expiration time": "expiration time"
+  "expiration time": "expiration time",
+
+  "places": "Places",
+  "settings": "Settings",
+  "exit": "Exit"
 }
 
 

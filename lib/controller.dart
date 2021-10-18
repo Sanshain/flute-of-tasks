@@ -26,11 +26,15 @@ class Controller extends GetxController {
 
 
     /// читаем данные с базы
-    @override void onInit() {
+    @override void onInit() async {
         super.onInit();
 
         Place.objects?.all().then((_places) => places.insertAll(0, _places));
-        Task.tasks?.readWChildren().then((_tasks) => tasks.insertAll(0, _tasks.where((task) => task.isDone == false))); // addAll ~ insertAll
+
+//        Task.tasks?.readWChildren().then((_tasks) => tasks.insertAll(0, _tasks.where((task) => task.isDone == false))); // addAll ~ insertAll
+        var _tasks = await Task.tasks?.readWChildren();
+        tasks.insertAll(0, (_tasks)?.where((task) => task.isDone == false) ?? []); // addAll ~ insertAll
+
         Task.tasks?.all().then((_tasks) => archive.insertAll(0, _tasks.where((task) {
             task.parentName = _tasks
                 .where((t) => task.parent == t.id)

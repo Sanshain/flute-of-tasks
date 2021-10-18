@@ -6,5 +6,9 @@
   "creation time": "дате создания",
   "importance": "важности",
   "urgency":  "срочности",
-  "expiration time": "времени исполнения"
+  "expiration time": "времени исполнения",
+
+  "places": "Мои места",
+  "settings": "Настройки",
+  "exit": "Выход"
 }

@@ -66,7 +66,7 @@ class Task {
     }
 
 //    @primaryKey
-    @PrimaryKey(autoGenerate: true) final int? id;
+    @PrimaryKey(autoGenerate: true) late int? id;
 
     int? parent;
     int? place;
@@ -127,6 +127,7 @@ class Task {
         return difference.inDays < 3 ? duration : duration! * 24;
     }
 
+    String get units => getDuration() == duration ? 'hours' : 'days';
 
     ///
     /// todo: `getDuration` + `gravity` grounds (to pro version will be appeared)

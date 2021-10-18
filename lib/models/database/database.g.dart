@@ -268,7 +268,24 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
-  Future<void> insertItem(Task task) async {
+  Future<Task?> findByName(String name) async {
+    return _queryAdapter.query('SELECT * FROM Task WHERE title LIKE :name',
+        mapper: (Map<String, Object?> row) => Task(
+            row['id'] as int?,
+            row['title'] as String,
+            row['description'] as String,
+            (row['isDone'] as int) != 0,
+            _dateTimeConverter.decode(row['created'] as int),
+            _nullableDateTimeConverter.decode(row['deadline'] as int?),
+            row['parent'] as int?,
+            row['place'] as int?,
+            row['gravity'] as int,
+            row['duration'] as int?),
+        arguments: [name]);
+  }
+
+  @override
+  Future<int?> insertItem(Task task) async {
     await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
   }
 

@@ -13,7 +13,6 @@ import '../../main_page.dart';
 //typedef ChangeState = Function Function();
 
 
-
 abstract class IExpandedTaskList {
     Widget listTileGenerate(BuildContext context, int index, {
         required MainPage widget,
@@ -34,9 +33,6 @@ class SwipeBackground {
     final Color color;
     final Icon icon;
 }
-
-
-
 
 
 class ListViewItem extends StatefulWidget {
@@ -122,6 +118,31 @@ class ListViewItemState extends State<ListViewItem> {
 
 //        return Text(index.toString());
 
+        String taskHint()
+        {
+//            '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask.subTasksAmount ?? 0}/${currentTask.id})',
+
+            var result = '';
+
+            if (currentTask.deadline != null && currentTask.duration != null) {
+                var rest = currentTask.deadline!.difference(DateTime.now());
+                var units = currentTask.units;
+
+                result = '(осталось ${currentTask.getDuration()} $units из ${units == 'days' ? rest.inDays : rest.inHours})';
+            } else if (currentTask.deadline != null) {
+                var rest = currentTask.deadline!.difference(DateTime.now());
+                var units = currentTask.units;
+
+                result = '(осталось ${units == 'days' ? rest.inDays : rest.inHours} $units)';
+            } else if (currentTask.subTasksAmount != null && currentTask.subTasksAmount != 0) {
+
+                result = '(Выполнено ${currentTask.subTasksAmount ?? 0 - currentTask.activeSubTasksAmount} из ${currentTask.subTasksAmount ?? 0})';
+            }
+
+            return result;
+        }
+
+
         return Dismissible(
 //      key: Key(index.toString()),
             key: UniqueKey(),
@@ -204,8 +225,8 @@ class ListViewItemState extends State<ListViewItem> {
                                             padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
 //                                          child: Icon(Icons.phone, color: Colors.black26)
                                             child: Text(
-                                                '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask
-                                                    .subTasksAmount})',
+//                                                '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask.subTasksAmount ?? 0}/${currentTask.id})',
+                                                '${currentTask.title} ${taskHint()}',
                                                 style: TextStyle(fontSize: 16 - deep.toDouble(),
                                                     color: Colors.black54.withAlpha(100 - deep * 10))
                                             ),
@@ -223,8 +244,8 @@ class ListViewItemState extends State<ListViewItem> {
                                                             color: btnColors,
                                                             shape: CircleBorder(),
                                                             child: Padding(
-                                                              padding: EdgeInsets.all(6.0),
-                                                              child: Icon(Icons.add, color: Colors.black26),
+                                                                padding: EdgeInsets.all(6.0),
+                                                                child: Icon(Icons.add, color: Colors.black26),
                                                             )
                                                         ),
                                                     ),
@@ -262,12 +283,10 @@ class ListViewItemState extends State<ListViewItem> {
                                                     padding: const EdgeInsets.symmetric(horizontal: 0.0),
                                                     child: ElevatedButton(
                                                         style: ButtonStyle(
-                                                            shape: MaterialStateProperty.resolveWith((
-                                                                states) => const CircleBorder()),
+                                                            shape: MaterialStateProperty.resolveWith((states) => const CircleBorder()),
                                                             shadowColor: MaterialStateProperty.resolveWith((states) =>
                                                             Colors.transparent),
-                                                            backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                                                                states) {
+                                                            backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
                                                                 return states.contains(MaterialState.pressed)
                                                                     ? Colors.lightBlueAccent
                                                                     : const Color(0xffEEEEEE);
@@ -288,7 +307,8 @@ class ListViewItemState extends State<ListViewItem> {
                                                                 PageRouteBuilder(
 //                                                                pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
                                                                     pageBuilder: (rootContext, animation,
-                                                                        secondaryAnimation) =>
+                                                                        secondaryAnimation)
+                                                                    =>
                                                                         TaskEditPage(
                                                                             subContextWrapper,
                                                                             index: index,
@@ -337,7 +357,11 @@ class ListViewItemState extends State<ListViewItem> {
 //                                    var children = tasks[index].children;
 
                                     return parent?.listTileGenerate(
-                                        context, _index, widget: self.widget.page, stateUpdate: setState, parentTasks: expandedCache, deep: deep + 1, parentTask: currentTask
+                                        context, _index, widget: self.widget.page,
+                                        stateUpdate: setState,
+                                        parentTasks: expandedCache,
+                                        deep: deep + 1,
+                                        parentTask: currentTask
                                     ) ?? Padding(
                                         padding: const EdgeInsets.only(left: 32),
                                         child: Text(expandedCache[_index].title,
@@ -377,7 +401,8 @@ Widget createListViewPoint(BuildContext context, int index, {
     Function? subTaskCreateAct,
     Function? expandAction,
     IExpandedTaskList? parent,
-    required BuildContext rootContext}) {
+    required BuildContext rootContext})
+{
     List<Task> expandedCache = [];
 
     return Dismissible(
@@ -486,23 +511,6 @@ Widget createListViewPoint(BuildContext context, int index, {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /// альтернативная реализация ListViewItem
 class TaskItemView extends StatefulWidget {
 
@@ -539,14 +547,13 @@ class TaskItemView extends StatefulWidget {
     }) : super(key: key);
 
 
-
     @override
     State<StatefulWidget> createState() {
         return TaskItemViewState();
     }
 }
 
-class TaskItemViewState extends State<TaskItemView>{
+class TaskItemViewState extends State<TaskItemView> {
     @override
     Widget build(BuildContext context)
     {
