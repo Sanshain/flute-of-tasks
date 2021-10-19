@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:sanshain_tasks/controller.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sanshain_tasks/task_view.dart';
+import 'package:sanshain_tasks/utils/notifications.dart';
 import 'package:sanshain_tasks/widgets/button.dart';
 import 'package:sanshain_tasks/widgets/fields.dart';
 import 'package:sanshain_tasks/widgets/popups.dart';
@@ -235,21 +236,16 @@ class TaskEditState extends State<TaskEditPage> {
                                                         ),
                                                         ElevatedButton(
                                                             style: TaskEditPage.getElevatedButtonStyle(),
-                                                            child: widget.task.deadline != null &&
-                                                                widget.task.deadline!.hour != 0
+                                                            child: widget.task.deadline != null && widget.task.deadline!.hour != 0
                                                                 ? Text(DateFormat("HH:mm").format(widget.task.deadline!))
                                                                 : const Icon(Icons.access_time, color: Colors.white54),
-//                                                            icon: const Icon(Icons.access_time),
+//                                                              icon: const Icon(Icons.access_time),
                                                             onPressed: () async {
                                                                 var expirationTime = await showTimePicker(context: context,
-                                                                    initialTime: TimeOfDay.fromDateTime(
-                                                                        DateTime.now().add(const Duration(hours: 1))
-                                                                    ),
+                                                                    initialTime: TimeOfDay.fromDateTime(DateTime.now().add(const Duration(hours: 1))),
                                                                     builder: (context, child) {
                                                                         return MediaQuery(
-                                                                            data: MediaQuery.of(context).copyWith(
-                                                                                alwaysUse24HourFormat: true
-                                                                            ),
+                                                                            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
                                                                             child: child as Widget,
                                                                         );
                                                                     }
@@ -273,19 +269,27 @@ class TaskEditState extends State<TaskEditPage> {
                                                                         });
                                                                     }
                                                                     else {
-
                                                                         var tomorrow = 0;
-                                                                        if (widget.task.deadline!.day == now.day && expirationTime.hour < DateTime.now().hour) {
+                                                                        if (widget.task.deadline!.day == now.day && expirationTime.hour < DateTime
+                                                                            .now()
+                                                                            .hour) {
                                                                             tomorrow = 1;
                                                                         }
 
-                                                                        setState(() => widget.task.deadline = DateTime(
+                                                                        setState(() =>
+                                                                        widget.task.deadline = DateTime(
                                                                             widget.task.deadline!.year, widget.task.deadline!.month,
                                                                             widget.task.deadline!.day + tomorrow,
                                                                             expirationTime.hour,
                                                                             expirationTime.minute
                                                                         ));
                                                                     }
+
+                                                                    await scheduleNotify(context,
+                                                                        title: 'через ${widget.task.getDuration()} часов',
+                                                                        message: widget.task.title,
+                                                                        time: widget.task.deadline!.subtract(Duration(hours: widget.task.getDuration() ?? 0))
+                                                                    );
 //                                                                    popup(context, expirationTime.toString());
                                                                 }
                                                             }

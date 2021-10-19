@@ -36,7 +36,7 @@ dependencies:
     sdk: flutter         # Add this line
   intl: ^0.17.0 # Add this line
   speech_to_text: ^5.0.0
-
+  flutter_local_notifications:
 
 
   # The following adds the Cupertino Icons font to your application.

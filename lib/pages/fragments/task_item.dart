@@ -133,7 +133,7 @@ class ListViewItemState extends State<ListViewItem> {
                 var rest = currentTask.deadline!.difference(DateTime.now());
                 var units = currentTask.units;
 
-                result = '(осталось ${units == 'days' ? rest.inDays : rest.inHours} $units)';
+                result = '(через ${units == 'days' ? rest.inDays : rest.inHours} $units)';
             } else if (currentTask.subTasksAmount != null && currentTask.subTasksAmount != 0) {
 
                 result = '(Выполнено ${currentTask.subTasksAmount ?? 0 - currentTask.activeSubTasksAmount} из ${currentTask.subTasksAmount ?? 0})';
