@@ -356,12 +356,13 @@ class _$Places extends Places {
 
   @override
   Future<List<Place>> getAll() async {
-    return _queryAdapter.queryList(
+    var r =  _queryAdapter.queryList(
         'SELECT              Place.*,              count(Task.id) as tasksAmount         FROM Place                                             LEFT JOIN                  (                     SELECT * FROM Task as Parent WHERE (SELECT Count(*) FROM Task WHERE parent = Parent.id) = 0 AND isDone = 0                 ) as Task             ON                  place.id = Task.place                           GROUP BY Place.id',
         mapper: (Map<String, Object?> row) => Place(row['id'] as int?,
             row['name'] as String, (row['isActive'] as int) != 0,
             tasksAmount: row['tasksAmount'] as int
         ));
+    return r;
   }
 
   @override

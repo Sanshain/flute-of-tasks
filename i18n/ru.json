@@ -1,6 +1,8 @@
 {
   "title": "Мои задачи",
 
+  "Loved Tasks": "Любые задачи",
+
   "sort by": "Сортировать по",
 
   "creation time": "дате создания",
@@ -8,7 +10,31 @@
   "urgency":  "срочности",
   "expiration time": "времени исполнения",
 
-  "places": "Мои места",
+  "hours": "часов",
+  "days": "дней",
+  "weeks": "недель",
+
+  "New task": "Новая задача",
+  "New subtask": "Новая подзадача",
+  "for": "для",
+  "enter task name": "Введите имя",
+
+  "Title": "Имя",
+  "Description": "Описание",
+  "Select date": "Выберите дату",
+
+  "places": "Места",
+  "Places": "Мои места",
+  "Select task location": "Выберите место",
+
   "settings": "Настройки",
+  "Dark theme": "Включить темную тему",
+  "Default order": "Сортировать по",
+  "show the remainder": "Показывать оставшееся время",
+
+  "New place": "Новое место",
+
+  "archive": "Архив",
+
   "exit": "Выход"
 }

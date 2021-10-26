@@ -17,19 +17,24 @@ List<PopupMenuItem<Text>> menu(context, widget) {
     return [
         PopupMenuItem(
             child: GestureDetector(
-                child: Row(children: const [Expanded(child: Text("Settings"))]),
-                onTap: () =>
-                    Navigator.push(context, PageRouteBuilder(
+                child: Row(children: [Expanded(child: Text(AppLocalizations.of(context)!.translate("settings")))]),
+                onTap: () async {
+                    await Navigator.push(context, PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) => SettingsPage(themeNotifier: widget.themeNotifier),
                         transitionsBuilder: instantTransition,
-                    ))
+                    ));
+                    Navigator.pop(context);
+                }
                 // MaterialPageRoute(builder: (context) => SettingsPage(),
             )
         ),
         PopupMenuItem(
             child: GestureDetector(
-                child: Row(children: const [Expanded(child: Text("My places"))]),
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PlacesPage())),
+                child: Row(children: [Expanded(child: Text(AppLocalizations.of(context)!.translate("Places")))]),
+                onTap: () async {
+                    await Navigator.push(context, MaterialPageRoute(builder: (context) => const PlacesPage()));
+                    Navigator.pop(context);
+                },
             )
         ),
         PopupMenuItem(

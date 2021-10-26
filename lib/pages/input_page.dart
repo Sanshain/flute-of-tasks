@@ -1,6 +1,7 @@
 //import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 
 import '../controller.dart';
 
@@ -48,16 +49,16 @@ class InputPage extends StatelessWidget {
                     minLines: 1,
                     style: const TextStyle(fontSize: 16, color: Colors.black54),
                     onChanged: (String text) {},
-                    decoration: const InputDecoration(
-                        focusedBorder: OutlineInputBorder(
+                    decoration: InputDecoration(
+                        focusedBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black38, width: 2.0),
                         ),
-                        border: OutlineInputBorder(
+                        border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(25.0))
                         ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
-                        hintStyle: TextStyle(fontSize: 20.0, color: Colors.black26),
-                        hintText: 'enter task name'
+                        contentPadding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
+                        hintStyle: const TextStyle(fontSize: 20.0, color: Colors.black26),
+                        hintText: AppLocalizations.of(context)!.translate('enter task name'),
                     ),
                 ),
                 floatingActionButton: Container(

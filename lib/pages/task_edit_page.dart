@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:sanshain_tasks/controller.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sanshain_tasks/task_view.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 import 'package:sanshain_tasks/utils/notifications.dart';
 import 'package:sanshain_tasks/widgets/button.dart';
 import 'package:sanshain_tasks/widgets/fields.dart';
@@ -80,7 +81,7 @@ class TaskEditState extends State<TaskEditPage> {
             context, value: widget.task.duration ?? 0, units: units, options: SliderOptions(max: max), title: 'Duration'
         );
         _updated = _updated ?? widget.task;
-        setState(() => widget.task.duration = value);
+        setState(() => widget.task.duration = value != 0 ? value : null);
 
         await Task.tasks?.updateItem.call(widget.task);
     }
@@ -113,17 +114,17 @@ class TaskEditState extends State<TaskEditPage> {
             child: Scaffold(
 
                 appBar: AppBar(
-                    title: Text(widget.task.title.isNotEmpty ? widget.task.title : 'new task'),
+                    title: Text(widget.task.title.isNotEmpty ? widget.task.title : AppLocalizations.of(context)!.translate('New task')),
                 ),
                 body: SingleChildScrollView(
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                            inputField(hint: 'Title', value: widget.task.title, onChanged: (String text) {
+                            inputField(hint: AppLocalizations.of(context)!.translate('Title'), value: widget.task.title, onChanged: (String text) {
                                 updated = updated ?? widget.task;
                                 widget.task.title = text;
                             }),
-                            inputField(hint: 'Description',
+                            inputField(hint: AppLocalizations.of(context)!.translate('Description'),
                                 value: widget.task.description,
                                 minLines: 4,
                                 maxLines: 10,
@@ -190,8 +191,8 @@ class TaskEditState extends State<TaskEditPage> {
                                                             child: Text('${widget.task.duration} ${
 //                                                                widget.task.deadline!.difference(widget.task.created).inDays > hoursDayLimit
                                                                 widget.task.deadline!.difference(widget.task.created).inDays > hoursDayLimit
-                                                                    ? 'days'
-                                                                    : 'hours'
+                                                                    ? AppLocalizations.of(context)!.translate('days')
+                                                                    : AppLocalizations.of(context)!.translate('hours')
                                                             } inside ${
                                                                 widget.task.deadline!.difference(widget.task.created).inDays > hoursDayLimit
                                                                     ? "${widget.task.deadline!.difference(DateTime.now()).inDays} days"
@@ -211,9 +212,8 @@ class TaskEditState extends State<TaskEditPage> {
                                                                     start: DateTime.now().add(Duration(
                                                                         hours: widget.task.getDuration() ?? 1
                                                                     )),
-                                                                    setState: (datetime) {
+                                                                    setState: (datetime) async {
                                                                         //                                                              selectedDate = datetime;
-                                                                        updated = updated ?? widget.task;
                                                                         setState(() {
 //                                                                            if (widget.task.deadline != null){
 //                                                                                datetime = datetime.add(Duration(hours: widget.task.deadline!.hour));
@@ -225,12 +225,14 @@ class TaskEditState extends State<TaskEditPage> {
                                                                                 ),
                                                                             );
                                                                         });
+                                                                        // updated = updated ?? widget.task;
+                                                                        await Task.tasks?.updateItem.call(widget.task);
                                                                     }
                                                                 ),
                                                             child: Text(
                                                                 widget.task.deadline != null
                                                                     ? DateFormat("dd.MM E y").format(widget.task.deadline!)
-                                                                    : 'Select date',
+                                                                    : 'Select date', // ?? AppLocalizations.of(context)!.translate('Select date'),
                                                                 style: const TextStyle(decorationColor: Colors.red)
                                                             ),
                                                         ),
@@ -250,9 +252,17 @@ class TaskEditState extends State<TaskEditPage> {
                                                                         );
                                                                     }
                                                                 );
+
                                                                 if (expirationTime != null) {
 //                                                                    widget.task.deadline
 //                                                                    expirationTime.hour
+
+                                                                    if (expirationTime.hour == 0 && expirationTime.minute == 0)
+                                                                    {
+                                                                        widget.task.deadline = null;
+                                                                        await Task.tasks?.updateItem.call(widget.task);
+                                                                        return;
+                                                                    }
 
                                                                     DateTime now = DateTime.now();
 
@@ -276,8 +286,7 @@ class TaskEditState extends State<TaskEditPage> {
                                                                             tomorrow = 1;
                                                                         }
 
-                                                                        setState(() =>
-                                                                        widget.task.deadline = DateTime(
+                                                                        setState(() => widget.task.deadline = DateTime(
                                                                             widget.task.deadline!.year, widget.task.deadline!.month,
                                                                             widget.task.deadline!.day + tomorrow,
                                                                             expirationTime.hour,
@@ -285,10 +294,14 @@ class TaskEditState extends State<TaskEditPage> {
                                                                         ));
                                                                     }
 
+                                                                    // updated = updated ?? widget.task;
+                                                                    await Task.tasks?.updateItem.call(widget.task);
+
                                                                     await scheduleNotify(context,
                                                                         title: 'через ${widget.task.getDuration()} часов',
                                                                         message: widget.task.title,
-                                                                        time: widget.task.deadline!.subtract(Duration(hours: widget.task.getDuration() ?? 0))
+                                                                        time: widget.task.deadline!.subtract(Duration(hours: widget.task.getDuration() ?? 0)),
+                                                                        taskId: widget.task.id?.toString()
                                                                     );
 //                                                                    popup(context, expirationTime.toString());
                                                                 }
@@ -318,15 +331,11 @@ class TaskEditState extends State<TaskEditPage> {
 
                                                         var location = await choiceDialog(
                                                             context, controller.places.map((p) => p.name),
-                                                            title: 'Select task location'
+                                                            title: AppLocalizations.of(context)!.translate('Select task location')
                                                         );
 
-                                                        int _placeIndex = controller.places
-                                                            .indexWhere((element) => element.name == location);
-
-                                                        Place? place = _placeIndex >= 0
-                                                            ? controller.places[_placeIndex]
-                                                            : null;
+                                                        int _placeIndex = controller.places.indexWhere((element) => element.name == location);
+                                                        Place? place = _placeIndex >= 0 ? controller.places[_placeIndex] : null;
 
 //                                                        var place = controller.places
 //                                                            .where((p0) => p0.name == location)
@@ -339,6 +348,10 @@ class TaskEditState extends State<TaskEditPage> {
 
                                                             widget.task.place = place?.id;
                                                             widget.task.save();
+
+                                                            controller.places[_placeIndex].activeTasks.add(widget.task);
+                                                            controller.places[_placeIndex] = controller.places[_placeIndex];
+                                                            // controller.places = controller.places;
                                                         }
                                                     },
                                                     child: const Icon(Icons.place),

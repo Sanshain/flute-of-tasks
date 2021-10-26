@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sanshain_tasks/pages/task_edit_page.dart';
 import 'package:sanshain_tasks/transitions/instant.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 
 import '../../controller.dart';
 import '../../main_page.dart';
@@ -52,6 +53,7 @@ class ListViewItem extends StatefulWidget {
     final IExpandedTaskList? parent;
     final BuildContext rootContext;
     final Task? parentTask;
+    final Controller controller;
 
     const ListViewItem(BuildContext context, this.index, {
         key,
@@ -67,6 +69,7 @@ class ListViewItem extends StatefulWidget {
         required this.expandAction,
         required this.parent,
         required this.rootContext,
+        required this.controller,
         this.parentTask,
         this.deep = 0}) : super(key: key);
 
@@ -87,6 +90,7 @@ class ListViewItemState extends State<ListViewItem> {
     @override
     void initState() {
         super.initState(); //      Future.delayed(Duration.zero,() { });
+        controller = widget.controller;
 //        controller = Get.find();
     }
 
@@ -118,29 +122,187 @@ class ListViewItemState extends State<ListViewItem> {
 
 //        return Text(index.toString());
 
+        String isToday(DateTime? date) { return (date?.day == DateTime.now().day) ? ' (уже)' : ""; }
+
         String taskHint()
         {
 //            '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask.subTasksAmount ?? 0}/${currentTask.id})',
 
             var result = '';
 
-            if (currentTask.deadline != null && currentTask.duration != null) {
-                var rest = currentTask.deadline!.difference(DateTime.now());
-                var units = currentTask.units;
+            if (currentTask.deadline != null)
+            {
+                Duration rest = currentTask.deadline!.difference(DateTime.now());
+                var units = AppLocalizations.of(context)!.translate(currentTask.units);
+                if (currentTask.duration != null){
+                    var restNumber = currentTask.units == 'days' ? rest.inDays : rest.inHours;
+                    result = '(есть ${((restNumber - currentTask.duration!) * 5 / 7).ceil()} $units из $restNumber)';
+                } else {
+                    if (rest.inDays > 13){
 
-                result = '(осталось ${currentTask.getDuration()} $units из ${units == 'days' ? rest.inDays : rest.inHours})';
-            } else if (currentTask.deadline != null) {
-                var rest = currentTask.deadline!.difference(DateTime.now());
-                var units = currentTask.units;
-
-                result = '(через ${units == 'days' ? rest.inDays : rest.inHours} $units)';
-            } else if (currentTask.subTasksAmount != null && currentTask.subTasksAmount != 0) {
-
-                result = '(Выполнено ${currentTask.subTasksAmount ?? 0 - currentTask.activeSubTasksAmount} из ${currentTask.subTasksAmount ?? 0})';
+                        result = '(еще ${(rest.inDays / 7).floor()} ${AppLocalizations.of(context)!.translate('weeks')})';
+                    }
+                    else if (rest.inDays > 2) {
+                        result = '(еще ${rest.inDays} ${AppLocalizations.of(context)!.translate('days')})';
+                    }
+                    else if (rest.inHours < 0){
+                        result = '(${rest.inHours} ${AppLocalizations.of(context)!.translate('hours')} назад)';
+                    }
+                    else{
+                        result = '(через ${rest.inHours} ${AppLocalizations.of(context)!.translate('hours')})';
+                    }
+                }
+            } else if (currentTask.subTasksAmount != null && currentTask.subTasksAmount != 0)
+            {
+                result = '(выполнено ${(currentTask.subTasksAmount ?? 0) - currentTask.activeSubTasksAmount} из ${currentTask.subTasksAmount ?? 0})';
             }
 
             return result;
         }
+
+
+        Widget generateTileValue({bool isExpansion = false}){
+            return Column(
+                children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                            Container(
+//                              width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
+                                width: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width - (isExpansion ? 220 : 180),
+                                padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
+//                              child: Icon(Icons.phone, color: Colors.black26)
+                                child: RichText(
+                                    text: TextSpan(text: currentTask.title,
+                                        style: TextStyle(
+                                            fontSize: 16 - deep.toDouble(), color: Colors.black54.withAlpha(100 - deep * 10), fontWeight: FontWeight.w500),
+                                        children: [
+                                            TextSpan(
+                                                text: controller.settings['view_time'] == true.toString() ? ('\n' + taskHint()) : '',
+                                                style: const TextStyle(fontWeight: FontWeight.normal, color: Colors.black38, fontSize: 12)
+                                            ),
+                                        ]
+                                    ),
+                                    // '${currentTask.title} ${controller.settings['view_time'] == true.toString() ? ('\n' + taskHint()) : ''}',
+                                    // style: TextStyle(
+                                    //     fontSize: 16 - deep.toDouble(), color: Colors.black54.withAlpha(100 - deep * 10)
+                                    // )
+                                ),
+                            ),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+
+                                    /// ADD
+                                    GestureDetector(
+                                        child: const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 4.0),
+                                            child: Card(
+                                                shadowColor: Colors.transparent,
+                                                color: btnColors,
+                                                shape: CircleBorder(),
+                                                child: Padding(
+                                                    padding: EdgeInsets.all(6.0),
+                                                    child: Icon(Icons.add, color: Colors.black26),
+                                                )
+                                            ),
+                                        ),
+                                        onTap: () =>
+                                            subTaskCreateAction?.call(onApply: (Task task) {
+                                                setState(() => expandedCache.add(task));
+                                            }),
+                                    ),
+
+//                                                Container(
+//                                                    decoration: BoxDecoration(
+//                                                        borderRadius: BorderRadius.circular(32),
+////                                                       color: Colors.orange,
+//                                                        boxShadow: const [
+//                                                            BoxShadow(color: Colors.white, spreadRadius: 8),
+//                                                        ],
+//                                                    ),
+//                                                    child: GestureDetector(
+//                                                        child: const Padding(
+//                                                            padding: EdgeInsets.symmetric(horizontal:4.0),
+//                                                            child: Card(
+//                                                                shape: CircleBorder(),
+//                                                                child: Icon(Icons.add, color: Colors.black26)
+//                                                            ),
+//                                                        ),
+//                                                        onTap: () => subTaskCreateAction?.call(onApply: (Task task) {
+//                                                                setState(() => expandedCache.add(task));
+//                                                            }
+//                                                        ),
+//                                                    ),
+//                                                ),
+
+                                    /// EDIT
+                                    Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                                        child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                shape: MaterialStateProperty.resolveWith((states) => const CircleBorder()),
+                                                shadowColor: MaterialStateProperty.resolveWith((states) =>
+                                                Colors.transparent),
+                                                backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                                                    return states.contains(MaterialState.pressed)
+                                                        ? Colors.lightBlueAccent
+                                                        : const Color(0xffEEEEEE);
+//                                                      : Colors.black12;
+                                                    },
+                                                )
+                                            ),
+
+                                            /// expand
+//                                                    child: const Icon(Icons.expand_less, color: Colors.black26),
+                                            child: const Icon(Icons.edit_outlined, color: Colors.black26),
+                                            onPressed: () {
+                                                void Function(Task?) onPop = onTap();
+
+                                                Navigator.push(
+                                                    rootContext,
+//                                                              MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
+                                                    PageRouteBuilder(
+//                                                                pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
+                                                        pageBuilder: (rootContext, animation,
+                                                            secondaryAnimation)
+                                                        =>
+                                                            TaskEditPage(
+                                                                subContextWrapper,
+                                                                index: index,
+                                                                tasks: tasks,
+                                                                onPop: onPop,
+                                                            ),
+                                                        transitionsBuilder: instantTransition,
+                                                    )
+                                                );
+                                            },
+                                        ),
+                                    ),
+                                ],
+                            )
+                        ],
+                    ),
+                    if (currentTask.deadline != null)
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8),
+                                    child: Text(
+                                        DateFormat("dd.MM E y").format(currentTask.deadline!) + isToday(currentTask.deadline),
+                                        style: const TextStyle(color: Colors.black26, fontSize: 13),
+                                    ),
+                                ),
+                            ],
+                        )
+                ],
+            );
+        }
+
 
 
         return Dismissible(
@@ -180,7 +342,7 @@ class ListViewItemState extends State<ListViewItem> {
                     color: Colors.white60,
 //                    child: const Text('1235'),
 
-                    child: ExpansionTile(
+                    child: (currentTask.subTasksAmount ?? 0) > 0 ? ExpansionTile(
 //                        trailing: const SizedBox.shrink(),
 //                        tilePadding: EdgeInsets.all(0),
 //                        childrenPadding: const EdgeInsets.all(0),
@@ -211,135 +373,7 @@ class ListViewItemState extends State<ListViewItem> {
                             }
                         },
 //                        title: const Text('234'),
-                        title: Column(
-                            children: [
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                        Container(
-//                                        width: MediaQuery.of(context).size.width - ((currentTask.subTasksAmount ?? 0) > 0 ? 220 : 150),
-                                            width: MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width - 220,
-                                            padding: EdgeInsets.only(left: 15.0 + deep.toDouble() * 4),
-//                                          child: Icon(Icons.phone, color: Colors.black26)
-                                            child: Text(
-//                                                '${currentTask.title} (${currentTask.activeSubTasksAmount}/${currentTask.subTasksAmount ?? 0}/${currentTask.id})',
-                                                '${currentTask.title} ${taskHint()}',
-                                                style: TextStyle(fontSize: 16 - deep.toDouble(),
-                                                    color: Colors.black54.withAlpha(100 - deep * 10))
-                                            ),
-                                        ),
-                                        Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-
-                                                /// ADD
-                                                GestureDetector(
-                                                    child: const Padding(
-                                                        padding: EdgeInsets.symmetric(horizontal: 4.0),
-                                                        child: Card(
-                                                            shadowColor: Colors.transparent,
-                                                            color: btnColors,
-                                                            shape: CircleBorder(),
-                                                            child: Padding(
-                                                                padding: EdgeInsets.all(6.0),
-                                                                child: Icon(Icons.add, color: Colors.black26),
-                                                            )
-                                                        ),
-                                                    ),
-                                                    onTap: () =>
-                                                        subTaskCreateAction?.call(onApply: (Task task) {
-                                                            setState(() => expandedCache.add(task));
-                                                        }),
-                                                ),
-
-//                                                Container(
-//                                                    decoration: BoxDecoration(
-//                                                        borderRadius: BorderRadius.circular(32),
-////                                                       color: Colors.orange,
-//                                                        boxShadow: const [
-//                                                            BoxShadow(color: Colors.white, spreadRadius: 8),
-//                                                        ],
-//                                                    ),
-//                                                    child: GestureDetector(
-//                                                        child: const Padding(
-//                                                            padding: EdgeInsets.symmetric(horizontal:4.0),
-//                                                            child: Card(
-//                                                                shape: CircleBorder(),
-//                                                                child: Icon(Icons.add, color: Colors.black26)
-//                                                            ),
-//                                                        ),
-//                                                        onTap: () => subTaskCreateAction?.call(onApply: (Task task) {
-//                                                                setState(() => expandedCache.add(task));
-//                                                            }
-//                                                        ),
-//                                                    ),
-//                                                ),
-
-                                                /// EDIT
-                                                Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                                                    child: ElevatedButton(
-                                                        style: ButtonStyle(
-                                                            shape: MaterialStateProperty.resolveWith((states) => const CircleBorder()),
-                                                            shadowColor: MaterialStateProperty.resolveWith((states) =>
-                                                            Colors.transparent),
-                                                            backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                                                                return states.contains(MaterialState.pressed)
-                                                                    ? Colors.lightBlueAccent
-                                                                    : const Color(0xffEEEEEE);
-//                                                                    : Colors.black12;
-                                                            },
-                                                            )
-                                                        ),
-
-                                                        /// expand
-//                                                    child: const Icon(Icons.expand_less, color: Colors.black26),
-                                                        child: const Icon(Icons.edit_outlined, color: Colors.black26),
-                                                        onPressed: () {
-                                                            void Function(Task?) onPop = onTap();
-
-                                                            Navigator.push(
-                                                                rootContext,
-//                                                              MaterialPageRoute(builder: (context) => TaskPage(subContextWrapper, title: users[index]))
-                                                                PageRouteBuilder(
-//                                                                pageBuilder: (context, animation, secondaryAnimation) => TaskPage(subContextWrapper, title: users[index], onPop: onPop,),
-                                                                    pageBuilder: (rootContext, animation,
-                                                                        secondaryAnimation)
-                                                                    =>
-                                                                        TaskEditPage(
-                                                                            subContextWrapper,
-                                                                            index: index,
-                                                                            tasks: tasks,
-                                                                            onPop: onPop,
-                                                                        ),
-                                                                    transitionsBuilder: instantTransition,
-                                                                )
-                                                            );
-                                                        },
-                                                    ),
-                                                ),
-                                            ],
-                                        )
-                                    ],
-                                ),
-                                if (currentTask.deadline != null)
-                                    Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                            Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8),
-                                                child: Text(
-                                                    DateFormat("dd.MM E y").format(currentTask.deadline!),
-                                                    style: const TextStyle(color: Colors.black26, fontSize: 13),
-                                                ),
-                                            ),
-                                        ],
-                                    )
-                            ],
-                        ),
+                        title: generateTileValue(isExpansion: true),
 //                    children: const [
 //                        Text('Parent element is not defined')
 //                    ],
@@ -374,10 +408,13 @@ class ListViewItemState extends State<ListViewItem> {
                                 }
                             )
                         ],
+                    ) : ListTile(
+                        title: generateTileValue(),
                     ),
                 ),
             ),
         );
+
     }
 
     @override
@@ -386,6 +423,9 @@ class ListViewItemState extends State<ListViewItem> {
         return item;
 //        return Text(widget.index.toString());
     }
+
+
+
 }
 
 
@@ -442,52 +482,55 @@ Widget createListViewPoint(BuildContext context, int index, {
                     )
                 );
             },
-            child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 1),
-                padding: const EdgeInsets.symmetric(vertical: 6),
-//            color: index == selectedIndex ? Colors.white60: Colors.white60,
-                color: Colors.white70,
-                child: ListTile(
+            child: ListTile(
 //                    onExpansionChanged: (bool expanded) async {
 //                        if (expanded && tasks[index].subTasksAmount != expandedCache.length) {
 //                            expandedCache = (await tasks[index].children) ?? [];
 //                        }
 //                    },
-                    title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                            Padding(
-                                padding: const EdgeInsets.only(left: 12.0),
-//                      child: Icon(Icons.phone, color: Colors.black26)
-                                child: Text(
-//                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
-                                    '${tasks[index].title} ${tasks[index].parentName != null
-                                        ? '(${tasks[index].parentName})'
-                                        : ''}',
-                                    style: const TextStyle(fontSize: 16, color: Colors.black54)
-                                ),
-                            ),
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                    Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        child: GestureDetector(
+                title: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 1),
+                    width: MediaQuery.of(context).size.width - 180,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+//                          color: index == selectedIndex ? Colors.white60: Colors.white60,
+                    color: Colors.white70,
+                    child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                              Padding(
+                                  padding: const EdgeInsets.only(left: 12.0),
+    //                      child: Icon(Icons.phone, color: Colors.black26)
+                                  child: Text(
+    //                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
+                                      '${tasks[index].title} ${tasks[index].parentName != null
+                                          ? '(${tasks[index].parentName})'
+                                          : ''}'.substring(0, 21) + '...',
+                                      style: const TextStyle(fontSize: 16, color: Colors.black54),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                  ),
+                              ),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                      Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                          child: GestureDetector(
 
-//                                            child: const Icon(Icons.expand_less, color: Colors.black26),
-                                            child: Text(
-//                                                tasks[index].deadline.toString(),
-                                                tasks[index].deadline != null ? DateFormat("H:m M E d").format(
-                                                    tasks[index].deadline!) : '',
-                                                style: const TextStyle(fontSize: 12, color: Colors.black38)
-                                            ),
-                                            onTap: () {},
-                                        ),
-                                    ),
-                                ],
-                            )
-                        ],
-                    ),
+    //                                            child: const Icon(Icons.expand_less, color: Colors.black26),
+                                              child: Text(
+        //                                                  tasks[index].deadline.toString(),
+                                                    tasks[index].deadline != null ? DateFormat("H:m M E d").format(tasks[index].deadline!) : '',
+                                                    style: const TextStyle(fontSize: 12, color: Colors.black38),
+                                                  ),
+                                              onTap: () {},
+                                          ),
+                                      ),
+                                  ],
+                              )
+                          ],
+                      ),
+                ),
 //                    children: const [
 //                        Text('Parent element is not defined')
 //                    ],
@@ -504,7 +547,6 @@ Widget createListViewPoint(BuildContext context, int index, {
 //                            }
 //                        )
 //                    ],
-                ),
             ),
         ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sanshain_tasks/controller.dart';
 import 'package:sanshain_tasks/utils/localizations.dart';
 import 'package:sanshain_tasks/utils/notifications.dart';
 
@@ -18,7 +19,7 @@ import 'package:get/get.dart';
 void main() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    final database = await $FloorAppDatabase
+    final database = Controller.storage = await $FloorAppDatabase
         .databaseBuilder('app_database_2.db')
         // .addMigrations([migration_1To2])
         .build();

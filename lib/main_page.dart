@@ -33,8 +33,8 @@ import 'package:collection/collection.dart';
 
 const List<String> tabTitle = [
     'Loved Tasks',
-    'Места',
-    'Архив',
+    'places',
+    'archive',
 ];
 
 
@@ -67,17 +67,16 @@ class MainPageState extends State<MainPage> with TasksListView {
     }
 
 
-
-
+    
     @override Widget build(BuildContext context)
     {
-        rootContext = context;
+        rootContext = context;             
 
         return Scaffold(
 
             appBar: AppBar(
 
-                title: Text(tabTitle[selectedTab]),
+                title: Text(subPage ?? AppLocalizations.of(context)!.translate(tabTitle[selectedTab])),
                 actions: [
                     GestureDetector(
                         onTap: () async {
@@ -92,9 +91,9 @@ class MainPageState extends State<MainPage> with TasksListView {
                                         if (_order == '0') {
                                             return n.created.compareTo(p.created);
                                         } else if (_order == '1') {
-                                            return n.getDuration()?.compareTo(p.getDuration() ?? 0) ?? 0;
-                                        } else if (_order == '2') {
                                             return n.gravity.compareTo(p.gravity);
+                                        } else if (_order == '2') {
+                                            return n.getDuration()?.compareTo(p.getDuration() ?? 0) ?? 0;
                                         } else {
                                             return n.deadline?.compareTo(p.deadline ?? defaultTime) ?? 0;
                                         }

@@ -1,6 +1,8 @@
 {
   "title": "Mis tareas",
 
+  "Loved Tasks": "Tareas Queridas",
+
   "sort by": "ordenar por",
 
   "creation time": "fecha de creación",
@@ -8,7 +10,32 @@
   "urgency":  "urgencia",
   "expiration time": "tiempo de caducidad",
 
-  "places": "Mis asientos",
+  "hours": "horas",
+  "days": "días",
+  "weeks": "semanas",
+
+
+  "New task": "Nuevo reto",
+  "New subtask": "Nuevo reto",
+  "for": "de",
+  "enter task name": "Escriba un nombre de tarea",
+
+  "Title": "Titular",
+  "Description": "Descripci",
+  "Select date": "Seleccionar fecha",
+
+  "places": "asientos",
+  "Places": "Mis asientos",
+  "Select task location": "Seleccione una ubicación",
+
   "settings": "Sintonización",
+  "Dark theme": "Mostrar el resto",
+  "Default order": "Orden por defecto",
+  "show the remainder": "mostrar el resto",
+
+  "New place": "Nuevo lugar",
+
+  "archive": "Archivo",
+
   "exit": "Salir"
 }

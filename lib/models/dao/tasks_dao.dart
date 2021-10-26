@@ -77,8 +77,8 @@ abstract class TaskDao {
 
 @dao
 abstract class Places {
-    @Query('SELECT * FROM Place')
-    Future<List<Place>> all();
+
+    @Query('SELECT * FROM Place') Future<List<Place>> all();
 
     /// todo annotate to count of active tasks:
     /// LEFT JOIN (SELECT * FROM Task WHERE isDone = 0) as Task ON place.id = Task.place
@@ -97,23 +97,17 @@ abstract class Places {
     ''')
     Future<List<Place>> getAll();
 
-    @insert Future<void> insertNew(Place place);
+    @insert Future<void> insertNew(Place place);  // returning?
     @update Future<void> updateItem(Place place);
     @delete Future<void> deleteItem(Place place);
 }
 
+
 @dao
 abstract class SettingsManager {
 
-    @Query('SELECT * FROM Setting')
-    Future<List<Setting>> all();
-
-    @insert
-    Future<void> insertItem(Setting option);
-
-    @update
-    Future<void> updateItem(Setting option);
-
-    @update
-    Future<void> updateItems(List<Setting> option);
+    @Query('SELECT * FROM Setting') Future<List<Setting>> all();
+    @insert Future<void> insertItem(Setting option);
+    @update Future<void> updateItem(Setting option);
+    @update Future<void> updateItems(List<Setting> option);
 }

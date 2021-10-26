@@ -36,9 +36,9 @@ Future<FlutterLocalNotificationsPlugin> notificationsInitialize(DidReceiveLocalN
 ///
 /// show notification
 ///
-Future<void> scheduleNotify(context, {String title = '', required String message, required DateTime time}) async {
-    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'some channel id',
+Future<void> scheduleNotify(context, {String title = '', required String message, required DateTime time, String? taskId}) async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        taskId ?? 'some channel id',
         'tasks channel',
         channelDescription: 'upcoming tasks',
         importance: Importance.max,
@@ -46,7 +46,7 @@ Future<void> scheduleNotify(context, {String title = '', required String message
         ticker: 'ticker'
     );
 
-    const platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
 //    await App.notification!.show(0,
 //        title,
 //        message,

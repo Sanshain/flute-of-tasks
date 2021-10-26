@@ -1,5 +1,7 @@
 import 'package:floor/floor.dart';
 
+import 'dao/tasks_dao.dart';
+
 @entity
 class Setting{
 
@@ -9,5 +11,7 @@ class Setting{
     @PrimaryKey(autoGenerate: true) final int? id;
     final String name;
     final String value;
+
+    static SettingsManager? objects;
 }
 

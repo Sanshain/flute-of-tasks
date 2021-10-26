@@ -166,5 +166,5 @@ async
         lastDate: DateTime(2112)
     );
 
-    if (picked != null && picked != selectedDate) setState(picked);
+    if (picked != null && picked != selectedDate) await setState(picked);
 }

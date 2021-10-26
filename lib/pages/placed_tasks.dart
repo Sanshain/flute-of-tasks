@@ -23,6 +23,7 @@ class PlacedTasksPage extends PlacesPage {
         Future dismissAction(DismissDirection direction, int _index) async {
             if (direction == DismissDirection.startToEnd) {
                 var archiveTask = controller.places[index].activeTasks[_index];
+
                 archiveTask.isDone = true;
                 await Task.tasks?.updateItem(archiveTask);
 
@@ -66,8 +67,7 @@ class PlacedTasksPage extends PlacesPage {
                                 itemBuilder: (context, int _index) {
                                     return Dismissible(
                                         key: UniqueKey(),
-                                        onDismissed: (DismissDirection direction) async =>
-                                        await dismissAction(direction, _index),
+                                        onDismissed: (DismissDirection direction) async => await dismissAction(direction, _index),
                                         background: Container(padding: const EdgeInsets.symmetric(horizontal: 12.0),
                                             color: Colors.orange,
                                             alignment: Alignment.centerLeft,

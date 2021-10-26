@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/string_extensions.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 import 'package:sanshain_tasks/utils/speech.dart';
 import 'package:sanshain_tasks/widgets/popups.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -17,6 +18,7 @@ import 'input_page.dart';
 mixin TasksListView implements IExpandedTaskList{
 
     // поля:
+    String? subPage;
     int? rootTaskId; // при создании новой таски содержит ид родительской
     void Function(Task)? useSubTasksUpdate; // обновляет саб_таски
     int selectedTab = 0; // индекс активной вкладки
@@ -31,7 +33,7 @@ mixin TasksListView implements IExpandedTaskList{
     bool searchBar = false; // @todo?
     late FocusNode searchFocusNode; // @todo_?
 
-    final Controller controller = Get.put<Controller>(Controller()); // ссылка на стэйт-менеджер
+    final Controller controller = Get.put<Controller>(Controller()); // инициализация стэйт-менеджера => ссылка на стэйт-менеджер
 
     List<Task> tasks = []; // реактвнй список актуальных задач
     late List<Task> archive = []; // реактвнй список выполненных задач
@@ -48,7 +50,7 @@ mixin TasksListView implements IExpandedTaskList{
         return Obx(() => Stack(
             children: [
                 Padding(
-                    padding: const EdgeInsets.only(bottom: 32),
+                    padding: const EdgeInsets.only(bottom: 50),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -79,8 +81,7 @@ mixin TasksListView implements IExpandedTaskList{
                 Expanded(child: ListView.separated(
                     padding: const EdgeInsets.all(8),
                     itemCount: archive.length,
-                    separatorBuilder: (BuildContext context, int index)
-                    => const Divider(),
+                    separatorBuilder: (BuildContext context, int index) => const Divider(),
                     itemBuilder: (BuildContext context, int index)
                     {
                         return createListViewPoint(context, index,
@@ -88,14 +89,19 @@ mixin TasksListView implements IExpandedTaskList{
                             toRight: const SwipeBackground(Colors.redAccent, Icon(Icons.delete_forever)),
                             subContextWrapper: subContextWrapper,
                             tasks: archive,
-                            onDismissed: (direction)
-                            async {
+                            onDismissed: (direction) async
+                            {
                                 if (direction == DismissDirection.endToStart) {
                                     archive[index].isDone = false;
                                     await widget.tasks.updateItem(archive[index]);
                                     stateUp(()
                                     {
-                                        tasks.add(archive[index]);
+                                        // tasks.add(archive[index]);
+                                        // controller.archive.removeAt(index);
+                                        // archive[index].isDone = false;
+
+                                        Task parent = tasks.where((_task) => _task.id == archive[index].parent).last;
+                                        parent.doneSubTasksAmount = parent.doneSubTasksAmount! - 1;
                                         archive.removeAt(index);
                                     });
                                 }
@@ -125,10 +131,12 @@ mixin TasksListView implements IExpandedTaskList{
 
     Future<void> createTaskPage(BuildContext context, {Task? parent}) async
     {
-        var titleSuffix = parent == null ? '' : ' (for ${parent.title})';
 
-        String? newTaskNameTitle = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => InputPage(initValue: '', title: 'New Task' + titleSuffix))
+        var titleSuffix = parent == null ? (AppLocalizations.of(context)?.translate('New task') ?? '') : '"${parent.title}"';
+
+        String? newTaskNameTitle = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => InputPage(initValue: '', title: titleSuffix))
         );
         // var newTaskNameTitle = await inputDialog(context, title: 'Enter new task title');
 
@@ -163,6 +171,7 @@ mixin TasksListView implements IExpandedTaskList{
         return ListViewItem(
             context,
             index,
+            controller: controller,
             page: widget,
             subContextWrapper: childContextWrapper,
             parentTask: parentTask,
@@ -231,7 +240,13 @@ mixin TasksListView implements IExpandedTaskList{
                 rootTaskId = tasks[index].id;
                 rootTaskIndex = index;
 
+                stateUpdate.call(() {
+                    subPage = AppLocalizations.of(context)!.translate('New task') + ' ' + AppLocalizations.of(context)!.translate('for');
+                });
                 await createTaskPage(context, parent: tasks[index]);
+                stateUpdate((){
+                    subPage = null;
+                });
             },
             expandAction: () {},
             rootContext: parentContext!
@@ -251,8 +266,8 @@ mixin TasksListView implements IExpandedTaskList{
                 child: Align(
                     alignment: Alignment.bottomRight,
                     child: GestureDetector(
-                        onLongPress: ()
-                        async {
+                        onLongPress: () async
+                        {
                             bool available = await speech.initialize(onStatus: speechStatusListener, onError: speechErrorListener);
                             if (available) {
                                 speech.listen(onResult: (SpeechRecognitionResult result)
@@ -275,7 +290,7 @@ mixin TasksListView implements IExpandedTaskList{
 
                             onPressed: () async
                             {
-                                await createTaskPage(context);
+                                return await createTaskPage(context);
 //                                setState(() {
 //                                    quickNew = true;
 //                                });

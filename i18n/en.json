@@ -1,14 +1,41 @@
 {
   "title": "Tasks",
 
+  "Loved Tasks": "Loved Tasks",
+
   "sort by": "order by",
   "creation time": "creation time",
   "importance": "importance",
   "urgency":  "urgency",
   "expiration time": "expiration time",
 
+  "hours": "hours",
+  "days": "days",
+  "weeks": "weeks",
+
+
+  "New task": "New task",
+  "New subtask": "New subtask",
+  "for": "for",
+  "enter task name": "enter task name",
+
+  "Title": "Title",
+  "Description": "Description",
+  "Select date": "Select date",
+
   "places": "Places",
+  "Places": "My places",
+  "Select task location": "Select task location",
+
   "settings": "Settings",
+  "Dark theme": "Dark theme",
+  "Default order": "Default order",
+  "show the remainder": "show the remainder",
+
+  "New place": "New place",
+
+  "archive": "archive",
+
   "exit": "Exit"
 }
 

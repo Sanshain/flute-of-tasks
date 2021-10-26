@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sanshain_tasks/models/dao/tasks_dao.dart';
 import 'package:sanshain_tasks/models/tasks.dart';
 import 'package:sanshain_tasks/pages/input_page.dart';
+import 'package:sanshain_tasks/utils/localizations.dart';
 import 'package:sanshain_tasks/widgets/popups.dart';
 import '../models/database/database.dart';
 
@@ -78,7 +79,7 @@ class PlacesPage extends StatelessWidget {
             child: Scaffold(
                 // Use Obx(()=> to update Text() whenever count is changed.
 //            appBar: AppBar(title: Obx(() => Text("Clicks: ${c.count}"))),
-                appBar: pageTitle.isNotEmpty ? AppBar(title: Text(pageTitle)) : null,
+                appBar: pageTitle.isNotEmpty ? AppBar(title: Text(AppLocalizations.of(context)!.translate(pageTitle.toLowerCase()))) : null,
 
                 // Replace the 8 lines Navigator.push by a simple Get.to(). You don't need context
 //            body: Center(child: ElevatedButton(
@@ -105,13 +106,18 @@ class PlacesPage extends StatelessWidget {
                 child: FloatingActionButton(
                     onPressed: () async {
                         String placeName = await Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const InputPage(title: 'New place'))
+                            MaterialPageRoute(builder: (context) => InputPage(title: AppLocalizations.of(context)!.translate('New place')))
                         );
                         if (placeName.isNotEmpty) {
                             var place = Place.init(placeName);
-//                                    controller.places.add(place);
-                            controller.appendPlace(place);
+//                          controller.places.add(place);
                             await Place.objects?.insertNew(place);
+                            // place = (await Place.objects?.getAll())?.where((_place) => _place.name == placeName).last ?? place;
+                            // controller.appendPlace(place);
+                            Place.objects?.getAll().then((places) {
+                                place = places.where((_place) => _place.name == placeName).last;
+                                controller.appendPlace(place);
+                            });
                         }
 //                                popup(context, placeName);
                     },
