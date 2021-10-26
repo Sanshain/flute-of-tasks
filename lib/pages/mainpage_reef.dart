@@ -100,8 +100,13 @@ mixin TasksListView implements IExpandedTaskList{
                                         // controller.archive.removeAt(index);
                                         // archive[index].isDone = false;
 
-                                        Task parent = tasks.where((_task) => _task.id == archive[index].parent).last;
-                                        parent.doneSubTasksAmount = parent.doneSubTasksAmount! - 1;
+                                        Task? parent = tasks.where((_task) => _task.id == archive[index].parent).lastOrNull;
+                                        if (parent != null){
+                                            parent.doneSubTasksAmount = parent.doneSubTasksAmount! - 1;
+                                        }
+                                        else{
+                                            tasks.add(archive[index]);
+                                        }
                                         archive.removeAt(index);
                                     });
                                 }

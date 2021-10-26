@@ -445,6 +445,10 @@ Widget createListViewPoint(BuildContext context, int index, {
 {
     List<Task> expandedCache = [];
 
+    String itemTitle = '${tasks[index].title} ${tasks[index].parentName != null
+        ? '(${tasks[index].parentName})'
+        : ''}'; // .substring(0, 21) + '...'
+
     return Dismissible(
 //      key: Key(index.toString()),
         key: UniqueKey(),
@@ -499,15 +503,13 @@ Widget createListViewPoint(BuildContext context, int index, {
                           children: [
                               Padding(
                                   padding: const EdgeInsets.only(left: 12.0),
-    //                      child: Icon(Icons.phone, color: Colors.black26)
+//                                child: Icon(Icons.phone, color: Colors.black26)
                                   child: Text(
-    //                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
-                                      '${tasks[index].title} ${tasks[index].parentName != null
-                                          ? '(${tasks[index].parentName})'
-                                          : ''}'.substring(0, 21) + '...',
+//                                    '${tasks[index].title} (${tasks[index].parentName ?? ''})',
+                                      itemTitle.length > 21 ? itemTitle.substring(0, 21) + '...' : itemTitle,
                                       style: const TextStyle(fontSize: 16, color: Colors.black54),
-                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
                                   ),
                               ),
                               Row(
