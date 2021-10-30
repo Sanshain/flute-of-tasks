@@ -66,6 +66,8 @@ abstract class TaskDao {
 
     @insert Future<int?> insertItem(Task task);  // int?
 
+    @insert Future<void> insertItems(List<Task> tasks);
+
     @delete Future<void> deleteItem(Task task);
 
     @update Future<void> updateItem(Task task);
@@ -97,6 +99,7 @@ abstract class Places {
     ''')
     Future<List<Place>> getAll();
 
+    @insert Future<void> insertItems(List<Place> place);
     @insert Future<void> insertNew(Place place);  // returning?
     @update Future<void> updateItem(Place place);
     @delete Future<void> deleteItem(Place place);

@@ -12,7 +12,10 @@ import '../controller.dart';
 
 class PlacedTasksPage extends PlacesPage {
 
-    const PlacedTasksPage({Key? key}) : super(key: key, pageTitle: "");
+    const PlacedTasksPage({Key? key, required this.archive, required this.changeState}) : super(key: key, pageTitle: "");
+
+    final void Function(VoidCallback cb) changeState;
+    final List<Task> archive;
 
     @override Widget buildFloatingActionButton(BuildContext context, Controller controller, {double bottom = 15}) {
         return super.buildFloatingActionButton(context, controller, bottom: 50);
@@ -20,6 +23,7 @@ class PlacedTasksPage extends PlacesPage {
 
     @override
     Widget itemBuilder(BuildContext context, Controller controller, int index) {
+
         Future dismissAction(DismissDirection direction, int _index) async {
             if (direction == DismissDirection.startToEnd) {
                 var archiveTask = controller.places[index].activeTasks[_index];
@@ -28,6 +32,12 @@ class PlacedTasksPage extends PlacesPage {
                 await Task.tasks?.updateItem(archiveTask);
 
                 controller.places[index].activeTasks.removeAt(_index);
+                controller.places[index].tasksAmount = controller.places[index].activeTasks.length;
+
+                changeState(() {
+                    archive.insert(0, archiveTask);
+                });
+
 //                popup(context, 'to add archiveTask to archive state');
             }
         }
@@ -53,6 +63,7 @@ class PlacedTasksPage extends PlacesPage {
 //                                ),
                                 Obx(() =>
                                     Text(" (${controller.places[index].tasksAmount})")
+                                    // Text(" (${controller.places[index].activeTasks.length})")
                                 ),
 //                                Text(" (${${controller.places[index].activeTasks.length})"),
                             ],
@@ -110,7 +121,9 @@ class PlacedTasksPage extends PlacesPage {
                     ],
                     onExpansionChanged: (bool expanded) async {
                         if (expanded) {
-                            controller.places[index].activeTasks = (await controller.places[index].tasks) ?? <Task>[];
+                            var activeTasks = (await controller.places[index].tasks)?.where((_task) => _task.isDone == false).toList();
+                            controller.places[index].activeTasks = activeTasks ?? <Task>[];
+                            controller.places[index].tasksAmount = controller.places[index].activeTasks.length;
                         }
                     }
                 )

@@ -94,6 +94,9 @@ mixin TasksListView implements IExpandedTaskList{
                                 if (direction == DismissDirection.endToStart) {
                                     archive[index].isDone = false;
                                     await widget.tasks.updateItem(archive[index]);
+                                    if (archive[index].place != null){
+                                        controller.places.where((p) => p.id == archive[index].place).last.tasksAmount += 1;
+                                    }
                                     stateUp(()
                                     {
                                         // tasks.add(archive[index]);

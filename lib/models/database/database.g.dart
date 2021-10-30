@@ -290,6 +290,11 @@ class _$TaskDao extends TaskDao {
   }
 
   @override
+  Future<void> insertItems(List<Task> tasks) async {
+      await _taskInsertionAdapter.insertList(tasks, OnConflictStrategy.abort);
+  }
+
+  @override
   Future<void> updateItem(Task task) async {
     await _taskUpdateAdapter.update(task, OnConflictStrategy.abort);
   }
@@ -368,6 +373,11 @@ class _$Places extends Places {
   @override
   Future<void> insertNew(Place place) async {
     await _placeInsertionAdapter.insert(place, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> insertItems(List<Place> place) async {
+      await _placeInsertionAdapter.insertList(place, OnConflictStrategy.abort);
   }
 
   @override

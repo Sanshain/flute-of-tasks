@@ -1,21 +1,23 @@
 import 'package:floor/floor.dart';
+import 'package:json_annotation/json_annotation.dart';
+
 
 import 'dao/tasks_dao.dart';
 import 'database/database.dart';
+import 'dumps.dart';
 
-@entity
-class Place {
+part 'tasks.g.dart';
 
+
+@JsonSerializable()
+@Entity() class Place
+{
     static Places? objects;
 
-//    static TaskDao? tasksHand;
-
     Place(this.id, this.name, this.isActive, {this.tasksAmount = 0});
-
     Place.init(this.name, {this.id, this.isActive = true});
 
-    @PrimaryKey(autoGenerate: true)
-    final int? id;
+    @PrimaryKey(autoGenerate: true) final int? id;
     final String name;
     final bool isActive;
 
@@ -32,10 +34,15 @@ class Place {
             throw Exception('static field database is not defined');
         }
     }
+
+    factory Place.fromJson(Map<String,dynamic> data) => _$PlaceFromJson(data);
+
+    Map<String,dynamic> toJson() => _$PlaceToJson(this);
 }
 
 
 //@entity
+@JsonSerializable()
 @Entity(
     foreignKeys: [
         ForeignKey(
@@ -140,6 +147,10 @@ class Task {
 
         }
     }
+
+    factory Task.fromJson(Map<String,dynamic> data) => _$TaskFromJson(data);
+
+    Map<String,dynamic> toJson() => _$TaskToJson(this);
 
 }
 

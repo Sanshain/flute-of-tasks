@@ -130,7 +130,7 @@ class MainPageState extends State<MainPage> with TasksListView {
                                 if (index == 0) {
                                     return tasksListView(widget: widget, updateState: setState);
                                 } else if (index == 1) {
-                                    return const PlacedTasksPage();
+                                    return PlacedTasksPage(archive: archive, changeState: setState);
                                 } else {
                                     return buildArchiveTab(widget, subContextWrapper, rootContext, inDetail, setState);
                                 }
