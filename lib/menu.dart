@@ -67,6 +67,9 @@ List<PopupMenuItem<Text>> menu(context, widget) {
                     }
                 )
             ),
+
+        if (!kReleaseMode)
+
             PopupMenuItem(
                 child: GestureDetector(
                     child: Row(children: const [Expanded(child: Text('read from backup'))],),
