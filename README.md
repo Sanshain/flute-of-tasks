@@ -1,10 +1,10 @@
 # Flute of tasks
 
-A new Flutter application.
+Flute of tanks is a program for planning your time and priorities. This is a kind of notebook with the ability to group tasks with a convenient and responsive UI interface. The program is open source, and does not serve the purpose of making money.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project has developed via Flutter framework.
 
 A few resources to get you started if this is your first Flutter project:
 
@@ -15,9 +15,11 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-## Development:
+## Development features:
 
 ### Database struct update:
+
+This app uses floor as orm, which has some imperfections. On each code generation you willl need in manual edition generated orm file:
 
 - `flutter packages pub run build_runner build`
 - Then add following lines to constructors with queries having fields named subTasksAmount/doneSubTasksAmount:
