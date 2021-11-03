@@ -1,6 +1,6 @@
 # Flute of tasks
 
-Flute of tanks is a program for planning your time and priorities. This is a kind of notebook with the ability to group tasks with a convenient and responsive UI interface. The program is open source, and does not serve the purpose of making money.
+Flute of tanks is a program for planning your time and priorities. This is a kind of notebook with the ability to group tasks with a convenient and responsive UI interface. The program is open source, and does not serve the purpose of making money. [More](https://sanshain.github.io/flute-of-tasks/)
 
 ## Getting Started
 
@@ -36,6 +36,4 @@ This app uses floor as orm, which has some imperfections. On each code generatio
 
 - `flutter run --release [-t lib/main_page.dart]`
 
-## Useful links:
 
-[Home page](https://sanshain.github.io/flute-of-tasks/)
