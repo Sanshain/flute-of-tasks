@@ -21,12 +21,12 @@ samples, guidance on mobile development, and a full API reference.
 
 - `flutter packages pub run build_runner build`
 - Then add following lines to constructors with queries having fields named subTasksAmount/doneSubTasksAmount:
-    ```
+    ```dart
     subTasksAmount: row['subTasksAmount'] as int?,
     doneSubTasksAmount: row['doneSubTasksAmount'] as int?
     ```
 - Add following line to `getAll()` function in Place constructor:
-    ```
+    ```js
     tasksAmount: row['tasksAmount'] as int
     ```
 
