@@ -1,4 +1,4 @@
-# some_app
+# Flute of tasks
 
 A new Flutter application.
 
@@ -15,8 +15,9 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## Development:
 
-## Database struct update:
+### Database struct update:
 
 - `flutter packages pub run build_runner build`
 - Then add following lines to constructors with queries having fields named subTasksAmount/doneSubTasksAmount:
@@ -33,3 +34,5 @@ samples, guidance on mobile development, and a full API reference.
 ## Build to release:
 
 - `flutter run --release [-t lib/main_page.dart]`
+
+(Home page)[https://sanshain.github.io/flute-of-tasks/]
