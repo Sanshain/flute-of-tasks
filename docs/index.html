@@ -184,13 +184,15 @@
                 display: block;
                 z-index: 2;
                 text-align: center;
+                outline: none;
             }
             .nav:focus{
                 color: red;
             }
             .nav:focus+ul{
                 right: 0;
-                left: min(40vw, 15em);
+                /* left: min(40vw, 20em); */
+                left: min(100% - 40vw, 100% - 15em);
                 z-index: 1;
             }
         }
