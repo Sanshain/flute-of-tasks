@@ -35,6 +35,9 @@
             z-index: 1;
         } */
 
+        .menu{
+            z-index: 1;
+        }
 
         .nav{
             display: none;
@@ -159,6 +162,7 @@
                 top: 0%;
                 bottom: 0;
                 right: min(-40vw, -15em);
+                left: 100vw;
                 /* right: 0; */
                 width: 40vw;
                 min-width: 15em;
@@ -179,12 +183,14 @@
             .nav{
                 display: block;
                 z-index: 2;
+                text-align: center;
             }
             .nav:focus{
                 color: red;
             }
             .nav:focus+ul{
                 right: 0;
+                left: min(40vw, 15em);
                 z-index: 1;
             }
         }
@@ -267,7 +273,7 @@
     <div class="top_bav"><a style="color: gray;" href="#menu">&uArr;</a></div>
 
     <!-- <a style="text-align: center;padding: 1em;display: block;" href="">О проекте</a> -->
-    <a style="text-align: center;padding: 1em;display: block;" href="..">О проекте</a>
+    <a style="text-align: center;padding: 1em;display: block;" href="https://github.com/Sanshain/flute-of-tasks">О проекте</a>
 
 </body>
 </html>
