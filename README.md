@@ -35,4 +35,4 @@ samples, guidance on mobile development, and a full API reference.
 
 - `flutter run --release [-t lib/main_page.dart]`
 
-(Home page)[https://sanshain.github.io/flute-of-tasks/]
+[Home page](https://sanshain.github.io/flute-of-tasks/)
