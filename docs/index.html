@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loved tasks</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+
+
+    <style>
+        *{
+            margin: 0;
+            font-family: 'Comfortaa', cursive;
+            scroll-behavior:smooth;
+            position: relative;
+            color: #333;            
+        }
+        a{
+            color: gray;
+        }
+        /* #about{
+            padding-top: 5em;
+        } */
+        /* .menu{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1;
+        } */
+
+
+        .nav{
+            display: none;
+            position: fixed;
+            right: 0;
+            top: 1em;
+            height: 2em;
+            width: 2em;
+            cursor: pointer;
+        }
+
+        .menu a{
+            text-decoration: none;
+            color: gray;
+            text-transform: uppercase; 
+            line-height: 4em;
+            padding: 0 1.5em;        
+            display: inline-block;   
+        }
+        .menu li{            
+            list-style-type: none;
+            display: inline-block;
+            /* padding: 0 1.5em;             */
+            line-height: 4em;
+            vertical-align: middle;
+            border-bottom: 1px solid transparent;
+            transition: .5s;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;    
+        }     
+        .menu li:hover{
+            border-bottom: 1px solid gray;
+            /* border-bottom: 1px solid red; */
+            /* box-shadow: 0 0 15px gray; */
+            box-shadow: 0 0 15px white;
+            color: #111;
+        }
+        .menu ul{
+            /* display: block; */
+            padding: 0;
+            display: flex;
+            width: 100%;            
+            justify-content:center;
+            background-color: lightcyan;
+            height: 4em;
+            align-items: center;
+            background-color: black;
+            /* background: linear-gradient(to bottom, lightblue, transparent);                 */
+        }   
+
+        h3{
+            color: #333;
+            text-align: center;
+            padding: 1.5em;
+        }
+        p{
+            padding: 0.5em 1em; 
+            line-height: 2em;                       
+        }
+        ul.in_text{
+            padding: 1em 4em;
+        }
+        ul.in_text>li{
+            padding: .5em 0;            
+            color: black;
+            color: #333;   
+        }
+
+        .another{
+            margin: 2em;
+            display: flex;
+            opacity: 0.5;
+            transition: 1s;
+            justify-content: space-around;
+        }
+        .another:hover{
+            opacity: 1;
+        }
+        .another img{
+            max-width: 256px;
+            margin: 1em;            
+        }
+        .another>a{
+            transition: 1s;
+            border: 1px lightgrey solid;
+            border-radius: 1em;
+        }
+        .another>a:hover{
+            box-shadow: 0 0 15px gray;
+        }
+
+        .top_bav{
+            position: fixed;
+            bottom: 2em;
+            right: 2em;
+            width: 3em;
+            height: 3em;
+            background-color: lightgray;
+            cursor: pointer;
+
+            text-align: center;
+            line-height: 3em;
+            color: aliceblue;
+            border-radius: 1em;
+            opacity: 0.5;            
+        }
+        .top_bav>a{
+            color: gray;
+            height: 3em;
+            width: 3em;
+            display: inline-block;
+        }
+        .top_bav:hover{
+            background-color: lightblue;
+        }
+
+        @media screen and (max-width: 960px) {
+
+
+            .menu ul{
+                position: fixed;
+                top: 0%;
+                bottom: 0;
+                right: min(-40vw, -15em);
+                /* right: 0; */
+                width: 40vw;
+                min-width: 15em;
+                height: 100vh;
+                transition: 1s;
+
+                flex-direction: column;
+                justify-content: start;
+            }            
+            .menu ul>li{
+                width: 100%;
+                text-align: center;
+            }
+            .menu ul>li:first-child{
+                margin-top: 3em;
+            }
+
+            .nav{
+                display: block;
+                z-index: 2;
+            }
+            .nav:focus{
+                color: red;
+            }
+            .nav:focus+ul{
+                right: 0;
+                z-index: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu" id="menu">        
+        <nav>
+            <div class="nav" tabindex="0">&#9776;</div>
+            <ul>
+                <li><a href="#about">О программе</a></li>
+                <li><a href="#features">История</a></li>
+                <li><a href="#history">Особенности</a></li>
+                <li><a href="#policy">Политика</a></li>
+                <li><a href="#another">Другие проекты</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <h3 id="about">О программе</h3>
+
+    <p>
+        <b>Loved tasks</b> - программа для планирования своего времени и приоритетов.         
+        Это своего рода записная книжка с возможностью группировки задач с удобным и отзывчивым ui-интерфейсом. Программа имеет открытый исходный код, и не служит целью заработка денег.
+    </p>
+
+
+    <h3 id="features">Особенности</h3>
+
+    <p>
+        Несмотря на все плюсы, нет никаких гарантий, что этот инструмент подойдет именно вам, поскольку у каждого человека свои потребности в инструментарии и свои вкусы к интерфейсу. Я предлагаю лишь то, что подошло мне. 
+    </p>
+
+    <p>На текущий момент приложение обладает следующим функционалом:</p>
+
+    <ul class="in_text">
+        <li>Группировка подзадач</li>
+        <li>Группировка задач по локации</li>
+        <li>Сортировка задач по приоритетам и по времени выполнения</li>
+        <li>Установка примерного времени выполнения задачи и определение оставшегося времени</li>
+        <li>Голосовое внесение задач (долгим нажатием на `+` в правом нижнем углу)</li>
+        <li>Напоминание в шторке униведомлений о предстоящей задаче (на данный момент нестабильно)</li>
+    </ul>
+    
+    <p>В <a href="https://github.com/Sanshain/flutter_tasksman">репозитории</a> на гитхаб я рад обсуждению по улучшению интерфейса пользователя и внедрению новых фич.</p>
+
+
+
+    <h3 id='history'>История создания</h3>
+
+    <p>
+        Когда-то я вел небольшой бизнес, который требовал от меня максимальной отдачи: ежесекундно меняющиеся обстоятельства приводили к постоянной корректировке планов и рабочего распорядка. Часто приходилось много ездить, выбирать приоритеты и оставаться пунктуальным. В тот момент я искал какой-то инструмент, который бы позволял удобно группировать и управлять своими текущими задачами. К счастью, на гугл плэй было огромное множество todo приложений: некоторые из них были слишком простыми и малофункциональными, иные - напротив черезчур усложненными и избыточными. И, меняя их с одного на другое, я никак не мог найти то, которое бы удовлетворяло моим требованиям.
+    </p>
+    
+    <p>
+        С тех пор прошло много времени, но мечта об удобном и универсальном инструменте осталась.
+    </p>
+    
+    <p>
+        Когда я оставил свой бизнес, у меня появилось время. И это время я посвятил созданию такого инструмента.
+    </p>
+
+    <h3 id="policy">Политика конфиденциальности</h3>
+
+    <p>
+        С политикой конфиденциальности можно ознакомиться по <a target="_blank" href="./policy/english.html">следующей ссылке</a>.   
+    </p>
+
+    <h3 id="another">
+        Другие проекты автора
+    </h3>
+
+    <div class="another">
+        <a href="https://coding-style.ru/"  target="_blank">
+            <img src="https://coding-style.ru/static/images/og_logo.png" alt="coding-style.ru" />
+        </a>
+    </div>
+
+    <div class="top_bav"><a style="color: gray;" href="#menu">&uArr;</a></div>
+
+    <a style="text-align: center;padding: 1em;display: block;" href="">О проекте</a>
+
+</body>
+</html>
