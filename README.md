@@ -1,4 +1,4 @@
-# some_app
+# Flute of tasks
 
 A new Flutter application.
 
@@ -15,21 +15,25 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## Development:
 
-## Database struct update:
+### Database struct update:
 
 - `flutter packages pub run build_runner build`
 - Then add following lines to constructors with queries having fields named subTasksAmount/doneSubTasksAmount:
-    ```
-            subTasksAmount: row['subTasksAmount'] as int?,
-            doneSubTasksAmount: row['doneSubTasksAmount'] as int?
+    ```dart
+    subTasksAmount: row['subTasksAmount'] as int?,
+    doneSubTasksAmount: row['doneSubTasksAmount'] as int?
     ```
 - Add following line to `getAll()` function in Place constructor:
+    ```js
+    tasksAmount: row['tasksAmount'] as int
     ```
-            tasksAmount: row['tasksAmount'] as int
-    ```
-- 
 
 ## Build to release:
 
 - `flutter run --release [-t lib/main_page.dart]`
+
+## Useful links:
+
+[Home page](https://sanshain.github.io/flute-of-tasks/)
